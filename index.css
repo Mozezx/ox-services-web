@@ -1,0 +1,18 @@
+/* Navbar scroll effects */
+.navbar {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.navbar.scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(246, 247, 248, 0.98);
+}
+
+.dark .navbar.scrolled {
+    background-color: rgba(19, 29, 31, 0.98);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.navbar.nav-hidden {
+    transform: translateY(-100%);
+}

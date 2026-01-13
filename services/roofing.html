@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OX Services - EPDM Rubber Membrane Roofing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a2329",
+                        "primary-hover": "#0f353d",
+                        "accent": "#57838e",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#131d1f",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .font-body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+
+        .navbar {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar.nav-hidden {
+            transform: translateY(-100%);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-primary dark:text-white font-display antialiased overflow-x-hidden">
+    <div class="flex flex-col min-h-screen">
+        <header id="navbar" class="navbar sticky top-0 z-50 w-full bg-[#0B242A] border-b border-white/10">
+            <div class="mx-auto max-w-[1280px] px-4 md:px-10">
+                <div class="flex h-20 items-center justify-between">
+                    <a href="/" class="flex items-center gap-3">
+                        <img src="/logo.png" alt="OX Services" class="h-16 w-auto rounded-lg" />
+                    </a>
+                    <nav class="hidden md:flex items-center gap-8">
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
+                            href="/#home">Home</a>
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
+                            href="/#services">Services</a>
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
+                            href="/#portfolio">Portfolio</a>
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
+                            href="/#contact">Contact</a>
+                    </nav>
+                    <a href="/#contact"
+                        class="hidden md:flex items-center justify-center rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-[#0B242A] transition hover:bg-gray-100">Get
+                        a Quote</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="relative w-full overflow-hidden bg-background-light dark:bg-background-dark">
+            <div class="mx-auto max-w-[1280px] px-6 py-12 lg:px-8 lg:py-20">
+                <div class="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+                    <div class="flex flex-col justify-center space-y-8">
+                        <div class="space-y-4">
+                            <span
+                                class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary dark:bg-white/10 dark:text-white ring-1 ring-inset ring-primary/20">
+                                Industrial Grade Protection
+                            </span>
+                            <h1
+                                class="text-5xl font-bold tracking-tight text-primary dark:text-white sm:text-6xl xl:text-7xl">
+                                EPDM Rubber Membrane Roofing
+                            </h1>
+                            <p
+                                class="max-w-[600px] text-lg text-primary/70 dark:text-white/70 font-body leading-relaxed">
+                                Industrial-grade EPDM rubber membrane provides a seamless, waterproof barrier with a
+                                50-year life expectancy, ensuring ultimate durability and protection.
+                            </p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="/#contact"
+                                class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-white transition hover:bg-primary-hover">
+                                Get a Quote
+                            </a>
+                            <a href="/#portfolio"
+                                class="inline-flex items-center justify-center rounded-lg border border-primary/20 px-8 py-4 text-base font-bold text-primary transition hover:bg-primary/5">
+                                View Projects
+                            </a>
+                        </div>
+                    </div>
+                    <div class="relative lg:h-full min-h-[400px]">
+                        <div class="relative h-full w-full overflow-hidden rounded-xl shadow-2xl">
+                            <img alt="EPDM roofing installation" class="h-full w-full object-cover"
+                                src="/epdm-roofing.png" />
+                        </div>
+                        <div
+                            class="absolute -bottom-6 -left-6 hidden md:block rounded-lg bg-white p-6 shadow-xl dark:bg-[#1a2629] border border-gray-100 dark:border-gray-700 max-w-xs">
+                            <div class="flex items-start gap-4">
+                                <span
+                                    class="material-symbols-outlined text-3xl text-primary dark:text-white">shield</span>
+                                <div>
+                                    <p class="font-bold text-primary dark:text-white">50 Year Warranty</p>
+                                    <p class="text-sm text-primary/60 dark:text-white/60 font-body">Ultimate protection
+                                        with long-lasting durability.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20 bg-white dark:bg-[#1a2629]">
+            <div class="mx-auto max-w-[1280px] px-6 lg:px-8">
+                <div class="mb-12">
+                    <h2
+                        class="text-3xl font-bold leading-tight tracking-tight text-primary dark:text-white sm:text-4xl">
+                        Superior Protection</h2>
+                    <div class="mt-4 h-1 w-20 bg-primary dark:bg-white"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div
+                        class="p-6 rounded-xl bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-800">
+                        <span
+                            class="material-symbols-outlined text-4xl text-primary dark:text-white mb-4">water_drop</span>
+                        <h3 class="text-xl font-bold text-primary dark:text-white mb-2">100% Waterproof</h3>
+                        <p class="text-primary/70 dark:text-white/70 font-body">Seamless membrane technology eliminates
+                            leak points completely.</p>
+                    </div>
+                    <div
+                        class="p-6 rounded-xl bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-800">
+                        <span
+                            class="material-symbols-outlined text-4xl text-primary dark:text-white mb-4">thermostat</span>
+                        <h3 class="text-xl font-bold text-primary dark:text-white mb-2">Weather Resistant</h3>
+                        <p class="text-primary/70 dark:text-white/70 font-body">Withstands extreme temperatures from
+                            -40°C to +120°C.</p>
+                    </div>
+                    <div
+                        class="p-6 rounded-xl bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-800">
+                        <span
+                            class="material-symbols-outlined text-4xl text-primary dark:text-white mb-4">schedule</span>
+                        <h3 class="text-xl font-bold text-primary dark:text-white mb-2">Long Lifespan</h3>
+                        <p class="text-primary/70 dark:text-white/70 font-body">50+ years of reliable protection with
+                            minimal maintenance.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solutions Grid -->
+        <section class="py-20 bg-background-light dark:bg-background-dark">
+            <div class="mx-auto max-w-[1280px] px-6 lg:px-8">
+                <div class="mb-12">
+                    <h2
+                        class="text-3xl font-bold leading-tight tracking-tight text-primary dark:text-white sm:text-4xl">
+                        Our Roofing Solutions</h2>
+                    <p class="mt-4 text-lg text-primary/70 dark:text-white/70 max-w-2xl font-body">
+                        Complete roofing solutions for commercial and industrial buildings.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div
+                        class="group relative flex flex-col overflow-hidden rounded-xl bg-white dark:bg-[#1a2629] shadow-sm transition hover:shadow-md border border-gray-100 dark:border-gray-800">
+                        <div class="aspect-[4/3] w-full overflow-hidden">
+                            <img alt="Flat roof"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800" />
+                        </div>
+                        <div class="flex flex-1 flex-col p-6">
+                            <h3 class="text-xl font-bold text-primary dark:text-white">Flat Roof Systems</h3>
+                            <p class="mt-2 text-sm text-primary/60 dark:text-white/60 font-body">Complete flat roof
+                                installations with proper drainage solutions.</p>
+                        </div>
+                    </div>
+                    <div
+                        class="group relative flex flex-col overflow-hidden rounded-xl bg-white dark:bg-[#1a2629] shadow-sm transition hover:shadow-md border border-gray-100 dark:border-gray-800">
+                        <div class="aspect-[4/3] w-full overflow-hidden">
+                            <img alt="Roof repair"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800" />
+                        </div>
+                        <div class="flex flex-1 flex-col p-6">
+                            <h3 class="text-xl font-bold text-primary dark:text-white">Roof Repairs</h3>
+                            <p class="mt-2 text-sm text-primary/60 dark:text-white/60 font-body">Expert repair services
+                                for existing EPDM and other flat roof systems.</p>
+                        </div>
+                    </div>
+                    <div
+                        class="group relative flex flex-col overflow-hidden rounded-xl bg-white dark:bg-[#1a2629] shadow-sm transition hover:shadow-md border border-gray-100 dark:border-gray-800">
+                        <div class="aspect-[4/3] w-full overflow-hidden">
+                            <img alt="Green roof"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=800" />
+                        </div>
+                        <div class="flex flex-1 flex-col p-6">
+                            <h3 class="text-xl font-bold text-primary dark:text-white">Green Roofs</h3>
+                            <p class="mt-2 text-sm text-primary/60 dark:text-white/60 font-body">EPDM as a base for
+                                sustainable green roof installations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="bg-primary dark:bg-black py-20">
+            <div class="mx-auto max-w-[960px] px-6 text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Protect your building for decades
+                </h2>
+                <p class="mt-4 text-lg text-white/70 font-body">
+                    Get a free roof inspection and quote today.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="/#contact"
+                        class="flex items-center justify-center rounded-lg bg-white px-8 py-4 text-base font-bold text-primary transition hover:bg-gray-100 min-w-[200px]">
+                        Request Quote
+                    </a>
+                    <a href="/"
+                        class="flex items-center justify-center rounded-lg border border-white/20 bg-transparent px-8 py-4 text-base font-bold text-white transition hover:bg-white/5 min-w-[200px]">
+                        Back to Home
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-primary dark:bg-black text-white py-12 border-t border-white/10">
+            <div class="mx-auto max-w-[1280px] px-6 lg:px-8">
+                <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-xs text-white/40 font-body">© 2024 OX Services. All rights reserved.</p>
+                    <a href="/" class="text-xs text-white/40 hover:text-white transition">Back to Home</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script>
+        const navbar = document.getElementById('navbar');
+        let lastScrollY = window.scrollY;
+        window.addEventListener('scroll', () => {
+            if (!navbar) return;
+            const currentY = window.scrollY;
+            if (currentY > 40) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
+            if (currentY > lastScrollY + 6 && currentY > 40) navbar.classList.add('nav-hidden');
+            else if (currentY < lastScrollY - 6) navbar.classList.remove('nav-hidden');
+            if (currentY < 10) navbar.classList.remove('nav-hidden');
+            lastScrollY = currentY;
+        });
+    </script>
+</body>
+
+</html>
