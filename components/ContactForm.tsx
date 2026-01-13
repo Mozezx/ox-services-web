@@ -77,7 +77,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
         setSubmitError(null);
 
         try {
-            const { error } = await supabase.from('leads').insert([
+            // Salvar no Supabase
+            const { error: supabaseError } = await supabase.from('leads').insert([
                 {
                     full_name: formData.fullName,
                     company: formData.company,
@@ -87,11 +88,32 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
                 }
             ]);
 
-            if (error) {
-                console.error('Supabase error:', error);
+            if (supabaseError) {
+                console.error('Supabase error:', supabaseError);
                 setSubmitError('Erro ao enviar. Por favor, tente novamente.');
                 setIsSubmitting(false);
                 return;
+            }
+
+            // Enviar e-mail via API
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+            const response = await fetch(`${apiUrl}/contact`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    fullName: formData.fullName,
+                    company: formData.company,
+                    email: formData.email,
+                    phone: formData.phone,
+                    message: formData.message,
+                }),
+            });
+
+            if (!response.ok) {
+                console.warn('Email API error:', await response.text());
+                // Não falhar se o e-mail não enviar, dados já foram salvos
             }
 
             setIsSubmitting(false);
@@ -102,6 +124,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
             setIsSubmitting(false);
         }
     };
+
 
     if (isSubmitted) {
         return (
