@@ -53,7 +53,7 @@ const Header: React.FC<HeaderProps> = ({ companyName, navLinks, ctaButtonText })
             <div className="mx-auto max-w-[1280px] px-4 md:px-10">
                 <div className="flex items-center justify-between h-20">
                     <a href="#home" className="flex items-center gap-3 text-primary dark:text-white" aria-label={`${companyName} homepage`}>
-                        <img src="/logo.png" alt={companyName} className="h-16 w-auto rounded-lg" />
+                        <img src="https://res.cloudinary.com/dswtssvkq/image/upload/v1766195939/logo1_x7rihp.png" alt={companyName} className="h-16 w-auto rounded-lg" />
                     </a>
 
                     <nav className="hidden md:flex items-center gap-8">
