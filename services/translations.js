@@ -345,10 +345,10 @@ const languageNames = {
 };
 
 const languageFlags = {
-    en: '🇬🇧',
-    nl: '🇳🇱',
-    es: '🇪🇸',
-    fr: '🇫🇷'
+    en: 'flags/gb.svg',
+    nl: 'flags/nl.svg',
+    es: 'flags/es.svg',
+    fr: 'flags/fr.svg'
 };
 
 // Get current language from localStorage
@@ -424,7 +424,7 @@ function createLanguageSelector() {
             <div id="lang-dropdown-menu" class="hidden absolute right-0 mt-2 w-40 bg-white dark:bg-[#1a2629] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
                 ${['en', 'nl', 'es', 'fr'].map(lang => `
                     <button onclick="setLanguage('${lang}')" class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${currentLang === lang ? 'bg-gray-100 dark:bg-white/10' : ''}">
-                        <span class="text-lg">${languageFlags[lang]}</span>
+                        <img src="${languageFlags[lang]}" alt="${languageNames[lang]}" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
                         <span class="text-sm font-medium text-primary dark:text-white">${languageNames[lang]}</span>
                         ${currentLang === lang ? '<span class="material-symbols-outlined text-primary dark:text-white text-sm ml-auto">check</span>' : ''}
                     </button>
@@ -442,7 +442,7 @@ function createLanguageSelector() {
             <div id="lang-dropdown-menu-mobile" class="hidden absolute right-0 mt-2 w-40 bg-white dark:bg-[#1a2629] rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50">
                 ${['en', 'nl', 'es', 'fr'].map(lang => `
                     <button onclick="setLanguage('${lang}')" class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-white/5 transition-colors ${currentLang === lang ? 'bg-gray-100 dark:bg-white/10' : ''}">
-                        <span class="text-lg">${languageFlags[lang]}</span>
+                        <img src="${languageFlags[lang]}" alt="${languageNames[lang]}" class="w-5 h-3.5 object-cover rounded-sm shadow-sm">
                         <span class="text-sm font-medium text-primary dark:text-white">${languageNames[lang]}</span>
                         ${currentLang === lang ? '<span class="material-symbols-outlined text-primary dark:text-white text-sm ml-auto">check</span>' : ''}
                     </button>

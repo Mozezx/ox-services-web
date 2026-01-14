@@ -43,7 +43,7 @@ const LanguageSelector: React.FC = () => {
                             className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-primary/5 dark:hover:bg-white/5 transition-colors ${language === lang ? 'bg-primary/10 dark:bg-white/10' : ''
                                 }`}
                         >
-                            <span className="text-lg">{languageFlags[lang]}</span>
+                            <img src={languageFlags[lang]} alt={languageNames[lang]} className="w-5 h-3.5 object-cover rounded-sm shadow-sm" />
                             <span className="text-sm font-medium text-primary dark:text-white">
                                 {languageNames[lang]}
                             </span>

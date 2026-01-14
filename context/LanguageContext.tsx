@@ -761,8 +761,8 @@ export const languageNames: Record<Language, string> = {
 };
 
 export const languageFlags: Record<Language, string> = {
-    en: '🇬🇧',
-    nl: '🇳🇱',
-    es: '🇪🇸',
-    fr: '🇫🇷',
+    en: '/flags/gb.svg',
+    nl: '/flags/nl.svg',
+    es: '/flags/es.svg',
+    fr: '/flags/fr.svg',
 };
