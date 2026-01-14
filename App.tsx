@@ -9,10 +9,11 @@ import CtaSection from './components/CtaSection';
 import ContactForm from './components/ContactForm';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
-
-import { textData } from './text';
+import { useLanguage } from './context/LanguageContext';
 
 const App: React.FC = () => {
+    const { textData } = useLanguage();
+
     return (
         <div className="flex flex-col min-h-screen">
             <Header

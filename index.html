@@ -18,9 +18,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Noto+Sans:wght@400;500;700&display=swap"
     rel="stylesheet">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-    rel="stylesheet" />
+  <link href="/fonts/material-symbols.css" rel="stylesheet" />
 
   <script>
     tailwind.config = {
@@ -57,6 +55,25 @@
 }
 </script>
   <link rel="stylesheet" href="/index.css">
+  <style>
+    /* Force sidebar background - highest specificity */
+    div[style*="backgroundColor"] {
+      background-color: #ffffff !important;
+      background-image: none !important;
+      opacity: 1 !important;
+    }
+
+    /* Additional sidebar fix */
+    .fixed.right-0.h-full.w-\[280px\] {
+      background-color: #ffffff !important;
+      background-image: none !important;
+    }
+
+    .fixed.right-0.h-full.w-\[280px\]>div {
+      background-color: #ffffff !important;
+      background-image: none !important;
+    }
+  </style>
 </head>
 
 <body class="bg-[#0B242A] text-white antialiased">

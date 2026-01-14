@@ -16,3 +16,12 @@
 .navbar.nav-hidden {
     transform: translateY(-100%);
 }
+
+/* Sidebar solid background */
+.sidebar-bg {
+    background-color: #ffffff !important;
+}
+
+.sidebar-bg>div {
+    background-color: #ffffff !important;
+}

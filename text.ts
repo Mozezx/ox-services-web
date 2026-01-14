@@ -37,7 +37,7 @@ export const textData = {
         icon: "window",
         title: "Aluminum Joinery & Glazing",
         description: "Harnessing technical precision, our windows and doors offer unparalleled thermal performance and durability, enhancing any architectural design.",
-        imageUrl: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80",
+        imageUrl: "/aluminum-joinery.png",
         altText: "A close-up of a sleek, modern aluminum window frame with high-performance glazing."
       },
       {
@@ -74,7 +74,7 @@ export const textData = {
         id: "p1",
         title: "Complete Home Renovation",
         category: "Full Renovation",
-        imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80",
+        imageUrl: "https://images.unsplash.com/photo-1581858726788-75bc0f6a952d?w=1600&q=80",
         videoUrl: "https://res.cloudinary.com/dswtssvkq/video/upload/v1766092988/1218_kli8yz.mp4",
         altText: "Complete home renovation before and after transformation."
       },

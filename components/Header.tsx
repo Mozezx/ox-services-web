@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import LanguageSelector from './LanguageSelector';
 
 interface NavLink {
     name: string;
@@ -30,7 +31,8 @@ const Header: React.FC<HeaderProps> = ({ companyName, navLinks, ctaButtonText })
             }
 
             // Esconde ao rolar para baixo, mostra ao rolar para cima
-            if (currentY > lastScrollY.current + 6 && currentY > 40) {
+            // NÃO esconde se o menu mobile estiver aberto
+            if (!isMenuOpen && currentY > lastScrollY.current + 6 && currentY > 40) {
                 setIsHidden(true);
             } else if (currentY < lastScrollY.current - 6) {
                 setIsHidden(false);
@@ -46,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ companyName, navLinks, ctaButtonText })
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [isMenuOpen]);
 
     return (
         <header className={`navbar sticky top-0 z-50 w-full bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 transition-all duration-300 ${isScrolled ? 'scrolled' : ''} ${isHidden ? 'nav-hidden' : ''}`}>
@@ -64,15 +66,19 @@ const Header: React.FC<HeaderProps> = ({ companyName, navLinks, ctaButtonText })
                         ))}
                     </nav>
 
-                    <div className="hidden md:flex items-center">
+                    <div className="hidden md:flex items-center gap-4">
+                        <LanguageSelector />
                         <a href="#contact" className="flex items-center justify-center rounded-lg h-10 px-6 bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-colors">
                             {ctaButtonText}
                         </a>
                     </div>
 
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="md:hidden text-primary dark:text-white" aria-label="Toggle mobile menu" aria-expanded={isMenuOpen}>
-                        <span className="material-symbols-outlined text-3xl">{isMenuOpen ? 'close' : 'menu'}</span>
-                    </button>
+                    <div className="flex items-center gap-2 md:hidden">
+                        <LanguageSelector />
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-primary dark:text-white" aria-label="Toggle mobile menu" aria-expanded={isMenuOpen}>
+                            <span className="material-symbols-outlined text-3xl">{isMenuOpen ? 'close' : 'menu'}</span>
+                        </button>
+                    </div>
                 </div>
                 {isMenuOpen && (
                     <div className="md:hidden pb-4">

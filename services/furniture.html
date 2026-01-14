@@ -11,13 +11,8 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&amp;display=swap"
         rel="stylesheet" />
-    <!-- Material Symbols -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-        rel="stylesheet" />
+    <!-- Material Symbols (Local) -->
+    <link href="fonts/material-symbols.css" rel="stylesheet" />
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <!-- Theme Config -->
@@ -67,6 +62,16 @@
         .navbar.nav-hidden {
             transform: translateY(-100%);
         }
+
+        /* Sidebar animations */
+        .sidebar-enter {
+            transform: translateX(100%);
+        }
+
+        .sidebar-enter-active {
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out;
+        }
     </style>
 </head>
 
@@ -78,21 +83,73 @@
                 <div class="flex h-20 items-center justify-between">
                     <a href="/" class="flex items-center gap-3">
                         <img src="https://res.cloudinary.com/dswtssvkq/image/upload/v1766195939/logo1_x7rihp.png"
-                            alt="OX Services" class="h-16 w-auto rounded-lg" />
+                            alt="OX Services" class="h-12 md:h-16 w-auto rounded-lg" />
                     </a>
                     <nav class="hidden md:flex items-center gap-8">
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors" href="/#home"
+                            data-translate="nav-home">Home</a>
                         <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
-                            href="/#home">Home</a>
+                            href="/#services" data-translate="nav-services">Services</a>
                         <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
-                            href="/#services">Services</a>
-                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
-                            href="/#portfolio">Portfolio</a>
-                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors"
-                            href="/#contact">Contact</a>
+                            href="/#portfolio" data-translate="nav-portfolio">Portfolio</a>
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors" href="/#contact"
+                            data-translate="nav-contact">Contact</a>
                     </nav>
-                    <a href="/#contact"
-                        class="hidden md:flex items-center justify-center rounded-lg bg-white px-6 py-2.5 text-sm font-bold text-[#0B242A] transition hover:bg-gray-100">Get
-                        a Quote</a>
+                    <div class="hidden md:flex items-center gap-4">
+                        <div id="language-selector-container"></div>
+                        <a href="/#contact"
+                            class="flex items-center justify-center rounded-lg bg-white px-6 h-10 text-sm font-bold text-[#0B242A] transition hover:bg-gray-100"
+                            data-translate="nav-getQuote">Get
+                            a Quote</a>
+                    </div>
+                    <div class="flex items-center gap-2 md:hidden">
+                        <div id="language-selector-container-mobile"></div>
+                        <button id="mobile-menu-btn" class="text-white" aria-label="Toggle mobile menu">
+                            <span class="material-symbols-outlined text-3xl">menu</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overlay -->
+            <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300"
+                onclick="closeSidebar()"></div>
+
+            <!-- Sidebar -->
+            <div id="sidebar"
+                class="fixed top-0 right-0 h-full w-[280px] bg-white dark:bg-[#1a2629] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+                <div class="flex flex-col h-full">
+                    <!-- Sidebar Header -->
+                    <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-lg font-bold text-primary dark:text-white">OX Services</span>
+                        <button onclick="closeSidebar()" class="text-primary dark:text-white" aria-label="Close menu">
+                            <span class="material-symbols-outlined text-3xl">close</span>
+                        </button>
+                    </div>
+
+                    <!-- Sidebar Navigation -->
+                    <nav class="flex flex-col p-6 gap-2 flex-1">
+                        <a href="/#home" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-home">Home</a>
+                        <a href="/#services" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-services">Services</a>
+                        <a href="/#portfolio" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-portfolio">Portfolio</a>
+                        <a href="/#contact" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-contact">Contact</a>
+                    </nav>
+
+                    <!-- Sidebar Footer -->
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-700">
+                        <a href="/#contact" onclick="closeSidebar()"
+                            class="w-full flex items-center justify-center rounded-lg h-12 px-6 bg-primary text-white hover:bg-primary-hover text-base font-bold transition-colors"
+                            data-translate="nav-getQuote">Get
+                            a Quote</a>
+                    </div>
                 </div>
             </div>
         </header>
@@ -106,25 +163,27 @@
                                 class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary dark:bg-white/10 dark:text-white ring-1 ring-inset ring-primary/20">
                                 Premium Infrastructure
                             </span>
-                            <h1
-                                class="text-5xl font-bold tracking-tight text-primary dark:text-white sm:text-6xl xl:text-7xl">
+                            <h1 class="text-5xl font-bold tracking-tight text-primary dark:text-white sm:text-6xl xl:text-7xl"
+                                data-translate="furniture-title">
                                 Bespoke Interior Craftsmanship
                             </h1>
-                            <p
-                                class="max-w-[600px] text-lg text-primary/70 dark:text-white/70 font-body leading-relaxed">
+                            <p class="max-w-[600px] text-lg text-primary/70 dark:text-white/70 font-body leading-relaxed"
+                                data-translate="furniture-description">
                                 Elevating corporate environments with precision-engineered doors and custom joinery.
                                 Experience the intersection of industrial strength and modern finesse.
                             </p>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <button
-                                class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-white transition hover:bg-primary-hover dark:bg-white dark:text-primary dark:hover:bg-gray-100">
-                                Explore Portfolio
-                            </button>
-                            <button
-                                class="inline-flex items-center justify-center rounded-lg border border-primary/20 px-8 py-4 text-base font-bold text-primary transition hover:bg-primary/5 dark:border-white/20 dark:text-white dark:hover:bg-white/5">
-                                Download Catalogue
-                            </button>
+                            <a href="/#portfolio"
+                                class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-white transition hover:bg-primary-hover dark:bg-white dark:text-primary dark:hover:bg-gray-100"
+                                data-translate="common-viewProjects">
+                                View Projects
+                            </a>
+                            <a href="/#contact"
+                                class="inline-flex items-center justify-center rounded-lg border border-primary/20 px-8 py-4 text-base font-bold text-primary transition hover:bg-primary/5 dark:border-white/20 dark:text-white dark:hover:bg-white/5"
+                                data-translate="nav-getQuote">
+                                Get a Quote
+                            </a>
                         </div>
                     </div>
                     <div class="relative lg:h-full min-h-[400px]">
@@ -224,7 +283,7 @@
                             <img alt="Modern executive desk with dark wood and clean lines"
                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                 data-alt="Modern executive desk with dark wood and clean lines"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0991qvIBUoD3AYC0iQETKWiq8KClT7MVjhY-3Mk4xcGcgJr2Q00xAmDI4qiKzCgatPxh3bKalCobeAIWfXA1tQoKWrGW7yPEqLmDxvC8jowVTH2AOdV_NiyPY2Rz5nucY-7_5evyA_K45nphVD0R9_oHFyeEvM_9ifP2eRGCqOOInUpNQKSpW27ZrO0ic5eDNXuQHwV5Rd1qiRivJntSp25WNru4QlX6550T4xQ4oHxl-636hG5_UP-Lu_y-KdGX5LgSz6ZPXFak" />
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0991qvIBUoD3AYC0iQETKWiq8KClT7MVjhY-3Mk4xcGcgJr2Q00xAmDI4qiKzCgatPxh3bKalCobeAIWfXA1tQoKWrGW7yPEqLmDxvC8jowVTH2AOdV_NiyPY2R5nucY-7_5evyA_K45nphVD0R9_oHFyeEvM_9ifP2eRGCqOOInUpNQKSpW25WNru4QlX6550T4xQ4oHxl-636hG5_UP-Lu_y-KdGX5LgSz6ZPXFak" />
                         </div>
                         <div class="flex flex-1 flex-col p-6">
                             <h3 class="text-xl font-bold text-primary dark:text-white">Executive Desks</h3>
@@ -270,7 +329,7 @@
                             <img alt="Custom wall cabinetry and shelving unit"
                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                                 data-alt="Custom wall cabinetry and shelving unit"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-zfrKZagXWfsFjJ75XUtD8LzHXLfAH3I__wrGWJGEPatE0d7UDQo1CU8aC7TnMx52VBtSe6eN-X0IYdFnlj8XmXm1YwnNhXPJEup9CHrayrwxDEXxHghzkWlLmdTzw7TTuLOewbkow1-tnwVU3pbA-IkWe80Bre99Bvh8z3Fpoh6h-aXh-sbYPb_4hTkHQKLBfeFwWEuhAghpcJphwbfgwGy0uCKvW6KRaxwsmXIVenJsCjCtssMV1FG1-ztDsuUUunYjnSc3aoyL" />
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-zfrKZagXWfsFjJ75XUtD8LzHXLfAH3I__wrGWJGEPatE0d7UDQo1CU8aC7TnMx52VBtSe6eN-X0IYdFnlj8XmXm1YwnNhXPJEup9CHrayrwxDEXxHghzkWlLmdTzw3TTuLOewbkow1-tnwVU3pbA-IkWe80Bre99Bvh8z3Fpoh6h-aXh-sbYPb_4hTkHQKLBfeFwWEuhAghpcJphwbfgwGy0uCKvW6KRaxwsmXIVenJsCjCtssMV1FG1-ztDsuUUunYjnSc3aoyL" />
                         </div>
                         <div class="flex flex-1 flex-col p-6">
                             <h3 class="text-xl font-bold text-primary dark:text-white">Integrated Cabinetry</h3>
@@ -578,7 +637,36 @@
             if (currentY < 10) navbar.classList.remove('nav-hidden');
             lastScrollY = currentY;
         });
+
+        // Sidebar toggle functions
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const menuIcon = mobileMenuBtn.querySelector('.material-symbols-outlined');
+
+        function openSidebar() {
+            sidebar.classList.remove('translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            overlay.classList.remove('hidden');
+            menuIcon.textContent = 'close';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('translate-x-full');
+            sidebar.classList.remove('translate-x-0');
+            overlay.classList.add('hidden');
+            menuIcon.textContent = 'menu';
+        }
+
+        mobileMenuBtn.addEventListener('click', () => {
+            if (sidebar.classList.contains('translate-x-full')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        });
     </script>
+    <script src="translations.js"></script>
 </body>
 
 </html>
