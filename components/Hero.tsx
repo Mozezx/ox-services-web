@@ -18,7 +18,7 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
             <div className="w-full max-w-[1280px]">
                 <div
                     className="relative overflow-hidden rounded-xl bg-primary min-h-[600px] flex flex-col justify-end p-8 md:p-16 bg-cover bg-center"
-                    style={{ backgroundImage: `linear-gradient(rgba(11, 36, 42, 0.3) 0%, rgba(11, 36, 42, 0.8) 100%), url('/hero-background.png')` }}
+                    style={{ backgroundImage: `linear-gradient(rgba(11, 36, 42, 0.3) 0%, rgba(11, 36, 42, 0.8) 100%), url('/hero-background-new.png')` }}
                     role="banner"
                     aria-label={content.backgroundImageAlt}
                 >
