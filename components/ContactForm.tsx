@@ -96,7 +96,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
             }
 
             // Enviar e-mail via API
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+            const apiUrl = import.meta.env.VITE_API_URL || 'https://oxservices.org/api';
             const response = await fetch(`${apiUrl}/contact`, {
                 method: 'POST',
                 headers: {
@@ -149,27 +149,27 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-primary/80 dark:text-white/80">{form.fullNameLabel}</label>
-                            <input type="text" name="fullName" id="fullName" value={formData.fullName} onChange={handleChange} placeholder={form.fullNamePlaceholder} aria-label={form.fullNameLabel} required aria-invalid={!!errors.fullName} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-background-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
+                            <input type="text" name="fullName" id="fullName" value={formData.fullName} onChange={handleChange} placeholder={form.fullNamePlaceholder} aria-label={form.fullNameLabel} required aria-invalid={!!errors.fullName} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-primary dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
                             {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
                         </div>
                         <div>
                             <label htmlFor="company" className="block text-sm font-medium text-primary/80 dark:text-white/80">{form.companyLabel}</label>
-                            <input type="text" name="company" id="company" value={formData.company} onChange={handleChange} placeholder={form.companyPlaceholder} aria-label={form.companyLabel} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-background-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
+                            <input type="text" name="company" id="company" value={formData.company} onChange={handleChange} placeholder={form.companyPlaceholder} aria-label={form.companyLabel} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-primary dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
                         </div>
                     </div>
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium text-primary/80 dark:text-white/80">{form.emailLabel}</label>
-                        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} placeholder={form.emailPlaceholder} aria-label={form.emailLabel} required aria-invalid={!!errors.email} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-background-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
+                        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} placeholder={form.emailPlaceholder} aria-label={form.emailLabel} required aria-invalid={!!errors.email} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-primary dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
                         {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
                     </div>
                     <div>
                         <label htmlFor="phone" className="block text-sm font-medium text-primary/80 dark:text-white/80">{form.phoneLabel}</label>
-                        <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleChange} placeholder={form.phonePlaceholder} aria-label={form.phoneLabel} aria-invalid={!!errors.phone} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-background-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
+                        <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleChange} placeholder={form.phonePlaceholder} aria-label={form.phoneLabel} aria-invalid={!!errors.phone} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-primary dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm" />
                         {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
                     </div>
                     <div>
                         <label htmlFor="message" className="block text-sm font-medium text-primary/80 dark:text-white/80">{form.messageLabel}</label>
-                        <textarea name="message" id="message" value={formData.message} onChange={handleChange} rows={4} placeholder={form.messagePlaceholder} aria-label={form.messageLabel} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-background-dark shadow-sm focus:border-primary focus:ring-primary sm:text-sm"></textarea>
+                        <textarea name="message" id="message" value={formData.message} onChange={handleChange} rows={4} placeholder={form.messagePlaceholder} aria-label={form.messageLabel} className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-background-dark text-primary dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm"></textarea>
                     </div>
                     <div>
                         {submitError && <p className="mb-3 text-sm text-red-500 text-center">{submitError}</p>}
