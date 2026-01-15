@@ -35,7 +35,7 @@ const PortfolioGrid: React.FC<PortfolioGridProps> = ({ content }) => {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[350px]">
                     {content.projects.map((project, index) => (
-                        <a key={project.id} href="#portfolio" className={`group relative overflow-hidden rounded-xl cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-300 ${index === 0 ? 'md:col-span-2' : ''}`}>
+                        <div key={project.id} className={`group relative overflow-hidden rounded-xl shadow-sm hover:shadow-2xl transition-all duration-300 ${index === 0 ? 'md:col-span-2' : ''}`}>
                             {index === 0 && project.videoUrl && !isMobile ? (
                                 <>
                                     {/* Always show poster image, hide it when video loads */}
@@ -61,11 +61,11 @@ const PortfolioGrid: React.FC<PortfolioGridProps> = ({ content }) => {
                             ) : (
                                 <img src={project.imageUrl} alt={project.altText} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                             )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                <span className="text-white/70 text-xs font-bold uppercase tracking-widest mb-1 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75">{project.category}</span>
-                                <h3 className="text-white text-xl font-bold font-display translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100">{project.title}</h3>
+                            <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                                <span className="text-white/70 text-xs font-bold uppercase tracking-widest mb-1 transition-transform duration-300 delay-75">{project.category}</span>
+                                <h3 className="text-white text-xl font-bold font-display transition-transform duration-300 delay-100">{project.title}</h3>
                             </div>
-                        </a>
+                        </div>
                     ))}
                 </div>
             </div>
