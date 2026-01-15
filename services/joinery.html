@@ -145,23 +145,22 @@
             </div>
         </header>
 
-        <!-- Hero Section -->
-        <section class="w-full flex justify-center py-5 px-4 md:px-10">
+        <!-- Hero Section - Mobile (background image) -->
+        <section class="w-full flex justify-center py-5 px-4 md:hidden">
             <div class="w-full max-w-[1280px]">
-                <div class="relative overflow-hidden rounded-xl bg-primary min-h-[500px] md:min-h-[600px] flex flex-col justify-end p-8 md:p-16 bg-cover bg-center"
+                <div class="relative overflow-hidden rounded-xl bg-primary min-h-[500px] flex flex-col justify-end p-8 bg-cover bg-center"
                     style="background-image: linear-gradient(rgba(11, 36, 42, 0.3) 0%, rgba(11, 36, 42, 0.8) 100%), url('https://images.unsplash.com/photo-1497366216548-37526070297c?w=1600&q=80')"
                     role="banner">
                     <div class="max-w-[720px] flex flex-col gap-6">
                         <div class="flex items-center gap-2 text-white/90">
                             <span class="material-symbols-outlined text-sm">verified</span>
-                            <span class="text-xs md:text-sm font-bold tracking-wider uppercase">Premium
-                                Infrastructure</span>
+                            <span class="text-xs font-bold tracking-wider uppercase">Premium Infrastructure</span>
                         </div>
-                        <h1 class="text-white text-4xl md:text-6xl lg:text-7xl font-bold font-display leading-tight tracking-tighter"
+                        <h1 class="text-white text-4xl font-bold font-display leading-tight tracking-tighter"
                             data-translate="joinery-title">
                             Aluminum Joinery & Glazing
                         </h1>
-                        <p class="text-white/90 text-base md:text-xl font-normal font-body leading-relaxed max-w-[600px]"
+                        <p class="text-white/90 text-base font-normal font-body leading-relaxed"
                             data-translate="joinery-description">
                             Precision-engineered windows and doors that offer unparalleled thermal performance and
                             durability. Enhance any architectural design with our premium aluminum solutions.
@@ -177,6 +176,61 @@
                                 data-translate="common-viewProjects">
                                 View Projects
                             </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Section - Desktop (2 columns) -->
+        <section class="relative w-full overflow-hidden bg-background-light dark:bg-background-dark hidden md:block">
+            <div class="mx-auto max-w-[1280px] px-6 py-12 lg:px-8 lg:py-20">
+                <div class="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+                    <div class="flex flex-col justify-center space-y-8">
+                        <div class="space-y-4">
+                            <span
+                                class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary dark:bg-white/10 dark:text-white ring-1 ring-inset ring-primary/20">
+                                Premium Infrastructure
+                            </span>
+                            <h1 class="text-5xl font-bold tracking-tight text-primary dark:text-white sm:text-6xl xl:text-7xl"
+                                data-translate="joinery-title">
+                                Aluminum Joinery & Glazing
+                            </h1>
+                            <p class="max-w-[600px] text-lg text-primary/70 dark:text-white/70 font-body leading-relaxed"
+                                data-translate="joinery-description">
+                                Precision-engineered windows and doors that offer unparalleled thermal performance and
+                                durability. Enhance any architectural design with our premium aluminum solutions.
+                            </p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="/#contact"
+                                class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-white transition hover:bg-primary-hover"
+                                data-translate="nav-getQuote">
+                                Get a Quote
+                            </a>
+                            <a href="/#portfolio"
+                                class="inline-flex items-center justify-center rounded-lg border border-primary/20 px-8 py-4 text-base font-bold text-primary transition hover:bg-primary/5"
+                                data-translate="common-viewProjects">
+                                View Projects
+                            </a>
+                        </div>
+                    </div>
+                    <div class="relative lg:h-full min-h-[400px]">
+                        <div class="relative h-full w-full overflow-hidden rounded-xl shadow-2xl">
+                            <img alt="Modern aluminum windows in luxury building" class="h-full w-full object-cover"
+                                src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800" />
+                        </div>
+                        <div
+                            class="absolute -bottom-6 -left-6 rounded-lg bg-white p-6 shadow-xl dark:bg-[#1a2629] border border-gray-100 dark:border-gray-700 max-w-xs">
+                            <div class="flex items-start gap-4">
+                                <span
+                                    class="material-symbols-outlined text-3xl text-primary dark:text-white">verified</span>
+                                <div>
+                                    <p class="font-bold text-primary dark:text-white">Energy Efficient</p>
+                                    <p class="text-sm text-primary/60 dark:text-white/60 font-body">Superior thermal
+                                        insulation & noise reduction.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
