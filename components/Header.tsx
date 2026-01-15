@@ -76,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ companyName, navLinks, ctaButtonText })
                     <div className="flex items-center gap-2 md:hidden">
                         <LanguageSelector />
                         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-primary dark:text-white" aria-label="Toggle mobile menu" aria-expanded={isMenuOpen}>
-                            <span className="material-symbols-outlined text-3xl">{isMenuOpen ? 'close' : 'menu'}</span>
+                            <span className="material-symbols-outlined text-3xl notranslate" translate="no">{isMenuOpen ? 'close' : 'menu'}</span>
                         </button>
                     </div>
                 </div>

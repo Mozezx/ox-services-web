@@ -130,7 +130,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
         return (
             <div className="w-full flex justify-center py-20 px-4 md:px-10 bg-[#0B242A]">
                 <div className="w-full max-w-2xl text-center p-12 bg-white dark:bg-[#1a2629] rounded-xl shadow-lg">
-                    <span className="material-symbols-outlined text-5xl text-green-500">check_circle</span>
+                    <span className="material-symbols-outlined text-5xl text-green-500 notranslate" translate="no">check_circle</span>
                     <h3 className="text-2xl font-bold mt-4 text-primary dark:text-white">{form.successMessage.split('!')[0]}!</h3>
                     <p className="text-primary/70 dark:text-white/70 mt-2">{form.successMessage.split('!')[1]}</p>
                 </div>

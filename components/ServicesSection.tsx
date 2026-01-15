@@ -23,7 +23,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ content }) => {
                     </div>
                     <a className="flex items-center gap-2 text-primary dark:text-white font-bold hover:underline whitespace-nowrap" href="#services">
                         {content.viewAll}
-                        <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                        <span className="material-symbols-outlined text-lg notranslate" translate="no">arrow_forward</span>
                     </a>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

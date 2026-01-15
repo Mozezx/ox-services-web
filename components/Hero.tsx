@@ -53,7 +53,7 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
                     {/* Conteúdo */}
                     <div className="relative z-10 max-w-[720px] flex flex-col gap-6">
                         <div className="flex items-center gap-2 text-white/90">
-                            <span className="material-symbols-outlined text-sm">verified</span>
+                            <span className="material-symbols-outlined text-sm notranslate" translate="no">verified</span>
                             <span className="text-xs font-bold tracking-wider uppercase">{content.preHeading}</span>
                         </div>
                         <h1 className="text-white text-4xl font-bold font-display leading-tight tracking-tighter">
@@ -79,8 +79,8 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
                                 key={index}
                                 onClick={() => setCurrentSlide(index)}
                                 className={`w-2 h-2 rounded-full transition-all ${index === currentSlide
-                                        ? 'bg-white w-6'
-                                        : 'bg-white/40 hover:bg-white/60'
+                                    ? 'bg-white w-6'
+                                    : 'bg-white/40 hover:bg-white/60'
                                     }`}
                                 aria-label={`Go to slide ${index + 1}`}
                             />
@@ -97,7 +97,7 @@ const Hero: React.FC<HeroProps> = ({ content }) => {
                 >
                     <div className="max-w-[720px] flex flex-col gap-6">
                         <div className="flex items-center gap-2 text-white/90">
-                            <span className="material-symbols-outlined text-sm">verified</span>
+                            <span className="material-symbols-outlined text-sm notranslate" translate="no">verified</span>
                             <span className="text-sm font-bold tracking-wider uppercase">{content.preHeading}</span>
                         </div>
                         <h1 className="text-white text-6xl lg:text-7xl font-bold font-display leading-tight tracking-tighter">

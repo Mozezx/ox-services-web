@@ -26,9 +26,9 @@ const LanguageSelector: React.FC = () => {
                 className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary/5 dark:hover:bg-white/5 transition-colors text-primary dark:text-white"
                 aria-label="Select language"
             >
-                <span className="material-symbols-outlined text-xl">translate</span>
+                <span className="material-symbols-outlined text-xl notranslate" translate="no">translate</span>
                 <span className="hidden sm:inline text-sm font-medium">{languageNames[language]}</span>
-                <span className="material-symbols-outlined text-sm">{isOpen ? 'expand_less' : 'expand_more'}</span>
+                <span className="material-symbols-outlined text-sm notranslate" translate="no">{isOpen ? 'expand_less' : 'expand_more'}</span>
             </button>
 
             {isOpen && (
@@ -48,7 +48,7 @@ const LanguageSelector: React.FC = () => {
                                 {languageNames[lang]}
                             </span>
                             {language === lang && (
-                                <span className="material-symbols-outlined text-primary dark:text-white text-sm ml-auto">check</span>
+                                <span className="material-symbols-outlined text-primary dark:text-white text-sm ml-auto notranslate" translate="no">check</span>
                             )}
                         </button>
                     ))}

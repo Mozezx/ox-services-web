@@ -50,15 +50,15 @@ const Footer: React.FC<FooterProps> = ({ companyName, content }) => {
                         <h3 className="text-white font-bold text-base font-display">{content.contactInfo.title}</h3>
                         <div className="flex flex-col gap-3 text-sm text-white/60 font-body">
                             <p className="flex items-start gap-3">
-                                <span className="material-symbols-outlined text-lg mt-0.5">location_on</span>
+                                <span className="material-symbols-outlined text-lg mt-0.5 notranslate" translate="no">location_on</span>
                                 <span style={{ whiteSpace: 'pre-line' }}>{content.contactInfo.address}</span>
                             </p>
                             <a href={`tel:${content.contactInfo.phone}`} className="flex items-center gap-3 hover:text-white">
-                                <span className="material-symbols-outlined text-lg">call</span>
+                                <span className="material-symbols-outlined text-lg notranslate" translate="no">call</span>
                                 {content.contactInfo.phone}
                             </a>
                             <a href={`mailto:${content.contactInfo.email}`} className="flex items-center gap-3 hover:text-white">
-                                <span className="material-symbols-outlined text-lg">mail</span>
+                                <span className="material-symbols-outlined text-lg notranslate" translate="no">mail</span>
                                 {content.contactInfo.email}
                             </a>
                         </div>

@@ -161,3 +161,13 @@
 .delay-800 {
     animation-delay: 0.8s;
 }
+
+/* Prevent browser translation of Material Symbols icon text (ligatures) */
+.material-symbols-outlined {
+    font-feature-settings: 'liga';
+}
+
+/* Mark icons as non-translatable for Google Translate and similar tools */
+.notranslate {
+    translate: no;
+}
