@@ -41,8 +41,10 @@
         }
 
         .navbar {
-            position: sticky;
+            position: fixed;
             top: 0;
+            left: 0;
+            right: 0;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -69,7 +71,7 @@
 <body
     class="bg-background-light dark:bg-background-dark text-primary dark:text-white font-display antialiased overflow-x-hidden">
     <div class="flex flex-col min-h-screen overflow-x-hidden">
-        <header id="navbar" class="navbar sticky top-0 z-50 w-full bg-[#0B242A] border-b border-white/10">
+        <header id="navbar" class="navbar fixed top-0 z-50 w-full bg-[#0B242A] border-b border-white/10">
             <div class="mx-auto max-w-[1280px] px-4 md:px-10">
                 <div class="flex h-20 items-center justify-between">
                     <a href="/" class="flex items-center gap-3">
@@ -146,7 +148,7 @@
         </header>
 
         <!-- Hero Section - Mobile (background image) -->
-        <section class="w-full flex justify-center py-5 px-4 md:hidden">
+        <section class="w-full flex justify-center py-5 px-4 md:hidden pt-20">
             <div class="w-full max-w-[1280px]">
                 <div class="relative overflow-hidden rounded-xl bg-primary min-h-[500px] flex flex-col justify-end p-8 bg-cover bg-center"
                     style="background-image: linear-gradient(rgba(11, 36, 42, 0.3) 0%, rgba(11, 36, 42, 0.8) 100%), url('https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1600&q=80')"
