@@ -381,41 +381,32 @@
     <script>
         const navbar = document.getElementById('navbar');
         let lastScrollY = window.scrollY;
-        let ticking = false;
 
         window.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    if (!navbar) return;
-                    const currentY = window.scrollY;
+            if (!navbar) return;
+            const currentY = window.scrollY;
 
-                    // Add shadow when scrolled
-                    if (currentY > 40) {
-                        navbar.classList.add('scrolled');
-                    } else {
-                        navbar.classList.remove('scrolled');
-                    }
-
-                    // Hide navbar when scrolling down, show when scrolling up
-                    if (currentY > lastScrollY && currentY > 80) {
-                        // Scrolling down & past threshold
-                        navbar.classList.add('nav-hidden');
-                    } else if (currentY < lastScrollY) {
-                        // Scrolling up - always show
-                        navbar.classList.remove('nav-hidden');
-                    }
-
-                    // Always show at top
-                    if (currentY < 10) {
-                        navbar.classList.remove('nav-hidden');
-                    }
-
-                    lastScrollY = currentY;
-                    ticking = false;
-                });
-                ticking = true;
+            // Adiciona/remove classe 'scrolled' baseado na posição
+            if (currentY > 40) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
             }
-        });
+
+            // Esconde ao rolar para baixo, mostra ao rolar para cima
+            if (currentY > lastScrollY + 6 && currentY > 40) {
+                navbar.classList.add('nav-hidden');
+            } else if (currentY < lastScrollY - 6) {
+                navbar.classList.remove('nav-hidden');
+            }
+
+            // Sempre mostra quando está no topo
+            if (currentY < 10) {
+                navbar.classList.remove('nav-hidden');
+            }
+
+            lastScrollY = currentY;
+        }, { passive: true });
 
         // Sidebar toggle functions
         const sidebar = document.getElementById('sidebar');
