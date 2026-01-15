@@ -393,10 +393,12 @@
                 navbar.classList.remove('scrolled');
             }
 
-            // Esconde ao rolar para baixo, mostra ao rolar para cima
+            // Esconde ao rolar para baixo (com threshold), mostra ao rolar para cima (sem threshold)
             if (currentY > lastScrollY + 6 && currentY > 40) {
+                // Rolando para baixo
                 navbar.classList.add('nav-hidden');
-            } else if (currentY < lastScrollY - 6) {
+            } else if (currentY < lastScrollY) {
+                // Rolando para cima - QUALQUER movimento para cima mostra
                 navbar.classList.remove('nav-hidden');
             }
 
