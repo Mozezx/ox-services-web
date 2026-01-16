@@ -9,6 +9,7 @@ import CtaSection from './components/CtaSection';
 import ContactForm from './components/ContactForm';
 import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
+import AIChatWidget from './components/AIChatWidget';
 import { useLanguage } from './context/LanguageContext';
 
 const App: React.FC = () => {
@@ -39,6 +40,7 @@ const App: React.FC = () => {
             </main>
             <Footer content={textData.footer} companyName={textData.companyName} />
             <WhatsAppButton phoneNumber={textData.footer.contactInfo.phone} />
+            <AIChatWidget webhookUrl="http://85.31.239.235:5678/webhook/oxchat" />
         </div>
     );
 };

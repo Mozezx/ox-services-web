@@ -1,0 +1,145 @@
+{
+    "name": "OX Services Chat - Groq",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "oxchat",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                0,
+                0
+            ],
+            "id": "webhook-groq",
+            "name": "Webhook",
+            "webhookId": "ox-chat-groq"
+        },
+        {
+            "parameters": {
+                "agent": "conversationalAgent",
+                "promptType": "define",
+                "text": "={{ $json.body.message }}",
+                "options": {
+                    "systemMessage": "Você é o assistente virtual da OX Services, uma empresa especializada em serviços de construção e renovação.\n\nSERVIÇOS OFERECIDOS:\n1. Esquadrias de Alumínio e Vidros - Janelas, portas, fachadas\n2. Energia Solar Fotovoltaica - Instalação de painéis solares\n3. Móveis Sob Medida - Armários, mesas, portas de madeira\n4. Impermeabilização EPDM - Telhados e coberturas\n\nSEU OBJETIVO:\n- Ser cordial, profissional e prestativo\n- Entender qual serviço o cliente busca\n- Coletar informações importantes:\n  * Nome do cliente\n  * Tipo de serviço desejado\n  * Localização/endereço da obra\n  * Dimensões ou quantidade (se aplicável)\n  * Prazo desejado\n  * Melhor forma de contato (telefone/email)\n\nREGRAS:\n- Responda sempre em português do Brasil\n- Seja conciso mas informativo\n- Faça uma pergunta por vez para não sobrecarregar\n- Use emojis ocasionalmente para ser amigável\n- Ao final da conversa, resuma as informações coletadas"
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 1.7,
+            "position": [
+                220,
+                0
+            ],
+            "id": "agent-groq",
+            "name": "AI Agent"
+        },
+        {
+            "parameters": {
+                "sessionIdType": "customKey",
+                "sessionKey": "={{ $json.body.sessionId }}"
+            },
+            "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+            "typeVersion": 1.3,
+            "position": [
+                340,
+                200
+            ],
+            "id": "memory-groq",
+            "name": "Window Buffer Memory"
+        },
+        {
+            "parameters": {
+                "model": "llama-3.3-70b-versatile",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+            "typeVersion": 1,
+            "position": [
+                60,
+                200
+            ],
+            "id": "groq-model",
+            "name": "Groq Chat Model"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "response-field",
+                            "name": "response",
+                            "value": "={{ $json.output }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                440,
+                0
+            ],
+            "id": "set-response-groq",
+            "name": "Format Response"
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent": {
+            "main": [
+                [
+                    {
+                        "node": "Format Response",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Groq Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Window Buffer Memory": {
+            "ai_memory": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_memory",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": false,
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "meta": {
+        "templateCredsSetupCompleted": true
+    },
+    "tags": []
+}
