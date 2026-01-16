@@ -14,7 +14,7 @@ interface AIChatWidgetProps {
 
 const AIChatWidget: React.FC<AIChatWidgetProps> = ({
     webhookUrl = '',
-    initialMessage = 'Olá! 👋 Sou o assistente virtual da OX Services. Como posso ajudar você hoje? Qual tipo de serviço você está buscando?'
+    initialMessage = 'Hello! 👋 I\'m the OX Services virtual assistant. How can I help you today? What type of service are you looking for?'
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -90,7 +90,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                 setIsTyping(false);
                 setMessages(prev => [...prev, {
                     id: `msg_${Date.now()}`,
-                    text: data.response || data.message || 'Desculpe, não consegui processar sua mensagem.',
+                    text: data.response || data.message || 'Sorry, I could not process your message.',
                     sender: 'ai',
                     timestamp: new Date()
                 }]);
@@ -110,7 +110,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             setIsTyping(false);
             setMessages(prev => [...prev, {
                 id: `msg_${Date.now()}`,
-                text: 'Desculpe, ocorreu um erro. Por favor, tente novamente ou entre em contato pelo WhatsApp.',
+                text: 'Sorry, an error occurred. Please try again or contact us via WhatsApp.',
                 sender: 'ai',
                 timestamp: new Date()
             }]);
@@ -136,7 +136,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             return 'Ficarei feliz em ajudar com um orçamento! Para isso, preciso de algumas informações:\n\n1. Qual serviço você precisa?\n2. Qual a localização da obra?\n3. Qual seu nome e melhor contato?';
         }
 
-        return 'Entendi! Oferecemos os seguintes serviços:\n\n• **Esquadrias de Alumínio** - Janelas e portas\n• **Energia Solar** - Sistemas fotovoltaicos\n• **Móveis Sob Medida** - Design exclusivo\n• **Impermeabilização EPDM** - Telhados\n\nQual desses serviços te interessa? Ou me conte mais sobre seu projeto!';
+        return 'Got it! We offer the following services:\n\n• **Aluminum Joinery** - Windows and doors\n• **Solar Energy** - PV systems\n• **Bespoke Furniture** - Custom design\n• **EPDM Roofing** - Waterproofing\n\nWhich of these services interests you? Or tell me more about your project!';
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -147,7 +147,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
     };
 
     const formatTime = (date: Date) => {
-        return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     };
 
     return (
@@ -159,7 +159,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                 style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                 }}
-                aria-label={isOpen ? 'Fechar chat' : 'Abrir chat com IA'}
+                aria-label={isOpen ? 'Close chat' : 'Open AI chat'}
             >
                 {isOpen ? (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-6 h-6">
@@ -177,7 +177,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             {!isOpen && messages.length === 0 && (
                 <div className="fixed bottom-[72px] left-6 z-50 animate-bounce">
                     <div className="bg-white rounded-lg shadow-lg px-3 py-2 text-sm text-gray-700 max-w-[200px]">
-                        💬 Precisa de ajuda?
+                        💬 Need help?
                     </div>
                 </div>
             )}
@@ -203,8 +203,8 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                             </svg>
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-semibold text-sm">Assistente OX Services</h3>
-                            <p className="text-xs opacity-80">Online agora</p>
+                            <h3 className="font-semibold text-sm">OX Services Assistant</h3>
+                            <p className="text-xs opacity-80">Online now</p>
                         </div>
                         <button
                             onClick={() => setIsOpen(false)}
@@ -262,7 +262,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                placeholder="Digite sua mensagem..."
+                                placeholder="Type your message..."
                                 className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#667eea]/50"
                                 disabled={isTyping}
                             />

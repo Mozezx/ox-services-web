@@ -76,6 +76,17 @@ interface TextData {
         contactInfo: { title: string; address: string; phone: string; email: string };
         copyright: string;
     };
+    chat: {
+        assistantName: string;
+        onlineStatus: string;
+        inputPlaceholder: string;
+        needHelp: string;
+        openChat: string;
+        closeChat: string;
+        initialMessage: string;
+        errorMessage: string;
+        fallbackGeneral: string;
+    };
 }
 
 const translations: Record<Language, TextData> = {
@@ -236,6 +247,17 @@ const translations: Record<Language, TextData> = {
             },
             copyright: '© 2024 OX Services. All rights reserved.',
         },
+        chat: {
+            assistantName: 'OX Services Assistant',
+            onlineStatus: 'Online now',
+            inputPlaceholder: 'Type your message...',
+            needHelp: '💬 Need help?',
+            openChat: 'Open AI chat',
+            closeChat: 'Close chat',
+            initialMessage: 'Hello! 👋 I\'m the OX Services virtual assistant. How can I help you today? What type of service are you looking for?',
+            errorMessage: 'Sorry, an error occurred. Please try again or contact us via WhatsApp.',
+            fallbackGeneral: 'Got it! We offer the following services:\n\n• **Aluminum Joinery** - Windows and doors\n• **Solar Energy** - PV systems\n• **Bespoke Furniture** - Custom design\n• **EPDM Roofing** - Waterproofing\n\nWhich of these services interests you? Or tell me more about your project!',
+        },
     },
     nl: {
         companyName: 'OX Services',
@@ -393,6 +415,17 @@ const translations: Record<Language, TextData> = {
                 email: 'info@oxservices.com',
             },
             copyright: '© 2024 OX Services. Alle rechten voorbehouden.',
+        },
+        chat: {
+            assistantName: 'OX Services Assistent',
+            onlineStatus: 'Nu online',
+            inputPlaceholder: 'Typ uw bericht...',
+            needHelp: '💬 Hulp nodig?',
+            openChat: 'Open AI chat',
+            closeChat: 'Chat sluiten',
+            initialMessage: 'Hallo! 👋 Ik ben de virtuele assistent van OX Services. Hoe kan ik u vandaag helpen? Welk type dienst zoekt u?',
+            errorMessage: 'Sorry, er is een fout opgetreden. Probeer het opnieuw of neem contact met ons op via WhatsApp.',
+            fallbackGeneral: 'Begrepen! Wij bieden de volgende diensten aan:\n\n• **Aluminium Schrijnwerk** - Ramen en deuren\n• **Zonne-energie** - PV-systemen\n• **Maatwerk Meubels** - Op maat ontwerp\n• **EPDM Dakbedekking** - Waterdichting\n\nWelke van deze diensten interesseert u? Of vertel me meer over uw project!',
         },
     },
     es: {
@@ -552,6 +585,17 @@ const translations: Record<Language, TextData> = {
             },
             copyright: '© 2024 OX Services. Todos los derechos reservados.',
         },
+        chat: {
+            assistantName: 'Asistente OX Services',
+            onlineStatus: 'En línea ahora',
+            inputPlaceholder: 'Escribe tu mensaje...',
+            needHelp: '💬 ¿Necesitas ayuda?',
+            openChat: 'Abrir chat de IA',
+            closeChat: 'Cerrar chat',
+            initialMessage: '¡Hola! 👋 Soy el asistente virtual de OX Services. ¿Cómo puedo ayudarte hoy? ¿Qué tipo de servicio estás buscando?',
+            errorMessage: 'Lo siento, ocurrió un error. Por favor, inténtalo de nuevo o contáctanos por WhatsApp.',
+            fallbackGeneral: '¡Entendido! Ofrecemos los siguientes servicios:\n\n• **Carpintería de Aluminio** - Ventanas y puertas\n• **Energía Solar** - Sistemas fotovoltaicos\n• **Muebles a Medida** - Diseño exclusivo\n• **Techos EPDM** - Impermeabilización\n\n¿Cuál de estos servicios te interesa? ¡O cuéntame más sobre tu proyecto!',
+        },
     },
     fr: {
         companyName: 'OX Services',
@@ -709,6 +753,17 @@ const translations: Record<Language, TextData> = {
                 email: 'info@oxservices.com',
             },
             copyright: '© 2024 OX Services. Tous droits réservés.',
+        },
+        chat: {
+            assistantName: 'Assistant OX Services',
+            onlineStatus: 'En ligne maintenant',
+            inputPlaceholder: 'Tapez votre message...',
+            needHelp: '💬 Besoin d\'aide?',
+            openChat: 'Ouvrir le chat IA',
+            closeChat: 'Fermer le chat',
+            initialMessage: 'Bonjour! 👋 Je suis l\'assistant virtuel d\'OX Services. Comment puis-je vous aider aujourd\'hui? Quel type de service recherchez-vous?',
+            errorMessage: 'Désolé, une erreur s\'est produite. Veuillez réessayer ou nous contacter via WhatsApp.',
+            fallbackGeneral: 'Compris! Nous offrons les services suivants:\n\n• **Menuiserie Aluminium** - Fenêtres et portes\n• **Énergie Solaire** - Systèmes PV\n• **Mobilier Sur Mesure** - Design exclusif\n• **Toiture EPDM** - Étanchéité\n\nLequel de ces services vous intéresse? Ou parlez-moi de votre projet!',
         },
     },
 };
