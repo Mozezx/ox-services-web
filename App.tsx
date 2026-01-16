@@ -40,7 +40,7 @@ const App: React.FC = () => {
             </main>
             <Footer content={textData.footer} companyName={textData.companyName} />
             <WhatsAppButton phoneNumber={textData.footer.contactInfo.phone} />
-            <AIChatWidget webhookUrl="http://85.31.239.235:5678/webhook/oxchat" />
+            <AIChatWidget webhookUrl="https://oxservices.org:5678/webhook/oxchat" />
         </div>
     );
 };
