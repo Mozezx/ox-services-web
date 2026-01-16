@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Message {
     id: string;
@@ -9,13 +10,12 @@ interface Message {
 
 interface AIChatWidgetProps {
     webhookUrl?: string;
-    initialMessage?: string;
 }
 
 const AIChatWidget: React.FC<AIChatWidgetProps> = ({
-    webhookUrl = '',
-    initialMessage = 'Hello! 👋 I\'m the OX Services virtual assistant. How can I help you today? What type of service are you looking for?'
+    webhookUrl = ''
 }) => {
+    const { textData } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState('');
@@ -38,12 +38,12 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
         if (isOpen && messages.length === 0) {
             setMessages([{
                 id: `msg_${Date.now()}`,
-                text: initialMessage,
+                text: textData.chat.initialMessage,
                 sender: 'ai',
                 timestamp: new Date()
             }]);
         }
-    }, [isOpen, initialMessage, messages.length]);
+    }, [isOpen, textData.chat.initialMessage, messages.length]);
 
     // Focus input when chat opens
     useEffect(() => {
@@ -110,7 +110,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             setIsTyping(false);
             setMessages(prev => [...prev, {
                 id: `msg_${Date.now()}`,
-                text: 'Sorry, an error occurred. Please try again or contact us via WhatsApp.',
+                text: textData.chat.errorMessage,
                 sender: 'ai',
                 timestamp: new Date()
             }]);
@@ -159,7 +159,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                 style={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                 }}
-                aria-label={isOpen ? 'Close chat' : 'Open AI chat'}
+                aria-label={isOpen ? textData.chat.closeChat : textData.chat.openChat}
             >
                 {isOpen ? (
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-6 h-6">
@@ -177,7 +177,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             {!isOpen && messages.length === 0 && (
                 <div className="fixed bottom-[72px] left-6 z-50 animate-bounce">
                     <div className="bg-white rounded-lg shadow-lg px-3 py-2 text-sm text-gray-700 max-w-[200px]">
-                        💬 Need help?
+                        {textData.chat.needHelp}
                     </div>
                 </div>
             )}
@@ -203,8 +203,8 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                             </svg>
                         </div>
                         <div className="flex-1">
-                            <h3 className="font-semibold text-sm">OX Services Assistant</h3>
-                            <p className="text-xs opacity-80">Online now</p>
+                            <h3 className="font-semibold text-sm">{textData.chat.assistantName}</h3>
+                            <p className="text-xs opacity-80">{textData.chat.onlineStatus}</p>
                         </div>
                         <button
                             onClick={() => setIsOpen(false)}
@@ -262,7 +262,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
                                 value={inputValue}
                                 onChange={(e) => setInputValue(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                placeholder="Type your message..."
+                                placeholder={textData.chat.inputPlaceholder}
                                 className="flex-1 px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#667eea]/50"
                                 disabled={isTyping}
                             />
