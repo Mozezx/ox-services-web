@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { ToastProvider } from '../components/Toast'
+import { SkipClerkProvider } from '../context/SkipClerkContext'
 import { api } from '../lib/api'
 import './index.css'
 
@@ -18,8 +19,8 @@ const queryClient = new QueryClient({
   },
 })
 
-// Clerk publishable key (produção: pk_live_... do dashboard.clerk.com)
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_dG9sZXJhbnQtcXVldHphbC0zMi5jbGVyay5hY2NvdW50cy5kZXYk'
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || ''
+const skipClerk = import.meta.env.VITE_ADMIN_SKIP_CLERK === 'true' || !clerkPubKey
 
 // ========== PUSH NOTIFICATIONS SETUP ==========
 
@@ -103,16 +104,26 @@ if (typeof window !== 'undefined') {
 // Export for manual triggering
 ;(window as any).setupPushNotifications = setupPushNotifications
 
+const app = (
+  <QueryClientProvider client={queryClient}>
+    <SkipClerkProvider value={skipClerk}>
+      <ToastProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ToastProvider>
+    </SkipClerkProvider>
+  </QueryClientProvider>
+)
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={clerkPubKey}>
-      <QueryClientProvider client={queryClient}>
-        <ToastProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </ToastProvider>
-      </QueryClientProvider>
-    </ClerkProvider>
+    {skipClerk ? (
+      app
+    ) : (
+      <ClerkProvider publishableKey={clerkPubKey}>
+        {app}
+      </ClerkProvider>
+    )}
   </React.StrictMode>,
 )

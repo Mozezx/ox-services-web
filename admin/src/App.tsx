@@ -1,5 +1,6 @@
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
+import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useSkipClerk } from '../context/SkipClerkContext'
 import Layout from '../components/Layout'
 import Dashboard from '../pages/Dashboard'
 import Works from '../pages/Works'
@@ -8,7 +9,31 @@ import Timeline from '../pages/Timeline'
 import Upload from '../pages/Upload'
 import Appointments from '../pages/Appointments'
 
+const AppRoutes = () => (
+  <Layout>
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/appointments" element={<Appointments />} />
+      <Route path="/works" element={<Works />} />
+      <Route path="/works/:id" element={<WorkDetail />} />
+      <Route path="/works/:id/timeline" element={<Timeline />} />
+      <Route path="/works/:id/upload" element={<Upload />} />
+    </Routes>
+  </Layout>
+)
+
 function App() {
+  const skipClerk = useSkipClerk()
+
+  if (skipClerk) {
+    return (
+      <div className="App">
+        <AppRoutes />
+      </div>
+    )
+  }
+
   return (
     <div className="App">
       <SignedOut>
@@ -32,19 +57,8 @@ function App() {
           </div>
         </div>
       </SignedOut>
-      
       <SignedIn>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/appointments" element={<Appointments />} />
-            <Route path="/works" element={<Works />} />
-            <Route path="/works/:id" element={<WorkDetail />} />
-            <Route path="/works/:id/timeline" element={<Timeline />} />
-            <Route path="/works/:id/upload" element={<Upload />} />
-          </Routes>
-        </Layout>
+        <AppRoutes />
       </SignedIn>
     </div>
   )
