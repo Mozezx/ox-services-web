@@ -1,13 +1,16 @@
 {
   "name": "OX Services - Acompanhamento de Obras",
   "short_name": "OX Obras",
-  "description": "Acompanhe o desenvolvimento de suas obras através de timeline com fotos e vídeos",
+  "description": "Acompanhe o desenvolvimento de suas obras através de timeline com fotos e vídeos em tempo real",
   "theme_color": "#0B242A",
-  "background_color": "#ffffff",
+  "background_color": "#f6f7f8",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "scope": "/",
   "start_url": "/",
+  "id": "/",
+  "lang": "pt-BR",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/pwa-64x64.png",
@@ -51,24 +54,28 @@
   "categories": ["business", "productivity", "utilities"],
   "shortcuts": [
     {
-      "name": "Nova Obra",
-      "short_name": "Nova",
-      "description": "Criar nova obra para acompanhamento",
-      "url": "/nova-obra",
-      "icons": [{ "src": "/icons/plus-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Minhas Obras",
-      "short_name": "Obras",
-      "description": "Ver todas as obras em andamento",
-      "url": "/obras",
-      "icons": [{ "src": "/icons/list-192.png", "sizes": "192x192" }]
+      "name": "Página Inicial",
+      "short_name": "Home",
+      "description": "Voltar para a página inicial da OX Services",
+      "url": "/",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
     }
   ],
+  "share_target": {
+    "action": "/obra/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "protocol_handlers": [
     {
       "protocol": "web+oxobras",
       "url": "/obra/%s"
     }
-  ]
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
 }

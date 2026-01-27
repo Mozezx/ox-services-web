@@ -97,6 +97,7 @@ interface TextData {
         photosRecorded: string;
         videos: string;
         daysRemaining: string;
+        totalDays: string;
         startDate: string;
         endDate: string;
         lastUpdate: string;
@@ -122,6 +123,17 @@ interface TextData {
         records: (count: number) => string;
         commentsCount: (count: number) => string;
         today: string;
+        moreDetails: string;
+        lessDetails: string;
+        totalPhotos: string;
+        totalVideos: string;
+        totalNotes: string;
+        shareOnWhatsApp: string;
+        followWorkProgress: string;
+        installApp: string;
+        installAppDescription: string;
+        youAreOffline: string;
+        dataOutdated: string;
     };
     comments: {
         title: string;
@@ -356,6 +368,7 @@ const translations: Record<Language, TextData> = {
             photosRecorded: 'Photos recorded',
             videos: 'Videos',
             daysRemaining: 'Days remaining',
+            totalDays: 'total days',
             startDate: 'Start date',
             endDate: 'Estimated completion',
             lastUpdate: 'Last update',
@@ -381,6 +394,17 @@ const translations: Record<Language, TextData> = {
             records: (count: number) => `${count} ${count === 1 ? 'record' : 'records'}`,
             commentsCount: (count: number) => `${count} ${count === 1 ? 'comment' : 'comments'}`,
             today: 'Today',
+            moreDetails: 'More details',
+            lessDetails: 'Less details',
+            totalPhotos: 'Total photos',
+            totalVideos: 'Total videos',
+            totalNotes: 'Total notes',
+            shareOnWhatsApp: 'Share on WhatsApp',
+            followWorkProgress: 'Follow the work progress:',
+            installApp: 'Install App',
+            installAppDescription: 'Add to home screen for quick access and update notifications.',
+            youAreOffline: 'You are offline',
+            dataOutdated: 'Some data may be outdated',
         },
         comments: {
             title: 'Comments and Feedback',
@@ -613,6 +637,7 @@ const translations: Record<Language, TextData> = {
             photosRecorded: "Foto's opgenomen",
             videos: "Video's",
             daysRemaining: 'Dagen resterend',
+            totalDays: 'totale dagen',
             startDate: 'Startdatum',
             endDate: 'Verwachte voltooiing',
             lastUpdate: 'Laatste update',
@@ -638,6 +663,17 @@ const translations: Record<Language, TextData> = {
             records: (count: number) => `${count} ${count === 1 ? 'record' : 'records'}`,
             commentsCount: (count: number) => `${count} ${count === 1 ? 'opmerking' : 'opmerkingen'}`,
             today: 'Vandaag',
+            moreDetails: 'Meer details',
+            lessDetails: 'Minder details',
+            totalPhotos: "Totaal foto's",
+            totalVideos: "Totaal video's",
+            totalNotes: 'Totaal notities',
+            shareOnWhatsApp: 'Delen via WhatsApp',
+            followWorkProgress: 'Volg de werkvoortgang:',
+            installApp: 'App Installeren',
+            installAppDescription: 'Voeg toe aan startscherm voor snelle toegang en updatemeldingen.',
+            youAreOffline: 'Je bent offline',
+            dataOutdated: 'Sommige gegevens kunnen verouderd zijn',
         },
         comments: {
             title: 'Opmerkingen en Feedback',
@@ -870,6 +906,7 @@ const translations: Record<Language, TextData> = {
             photosRecorded: 'Fotos registradas',
             videos: 'Videos',
             daysRemaining: 'Días restantes',
+            totalDays: 'días totales',
             startDate: 'Fecha de inicio',
             endDate: 'Finalización estimada',
             lastUpdate: 'Última actualización',
@@ -895,6 +932,17 @@ const translations: Record<Language, TextData> = {
             records: (count: number) => `${count} ${count === 1 ? 'registro' : 'registros'}`,
             commentsCount: (count: number) => `${count} ${count === 1 ? 'comentario' : 'comentarios'}`,
             today: 'Hoy',
+            moreDetails: 'Más detalles',
+            lessDetails: 'Menos detalles',
+            totalPhotos: 'Total de fotos',
+            totalVideos: 'Total de videos',
+            totalNotes: 'Total de notas',
+            shareOnWhatsApp: 'Compartir en WhatsApp',
+            followWorkProgress: 'Sigue el progreso del trabajo:',
+            installApp: 'Instalar App',
+            installAppDescription: 'Añadir a la pantalla de inicio para acceso rápido y notificaciones de actualizaciones.',
+            youAreOffline: 'Estás sin conexión',
+            dataOutdated: 'Algunos datos pueden estar desactualizados',
         },
         comments: {
             title: 'Comentarios y Retroalimentación',
@@ -1127,6 +1175,7 @@ const translations: Record<Language, TextData> = {
             photosRecorded: 'Photos enregistrées',
             videos: 'Vidéos',
             daysRemaining: 'Jours restants',
+            totalDays: 'jours totaux',
             startDate: 'Date de début',
             endDate: 'Fin estimée',
             lastUpdate: 'Dernière mise à jour',
@@ -1152,6 +1201,17 @@ const translations: Record<Language, TextData> = {
             records: (count: number) => `${count} ${count === 1 ? 'enregistrement' : 'enregistrements'}`,
             commentsCount: (count: number) => `${count} ${count === 1 ? 'commentaire' : 'commentaires'}`,
             today: 'Aujourd\'hui',
+            moreDetails: 'Plus de détails',
+            lessDetails: 'Moins de détails',
+            totalPhotos: 'Total de photos',
+            totalVideos: 'Total de vidéos',
+            totalNotes: 'Total de notes',
+            shareOnWhatsApp: 'Partager sur WhatsApp',
+            followWorkProgress: 'Suivez la progression du travail:',
+            installApp: 'Installer l\'App',
+            installAppDescription: 'Ajouter à l\'écran d\'accueil pour un accès rapide et des notifications de mises à jour.',
+            youAreOffline: 'Vous êtes hors ligne',
+            dataOutdated: 'Certaines données peuvent être obsolètes',
         },
         comments: {
             title: 'Commentaires et Retours',

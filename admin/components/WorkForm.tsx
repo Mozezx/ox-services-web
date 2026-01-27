@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Work } from '../lib/api'
+import { useState, useEffect, useRef } from 'react'
+import { Work, api } from '../lib/api'
 
 interface WorkFormProps {
   work?: Work | null
@@ -32,6 +32,9 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
   })
 
   const [errors, setErrors] = useState<Partial<Record<keyof WorkFormData, string>>>({})
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (work) {
@@ -86,6 +89,57 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
     setFormData(prev => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }))
+    }
+  }
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, cover_image_url: 'Apenas imagens são permitidas' }))
+      return
+    }
+
+    // Validar tamanho (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, cover_image_url: 'A imagem deve ter no máximo 5MB' }))
+      return
+    }
+
+    setIsUploading(true)
+    setUploadProgress(0)
+
+    try {
+      // Simular progresso
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90))
+      }, 100)
+
+      const result = await api.uploadCoverImage(file)
+      
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+
+      setFormData(prev => ({ ...prev, cover_image_url: result.url }))
+      setErrors(prev => ({ ...prev, cover_image_url: undefined }))
+
+      setTimeout(() => {
+        setUploadProgress(0)
+      }, 500)
+    } catch (error) {
+      console.error('Erro no upload:', error)
+      setErrors(prev => ({ ...prev, cover_image_url: 'Erro ao fazer upload da imagem' }))
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setFormData(prev => ({ ...prev, cover_image_url: '' }))
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
     }
   }
 
@@ -207,30 +261,105 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
         </div>
       </div>
 
-      {/* URL da Imagem de Capa */}
+      {/* Imagem de Capa */}
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">
-          URL da Imagem de Capa
+          Imagem de Capa
         </label>
-        <input
-          type="url"
-          className="input"
-          placeholder="https://exemplo.com/imagem.jpg"
-          value={formData.cover_image_url}
-          onChange={(e) => handleChange('cover_image_url', e.target.value)}
-        />
-        {formData.cover_image_url && (
-          <div className="mt-3">
+        
+        {formData.cover_image_url ? (
+          <div className="relative">
             <img
               src={formData.cover_image_url}
               alt="Preview da capa"
-              className="w-full h-32 object-cover rounded-lg border border-border"
+              className="w-full h-48 object-cover rounded-lg border border-border"
               onError={(e) => {
-                e.currentTarget.style.display = 'none'
+                e.currentTarget.src = '/placeholder.png'
               }}
             />
+            <div className="absolute top-2 right-2 flex gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="p-2 bg-white/90 hover:bg-white rounded-lg shadow-sm transition-colors"
+                title="Trocar imagem"
+              >
+                <span className="material-symbols-outlined text-text-light text-sm">edit</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="p-2 bg-white/90 hover:bg-red-50 rounded-lg shadow-sm transition-colors"
+                title="Remover imagem"
+              >
+                <span className="material-symbols-outlined text-red-500 text-sm">delete</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div
+            onClick={() => !isUploading && fileInputRef.current?.click()}
+            className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+              isUploading 
+                ? 'border-primary bg-primary/5' 
+                : 'border-border hover:border-primary hover:bg-primary/5'
+            }`}
+          >
+            {isUploading ? (
+              <div className="space-y-3">
+                <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+                <p className="text-sm text-text-light">Enviando imagem...</p>
+                <div className="w-48 h-2 mx-auto bg-border rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="w-12 h-12 mx-auto rounded-full bg-background flex items-center justify-center mb-3">
+                  <span className="material-symbols-outlined text-text-light">cloud_upload</span>
+                </div>
+                <p className="text-sm font-medium text-text mb-1">
+                  Clique para fazer upload
+                </p>
+                <p className="text-xs text-text-light">
+                  PNG, JPG ou WEBP (máx. 5MB)
+                </p>
+              </>
+            )}
           </div>
         )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileSelect}
+          disabled={isUploading}
+        />
+
+        {errors.cover_image_url && (
+          <p className="text-red-500 text-sm mt-1">{errors.cover_image_url}</p>
+        )}
+
+        {/* Campo oculto para URL manual (fallback) */}
+        <details className="mt-2">
+          <summary className="text-xs text-text-light cursor-pointer hover:text-primary">
+            Ou insira uma URL manualmente
+          </summary>
+          <input
+            type="url"
+            className="input mt-2 text-sm"
+            placeholder="https://exemplo.com/imagem.jpg"
+            value={formData.cover_image_url}
+            onChange={(e) => handleChange('cover_image_url', e.target.value)}
+          />
+        </details>
       </div>
 
       {/* Actions */}

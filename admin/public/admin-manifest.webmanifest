@@ -1,0 +1,14 @@
+{
+  "name": "OX Services Admin - Gerenciamento de Obras",
+  "short_name": "OX Admin",
+  "description": "Painel administrativo para gerenciamento de obras e timeline",
+  "theme_color": "#0B242A",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    { "src": "/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -19,7 +19,7 @@ const queryClient = new QueryClient({
 })
 
 // Clerk publishable key (produção: pk_live_... do dashboard.clerk.com)
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_live_Y2xlcmsub3hzZXJ2aWNlcy5vcmck'
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || 'pk_test_dG9sZXJhbnQtcXVldHphbC0zMi5jbGVyay5hY2NvdW50cy5kZXYk'
 
 // ========== PUSH NOTIFICATIONS SETUP ==========
 

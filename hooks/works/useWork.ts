@@ -35,14 +35,37 @@ export interface Comment {
     approved: boolean;
 }
 
+export interface WorkStats {
+    progress: number;
+    daysWorked: number;
+    daysRemaining: number;
+    totalDays: number;
+    photosCount: number;
+    videosCount: number;
+    notesCount: number;
+    totalEntries: number;
+    commentsCount: number;
+    lastUpdate: string;
+}
+
 interface WorkData {
     work: Work;
     timeline: TimelineEntry[];
     comments: Comment[];
+    stats: WorkStats;
 }
 
+const getApiBase = () => {
+    const env = import.meta.env.VITE_API_URL ?? '';
+    if (env) return env.replace(/\/$/, '');
+    if (import.meta.env.DEV) return 'http://localhost:4000';
+    return ''; // produção: path relativo /api (mesmo domínio)
+};
+
 const fetchWorkData = async (token: string): Promise<WorkData> => {
-    const response = await fetch(`http://localhost:4000/api/works/${token}`);
+    const base = getApiBase();
+    const url = base ? `${base}/api/works/${token}` : `/api/works/${token}`;
+    const response = await fetch(url);
     if (!response.ok) {
         if (response.status === 404) {
             throw new Error('Obra não encontrada');

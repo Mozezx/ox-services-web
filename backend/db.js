@@ -2,7 +2,8 @@
  * Conexão com PostgreSQL (banco Hostinger ou outro)
  * Use DATABASE_URL ou as variáveis DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
  */
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const { Pool } = require('pg');
 
 let pool = null;

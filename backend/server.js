@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
@@ -11,6 +11,13 @@ const cloudinary = require('./cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// Log se o banco está configurado (carrega .env da pasta backend)
+if (process.env.DATABASE_URL) {
+  console.log('✅ DATABASE_URL definida – backend vai usar o PostgreSQL configurado');
+} else {
+  console.warn('⚠️ DATABASE_URL não definida – defina em backend/.env (ver HOSTINGER-DB.md)');
+}
 
 // ========== CONFIGURAÇÃO WEB PUSH ==========
 // Configurar VAPID keys para push notifications
@@ -333,6 +340,47 @@ app.get('/api/push/vapid-public-key', (req, res) => {
 
 // ========== ENDPOINTS PARA OBRAS (PÚBLICOS) ==========
 
+// Funções auxiliares para cálculo de estatísticas
+function calculateProgress(startDate, endDate, status) {
+    if (status === 'completed') return 100;
+    if (status === 'planned') return 0;
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const now = new Date();
+    
+    if (now < start) return 0;
+    if (now > end) return 100;
+    
+    const totalDuration = end - start;
+    const elapsed = now - start;
+    
+    return Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)));
+}
+
+function getDaysSince(date) {
+    const start = new Date(date);
+    const now = new Date();
+    const diffTime = now - start;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+}
+
+function getDaysUntil(date) {
+    const end = new Date(date);
+    const now = new Date();
+    const diffTime = end - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+}
+
+function getTotalDays(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = end - start;
+    return Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+}
+
 // GET /api/works/:token - Retorna obra e timeline pelo access_token
 app.get('/api/works/:token', async (req, res) => {
     const { token } = req.params;
@@ -344,7 +392,7 @@ app.get('/api/works/:token', async (req, res) => {
         }
         
         const timelineResult = await db.query(
-            'SELECT * FROM timeline_entries WHERE work_id = $1 ORDER BY "order" ASC',
+            'SELECT * FROM timeline_entries WHERE work_id = $1 ORDER BY date DESC, created_at DESC',
             [work.id]
         );
         const timeline = timelineResult.rows || [];
@@ -391,10 +439,34 @@ app.get('/api/works/:token', async (req, res) => {
             approved: comment.approved,
         }));
         
+        // Calcular estatísticas da obra
+        const photosCount = timelineFormatted.filter(t => t.type === 'image').length;
+        const videosCount = timelineFormatted.filter(t => t.type === 'video').length;
+        const notesCount = timelineFormatted.filter(t => t.type === 'note').length;
+        
+        // Ordenar por data para pegar a última atualização
+        const sortedByDate = [...timelineFormatted].sort((a, b) => 
+            new Date(b.date) - new Date(a.date)
+        );
+        
+        const stats = {
+            progress: calculateProgress(work.start_date, work.end_date, work.status),
+            daysWorked: getDaysSince(work.start_date),
+            daysRemaining: getDaysUntil(work.end_date),
+            totalDays: getTotalDays(work.start_date, work.end_date),
+            photosCount,
+            videosCount,
+            notesCount,
+            totalEntries: timelineFormatted.length,
+            commentsCount: commentsFormatted.length,
+            lastUpdate: sortedByDate[0]?.date || work.start_date,
+        };
+        
         res.json({
             work: workFormatted,
             timeline: timelineFormatted,
             comments: commentsFormatted,
+            stats,
         });
     } catch (error) {
         console.error('Erro ao buscar obra:', error);
@@ -616,6 +688,58 @@ app.delete('/admin/works/:id', async (req, res) => {
   }
 });
 
+// Multer middleware para upload de imagem de capa
+const coverUploadMw = cloudinary.isConfigured()
+  ? upload.uploadMemory.single('cover')
+  : upload.single('cover');
+
+// POST /admin/upload/cover - Upload de imagem de capa para Cloudinary
+app.post('/admin/upload/cover', coverUploadMw, async (req, res) => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    }
+
+    // Verificar se é uma imagem
+    if (!file.mimetype.startsWith('image')) {
+      return res.status(400).json({ error: 'Apenas imagens são permitidas para capa' });
+    }
+
+    let imageUrl;
+
+    if (cloudinary.isConfigured()) {
+      // Enviar para o Cloudinary
+      if (!file.buffer) {
+        return res.status(400).json({ error: 'Arquivo não disponível para upload' });
+      }
+      const result = await cloudinary.uploadBuffer(file.buffer, {
+        folder: 'ox-services/covers',
+        resourceType: 'image',
+      });
+      imageUrl = result.secure_url;
+    } else {
+      // Fallback: disco local
+      const fs = require('fs');
+      const path = require('path');
+      const coversDir = path.join(__dirname, 'public', 'uploads', 'covers');
+      if (!fs.existsSync(coversDir)) {
+        fs.mkdirSync(coversDir, { recursive: true });
+      }
+      const filename = `${Date.now()}_${file.originalname}`;
+      const filepath = path.join(coversDir, filename);
+      fs.writeFileSync(filepath, file.buffer);
+      imageUrl = `/uploads/covers/${filename}`;
+    }
+
+    res.json({ url: imageUrl });
+  } catch (error) {
+    console.error('Erro no upload de capa:', error);
+    res.status(500).json({ error: 'Erro ao fazer upload da imagem de capa' });
+  }
+});
+
 // Multer: usar memory quando Cloudinary está configurado (upload via buffer)
 const timelineUploadMw = cloudinary.isConfigured()
   ? upload.uploadMemory.single('file')
@@ -676,7 +800,7 @@ app.get('/admin/works/:id/timeline', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.query(
-      'SELECT * FROM timeline_entries WHERE work_id = $1 ORDER BY "order" ASC',
+      'SELECT * FROM timeline_entries WHERE work_id = $1 ORDER BY date DESC, created_at DESC',
       [id]
     );
     res.json({ entries: result.rows || [] });
@@ -781,10 +905,17 @@ app.get('/admin/appointments', async (req, res) => {
 
         res.json({ appointments: formatted, total: formatted.length });
     } catch (error) {
+        if (error.code === '42P01' || (error.message && error.message.includes('appointments'))) {
+            return res.json({ appointments: [], total: 0 });
+        }
         console.error('Erro ao buscar agendamentos:', error);
         res.status(500).json({ error: 'Erro ao buscar agendamentos' });
     }
 });
+
+function emptyAppointmentStats() {
+  return { total: 0, new: 0, read: 0, contacted: 0, completed: 0 };
+}
 
 // GET /admin/appointments/stats - Estatísticas de agendamentos
 app.get('/admin/appointments/stats', async (req, res) => {
@@ -803,6 +934,10 @@ app.get('/admin/appointments/stats', async (req, res) => {
             completed: parseInt(completedResult.rows[0].count),
         });
     } catch (error) {
+        // Tabela appointments pode não existir se só works/timeline/comments foram criados
+        if (error.code === '42P01' || (error.message && error.message.includes('appointments'))) {
+            return res.json(emptyAppointmentStats());
+        }
         console.error('Erro ao buscar estatísticas:', error);
         res.status(500).json({ error: 'Erro ao buscar estatísticas' });
     }

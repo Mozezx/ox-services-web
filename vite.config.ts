@@ -9,6 +9,12 @@ export default defineConfig(({ mode }) => {
       server: {
         port: 3000,
         host: '0.0.0.0',
+        proxy: {
+          '/uploads': {
+            target: 'http://localhost:4000',
+            changeOrigin: true,
+          },
+        },
       },
       plugins: [
         react(),
@@ -91,6 +97,51 @@ export default defineConfig(({ mode }) => {
                   expiration: {
                     maxEntries: 100,
                     maxAgeSeconds: 60 * 5 // 5 minutes
+                  },
+                  cacheableResponse: {
+                    statuses: [0, 200]
+                  }
+                }
+              },
+              {
+                // Cache de imagens do Cloudinary (timeline)
+                urlPattern: /^https:\/\/res\.cloudinary\.com\/.*/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'cloudinary-images-cache',
+                  expiration: {
+                    maxEntries: 200,
+                    maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  },
+                  cacheableResponse: {
+                    statuses: [0, 200]
+                  }
+                }
+              },
+              {
+                // Cache de imagens locais (uploads)
+                urlPattern: /\/uploads\/.*/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'uploads-cache',
+                  expiration: {
+                    maxEntries: 200,
+                    maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  },
+                  cacheableResponse: {
+                    statuses: [0, 200]
+                  }
+                }
+              },
+              {
+                // Cache de imagens externas genéricas
+                urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'images-cache',
+                  expiration: {
+                    maxEntries: 100,
+                    maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
                   },
                   cacheableResponse: {
                     statuses: [0, 200]

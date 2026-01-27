@@ -3,6 +3,10 @@
 ## Visão Geral
 Sistema administrativo completo para gerenciamento de obras e timeline, com autenticação Clerk, upload de imagens/vídeos e interface PWA.
 
+### Onde fica cada parte (Opção 2)
+- **Admin**: `obras.oxservices.org` — painel (login, obras, timeline, upload).
+- **Página do cliente** (fotos da obra): `oxservices.org/obra/{token}` — site principal. O link que o admin copia aponta para o site principal.
+
 ## Estrutura do Projeto
 
 ### Backend (Node.js + Express)
@@ -38,10 +42,18 @@ SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=sua-chave-servico
 ```
 
-#### Frontend (.env.local)
+#### Frontend (.env.local ou variáveis no build)
+Use a chave de **teste** do Clerk até o SSL de produção estar ativo:
 ```env
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_dG9sZXJhbnQtcXVldHphbC0zMi5jbGVyay5hY2NvdW50cy5kZXYk
 ```
+(O fallback em `admin/src/main.tsx` já é essa chave; em deploy, defina essa variável no momento do build.)
+
+Para que o “copiar link” aponte para a página do cliente no **site principal** (Opção 2: admin em obras, cliente em oxservices.org):
+```env
+VITE_PUBLIC_SITE_URL=https://oxservices.org
+```
+(Em dev, sem essa variável, o link usa a origem do site principal em localhost.)
 
 ### 2. Banco de Dados (Supabase)
 Execute o SQL em `plans/database-schema.md` para criar as tabelas:

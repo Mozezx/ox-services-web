@@ -3,6 +3,21 @@ import { useAuth } from '@clerk/clerk-react'
 // Usar caminho relativo para o proxy configurado no Vite
 const API_BASE = '/api'
 
+/** URL pública da página da obra para o cliente */
+export function getClientWorkPageUrl(token: string): string {
+  // Se tiver variável de ambiente configurada, usa ela
+  const base = (import.meta.env.VITE_PUBLIC_SITE_URL || '').replace(/\/$/, '')
+  if (base) return `${base}/obra/${token}`
+  
+  // Em desenvolvimento (localhost), usa porta 3000
+  if (typeof window !== 'undefined' && window.location.hostname.includes('localhost')) {
+    return `${window.location.origin.replace(':3001', ':3000')}/obra/${token}`
+  }
+  
+  // Em produção, sempre usa o domínio principal
+  return `https://oxservices.org/obra/${token}`
+}
+
 export interface Work {
   id: string
   name: string
@@ -240,6 +255,26 @@ class AdminAPI {
       method: 'POST',
       headers: this.getAuthHeader(),
     })
+  }
+
+  // Upload de imagem de capa
+  async uploadCoverImage(file: File): Promise<{ url: string }> {
+    const formData = new FormData()
+    formData.append('cover', file)
+
+    const response = await fetch(`${API_BASE}/admin/upload/cover`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer test-token`,
+      },
+      body: formData,
+    })
+
+    if (!response.ok) {
+      throw new Error('Erro ao fazer upload da imagem')
+    }
+
+    return response.json()
   }
 }
 

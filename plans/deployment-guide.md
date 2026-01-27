@@ -152,11 +152,11 @@ sudo chown -R $USER:$USER /var/www/ox-services-admin/public/uploads
 ```
 
 ## 6. Variáveis de Ambiente Frontend (Build‑time)
-Criar `.env.production` na raiz do frontend:
+Criar `.env.production` na raiz do frontend (ou na pasta `admin/` se o build for só do admin). Use a chave de **teste** do Clerk até o SSL de produção estar ativo:
 
 ```env
 VITE_API_URL=https://obras.oxservices.org/api
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_dG9sZXJhbnQtcXVldHphbC0zMi5jbGVyay5hY2NvdW50cy5kZXYk
 VITE_SUPABASE_URL=https://...
 VITE_SUPABASE_ANON_KEY=...
 ```

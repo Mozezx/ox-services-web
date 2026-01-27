@@ -286,6 +286,35 @@
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 .ox-animate-fade-in {
   animation: ox-fade-in 0.6s var(--transition-base) both;
 }
@@ -304,6 +333,27 @@
 .ox-stagger > *:nth-child(3) { animation-delay: 0.3s; }
 .ox-stagger > *:nth-child(4) { animation-delay: 0.4s; }
 .ox-stagger > *:nth-child(5) { animation-delay: 0.5s; }
+
+/* New animations for WorkPage redesign */
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out both;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* Utilitários */
 .ox-text-primary {

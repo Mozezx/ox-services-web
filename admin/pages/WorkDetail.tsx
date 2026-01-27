@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, Work, TimelineEntry } from '../lib/api'
+import { api, Work, TimelineEntry, getClientWorkPageUrl } from '../lib/api'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import WorkForm, { WorkFormData } from '../components/WorkForm'
@@ -67,12 +67,44 @@ const WorkDetail = () => {
     await deleteMutation.mutateAsync()
   }
 
-  const copyAccessLink = () => {
-    if (work) {
-      const baseUrl = window.location.origin.replace(':3001', ':5173')
-      navigator.clipboard.writeText(`${baseUrl}/obra/${work.access_token}`)
-      addToast('success', 'Link de acesso copiado!')
+  const copyAccessLink = async () => {
+    if (!work) return
+    
+    const url = getClientWorkPageUrl(work.access_token)
+    
+    // Tenta usar a Clipboard API moderna primeiro
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(url)
+        addToast('success', 'Link de acesso copiado!')
+        return
+      } catch (err) {
+        // Fallback se a Clipboard API falhar
+      }
     }
+    
+    // Fallback para contextos não-seguros (HTTP, IP local, mobile)
+    const textArea = document.createElement('textarea')
+    textArea.value = url
+    textArea.style.position = 'fixed'
+    textArea.style.left = '-999999px'
+    textArea.style.top = '-999999px'
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+    
+    try {
+      const successful = document.execCommand('copy')
+      if (successful) {
+        addToast('success', 'Link de acesso copiado!')
+      } else {
+        addToast('error', 'Não foi possível copiar. Copie manualmente.')
+      }
+    } catch (err) {
+      addToast('error', 'Não foi possível copiar. Copie manualmente.')
+    }
+    
+    document.body.removeChild(textArea)
   }
 
   const getStatusColor = (status: string) => {
@@ -267,8 +299,8 @@ const WorkDetail = () => {
               <div className="pt-4 border-t border-border">
                 <p className="text-sm text-text-light mb-2">Link de Acesso do Cliente</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-background px-3 py-2 rounded text-xs font-mono truncate">
-                    {work.access_token}
+                  <code className="flex-1 bg-background px-3 py-2 rounded text-xs font-mono truncate" title={getClientWorkPageUrl(work.access_token)}>
+                    {getClientWorkPageUrl(work.access_token)}
                   </code>
                   <button 
                     onClick={copyAccessLink}
@@ -279,7 +311,7 @@ const WorkDetail = () => {
                   </button>
                 </div>
                 <p className="text-xs text-text-light mt-2">
-                  Compartilhe este link com o cliente para acessar a página da obra
+                  Compartilhe este link com o cliente para acessar a página da obra (site principal oxservices.org)
                 </p>
               </div>
             </div>
