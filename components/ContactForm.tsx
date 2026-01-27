@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import type { Lead } from '../types';
-import { supabase } from '../lib/supabase';
 
 interface ContactFormProps {
     content: {
@@ -77,27 +76,9 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
         setSubmitError(null);
 
         try {
-            // Salvar no Supabase
-            const { error: supabaseError } = await supabase.from('leads').insert([
-                {
-                    full_name: formData.fullName,
-                    company: formData.company,
-                    email: formData.email,
-                    phone: formData.phone,
-                    message: formData.message,
-                }
-            ]);
-
-            if (supabaseError) {
-                console.error('Supabase error:', supabaseError);
-                setSubmitError('Erro ao enviar. Por favor, tente novamente.');
-                setIsSubmitting(false);
-                return;
-            }
-
-            // Enviar e-mail via API
+            // Enviar para a API de agendamentos (salva no PostgreSQL e envia push notification)
             const apiUrl = import.meta.env.VITE_API_URL || 'https://oxservices.org/api';
-            const response = await fetch(`${apiUrl}/contact`, {
+            const response = await fetch(`${apiUrl}/appointments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,8 +93,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ content }) => {
             });
 
             if (!response.ok) {
-                console.warn('Email API error:', await response.text());
-                // Não falhar se o e-mail não enviar, dados já foram salvos
+                const errorData = await response.json().catch(() => ({}));
+                console.error('API error:', errorData);
+                setSubmitError('Erro ao enviar. Por favor, tente novamente.');
+                setIsSubmitting(false);
+                return;
             }
 
             setIsSubmitting(false);

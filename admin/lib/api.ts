@@ -29,6 +29,26 @@ export interface TimelineEntry {
   order: number
 }
 
+export interface Appointment {
+  id: string
+  fullName: string
+  company: string | null
+  email: string
+  phone: string | null
+  message: string | null
+  status: 'new' | 'read' | 'contacted' | 'completed'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface AppointmentStats {
+  total: number
+  new: number
+  read: number
+  contacted: number
+  completed: number
+}
+
 class AdminAPI {
   private getAuthHeader(): HeadersInit {
     // Em desenvolvimento, usar token fixo
@@ -138,6 +158,87 @@ class AdminAPI {
       method: 'PUT',
       headers: this.getAuthHeader(),
       body: JSON.stringify({ order }),
+    })
+  }
+
+  // Appointments
+  async getAppointments(status?: string): Promise<Appointment[]> {
+    const url = status 
+      ? `${API_BASE}/admin/appointments?status=${status}`
+      : `${API_BASE}/admin/appointments`
+    const response = await fetch(url, {
+      headers: this.getAuthHeader(),
+    })
+    const data = await response.json()
+    return data.appointments || []
+  }
+
+  async getAppointment(id: string): Promise<Appointment> {
+    const response = await fetch(`${API_BASE}/admin/appointments/${id}`, {
+      headers: this.getAuthHeader(),
+    })
+    return response.json()
+  }
+
+  async getAppointmentsStats(): Promise<AppointmentStats> {
+    const response = await fetch(`${API_BASE}/admin/appointments/stats`, {
+      headers: this.getAuthHeader(),
+    })
+    return response.json()
+  }
+
+  async updateAppointment(id: string, status: string): Promise<Appointment> {
+    const response = await fetch(`${API_BASE}/admin/appointments/${id}`, {
+      method: 'PUT',
+      headers: this.getAuthHeader(),
+      body: JSON.stringify({ status }),
+    })
+    return response.json()
+  }
+
+  async deleteAppointment(id: string): Promise<void> {
+    await fetch(`${API_BASE}/admin/appointments/${id}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeader(),
+    })
+  }
+
+  // Push Notifications
+  async getVapidPublicKey(): Promise<string | null> {
+    try {
+      const response = await fetch(`${API_BASE}/push/vapid-public-key`)
+      if (!response.ok) return null
+      const data = await response.json()
+      return data.publicKey || null
+    } catch {
+      return null
+    }
+  }
+
+  async subscribePush(subscription: PushSubscription): Promise<void> {
+    const subscriptionJson = subscription.toJSON()
+    await fetch(`${API_BASE}/admin/push/subscribe`, {
+      method: 'POST',
+      headers: this.getAuthHeader(),
+      body: JSON.stringify({
+        endpoint: subscriptionJson.endpoint,
+        keys: subscriptionJson.keys,
+      }),
+    })
+  }
+
+  async unsubscribePush(endpoint: string): Promise<void> {
+    await fetch(`${API_BASE}/admin/push/unsubscribe`, {
+      method: 'DELETE',
+      headers: this.getAuthHeader(),
+      body: JSON.stringify({ endpoint }),
+    })
+  }
+
+  async testPushNotification(): Promise<void> {
+    await fetch(`${API_BASE}/admin/push/test`, {
+      method: 'POST',
+      headers: this.getAuthHeader(),
     })
   }
 }

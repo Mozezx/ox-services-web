@@ -3,6 +3,7 @@ const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+const webpush = require('web-push');
 const verifyClerkAuth = require('./middleware/clerkAuth');
 const db = require('./db');
 const upload = require('./middleware/upload');
@@ -10,6 +11,72 @@ const cloudinary = require('./cloudinary');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// ========== CONFIGURAÇÃO WEB PUSH ==========
+// Configurar VAPID keys para push notifications
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    webpush.setVapidDetails(
+        process.env.VAPID_EMAIL || 'mailto:admin@oxservices.org',
+        process.env.VAPID_PUBLIC_KEY,
+        process.env.VAPID_PRIVATE_KEY
+    );
+    console.log('✅ Web Push configurado com VAPID keys');
+} else {
+    console.warn('⚠️ VAPID keys não configuradas - Push notifications desativadas');
+    console.warn('   Gere as chaves com: npx web-push generate-vapid-keys');
+}
+
+// Função para enviar push notification para todos os subscribers
+async function sendPushNotificationToAll(title, body, data = {}) {
+    if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+        console.log('Push notifications desativadas - VAPID keys não configuradas');
+        return;
+    }
+
+    try {
+        const result = await db.query('SELECT * FROM push_subscriptions');
+        const subscriptions = result.rows || [];
+
+        console.log(`📤 Enviando push para ${subscriptions.length} dispositivo(s)...`);
+
+        const payload = JSON.stringify({
+            title,
+            body,
+            icon: '/logo.png',
+            badge: '/logo.png',
+            data: {
+                url: '/appointments',
+                ...data
+            }
+        });
+
+        const sendPromises = subscriptions.map(async (sub) => {
+            const pushSubscription = {
+                endpoint: sub.endpoint,
+                keys: {
+                    p256dh: sub.keys_p256dh,
+                    auth: sub.keys_auth
+                }
+            };
+
+            try {
+                await webpush.sendNotification(pushSubscription, payload);
+                console.log(`✅ Push enviado para: ${sub.endpoint.substring(0, 50)}...`);
+            } catch (error) {
+                console.error(`❌ Erro ao enviar push para ${sub.endpoint.substring(0, 50)}:`, error.message);
+                // Se a subscription expirou ou é inválida, remover do banco
+                if (error.statusCode === 404 || error.statusCode === 410) {
+                    await db.query('DELETE FROM push_subscriptions WHERE id = $1', [sub.id]);
+                    console.log(`🗑️ Subscription removida (expirada): ${sub.id}`);
+                }
+            }
+        });
+
+        await Promise.allSettled(sendPromises);
+    } catch (error) {
+        console.error('Erro ao buscar subscriptions:', error);
+    }
+}
 
 // Middleware
 app.use(cors());
@@ -199,6 +266,69 @@ app.post('/contact', async (req, res) => {
             details: error.message
         });
     }
+});
+
+// ========== ENDPOINT PARA AGENDAMENTOS (PÚBLICO) ==========
+
+// POST /api/appointments - Criar agendamento (substitui envio de email)
+app.post('/api/appointments', async (req, res) => {
+    const { fullName, company, email, phone, message } = req.body;
+
+    // Validação básica
+    if (!fullName || !email) {
+        return res.status(400).json({
+            error: 'Campos obrigatórios: fullName, email'
+        });
+    }
+
+    try {
+        // Salvar no banco de dados
+        const insertResult = await db.query(
+            `INSERT INTO appointments (full_name, company, email, phone, message, status)
+             VALUES ($1, $2, $3, $4, $5, 'new')
+             RETURNING *`,
+            [fullName, company || null, email, phone || null, message || null]
+        );
+        const appointment = insertResult.rows[0];
+
+        console.log(`📅 Novo agendamento: ${fullName} (${email})`);
+
+        // Enviar push notification para admin
+        await sendPushNotificationToAll(
+            '🆕 Novo Agendamento!',
+            `${fullName} enviou uma mensagem`,
+            { appointmentId: appointment.id }
+        );
+
+        res.status(201).json({
+            success: true,
+            message: 'Agendamento enviado com sucesso!',
+            appointment: {
+                id: appointment.id,
+                fullName: appointment.full_name,
+                company: appointment.company,
+                email: appointment.email,
+                phone: appointment.phone,
+                message: appointment.message,
+                status: appointment.status,
+                createdAt: appointment.created_at,
+            }
+        });
+    } catch (error) {
+        console.error('❌ Erro ao criar agendamento:', error);
+        res.status(500).json({
+            error: 'Erro ao criar agendamento',
+            details: error.message
+        });
+    }
+});
+
+// GET /api/push/vapid-public-key - Obter chave pública VAPID (público)
+app.get('/api/push/vapid-public-key', (req, res) => {
+    if (!process.env.VAPID_PUBLIC_KEY) {
+        return res.status(404).json({ error: 'VAPID key não configurada' });
+    }
+    res.json({ publicKey: process.env.VAPID_PUBLIC_KEY });
 });
 
 // ========== ENDPOINTS PARA OBRAS (PÚBLICOS) ==========
@@ -617,18 +747,243 @@ app.put('/admin/works/:id/timeline/reorder', async (req, res) => {
   }
 });
 
+// ========== ENDPOINTS ADMIN - AGENDAMENTOS ==========
+
+// GET /admin/appointments - Listar agendamentos
+app.get('/admin/appointments', async (req, res) => {
+    try {
+        const { status } = req.query;
+        let query = 'SELECT * FROM appointments';
+        const params = [];
+
+        if (status && status !== 'all') {
+            query += ' WHERE status = $1';
+            params.push(status);
+        }
+
+        query += ' ORDER BY created_at DESC';
+
+        const result = await db.query(query, params);
+        const appointments = result.rows || [];
+
+        // Formatar dados para o frontend
+        const formatted = appointments.map(apt => ({
+            id: apt.id,
+            fullName: apt.full_name,
+            company: apt.company,
+            email: apt.email,
+            phone: apt.phone,
+            message: apt.message,
+            status: apt.status,
+            createdAt: apt.created_at,
+            updatedAt: apt.updated_at,
+        }));
+
+        res.json({ appointments: formatted, total: formatted.length });
+    } catch (error) {
+        console.error('Erro ao buscar agendamentos:', error);
+        res.status(500).json({ error: 'Erro ao buscar agendamentos' });
+    }
+});
+
+// GET /admin/appointments/stats - Estatísticas de agendamentos
+app.get('/admin/appointments/stats', async (req, res) => {
+    try {
+        const totalResult = await db.query('SELECT COUNT(*) as count FROM appointments');
+        const newResult = await db.query("SELECT COUNT(*) as count FROM appointments WHERE status = 'new'");
+        const readResult = await db.query("SELECT COUNT(*) as count FROM appointments WHERE status = 'read'");
+        const contactedResult = await db.query("SELECT COUNT(*) as count FROM appointments WHERE status = 'contacted'");
+        const completedResult = await db.query("SELECT COUNT(*) as count FROM appointments WHERE status = 'completed'");
+
+        res.json({
+            total: parseInt(totalResult.rows[0].count),
+            new: parseInt(newResult.rows[0].count),
+            read: parseInt(readResult.rows[0].count),
+            contacted: parseInt(contactedResult.rows[0].count),
+            completed: parseInt(completedResult.rows[0].count),
+        });
+    } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+        res.status(500).json({ error: 'Erro ao buscar estatísticas' });
+    }
+});
+
+// GET /admin/appointments/:id - Obter agendamento por ID
+app.get('/admin/appointments/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const apt = await db.queryOne('SELECT * FROM appointments WHERE id = $1', [id]);
+
+        if (!apt) {
+            return res.status(404).json({ error: 'Agendamento não encontrado' });
+        }
+
+        res.json({
+            id: apt.id,
+            fullName: apt.full_name,
+            company: apt.company,
+            email: apt.email,
+            phone: apt.phone,
+            message: apt.message,
+            status: apt.status,
+            createdAt: apt.created_at,
+            updatedAt: apt.updated_at,
+        });
+    } catch (error) {
+        console.error('Erro ao buscar agendamento:', error);
+        res.status(500).json({ error: 'Erro ao buscar agendamento' });
+    }
+});
+
+// PUT /admin/appointments/:id - Atualizar agendamento (status)
+app.put('/admin/appointments/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        const validStatuses = ['new', 'read', 'contacted', 'completed'];
+        if (status && !validStatuses.includes(status)) {
+            return res.status(400).json({ error: 'Status inválido' });
+        }
+
+        const result = await db.query(
+            'UPDATE appointments SET status = $1 WHERE id = $2 RETURNING *',
+            [status, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Agendamento não encontrado' });
+        }
+
+        const apt = result.rows[0];
+        res.json({
+            id: apt.id,
+            fullName: apt.full_name,
+            company: apt.company,
+            email: apt.email,
+            phone: apt.phone,
+            message: apt.message,
+            status: apt.status,
+            createdAt: apt.created_at,
+            updatedAt: apt.updated_at,
+        });
+    } catch (error) {
+        console.error('Erro ao atualizar agendamento:', error);
+        res.status(500).json({ error: 'Erro ao atualizar agendamento' });
+    }
+});
+
+// DELETE /admin/appointments/:id - Excluir agendamento
+app.delete('/admin/appointments/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        await db.query('DELETE FROM appointments WHERE id = $1', [id]);
+        res.status(204).end();
+    } catch (error) {
+        console.error('Erro ao excluir agendamento:', error);
+        res.status(500).json({ error: 'Erro ao excluir agendamento' });
+    }
+});
+
+// ========== ENDPOINTS ADMIN - PUSH SUBSCRIPTIONS ==========
+
+// POST /admin/push/subscribe - Registrar subscription
+app.post('/admin/push/subscribe', async (req, res) => {
+    try {
+        const { endpoint, keys } = req.body;
+
+        if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
+            return res.status(400).json({ error: 'Dados de subscription inválidos' });
+        }
+
+        // Upsert: inserir ou atualizar se já existir
+        const existingResult = await db.query(
+            'SELECT id FROM push_subscriptions WHERE endpoint = $1',
+            [endpoint]
+        );
+
+        if (existingResult.rows.length > 0) {
+            // Atualizar chaves
+            await db.query(
+                'UPDATE push_subscriptions SET keys_p256dh = $1, keys_auth = $2 WHERE endpoint = $3',
+                [keys.p256dh, keys.auth, endpoint]
+            );
+            console.log('🔄 Push subscription atualizada');
+        } else {
+            // Inserir nova
+            await db.query(
+                `INSERT INTO push_subscriptions (endpoint, keys_p256dh, keys_auth)
+                 VALUES ($1, $2, $3)`,
+                [endpoint, keys.p256dh, keys.auth]
+            );
+            console.log('✅ Nova push subscription registrada');
+        }
+
+        res.json({ success: true, message: 'Subscription registrada com sucesso' });
+    } catch (error) {
+        console.error('Erro ao registrar subscription:', error);
+        res.status(500).json({ error: 'Erro ao registrar subscription' });
+    }
+});
+
+// DELETE /admin/push/unsubscribe - Remover subscription
+app.delete('/admin/push/unsubscribe', async (req, res) => {
+    try {
+        const { endpoint } = req.body;
+
+        if (!endpoint) {
+            return res.status(400).json({ error: 'Endpoint obrigatório' });
+        }
+
+        await db.query('DELETE FROM push_subscriptions WHERE endpoint = $1', [endpoint]);
+        console.log('🗑️ Push subscription removida');
+
+        res.json({ success: true, message: 'Subscription removida com sucesso' });
+    } catch (error) {
+        console.error('Erro ao remover subscription:', error);
+        res.status(500).json({ error: 'Erro ao remover subscription' });
+    }
+});
+
+// POST /admin/push/test - Testar push notification (desenvolvimento)
+app.post('/admin/push/test', async (req, res) => {
+    try {
+        await sendPushNotificationToAll(
+            '🔔 Teste de Notificação',
+            'Esta é uma notificação de teste do Admin OX Services',
+            { test: true }
+        );
+        res.json({ success: true, message: 'Notificação de teste enviada' });
+    } catch (error) {
+        console.error('Erro ao enviar notificação de teste:', error);
+        res.status(500).json({ error: 'Erro ao enviar notificação' });
+    }
+});
+
 // Iniciar servidor
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
-    console.log(`📁 Endpoints de obras disponíveis:`);
+    console.log(`📁 Endpoints públicos disponíveis:`);
+    console.log(`   POST /api/appointments`);
+    console.log(`   GET  /api/push/vapid-public-key`);
     console.log(`   GET  /api/works/:token`);
     console.log(`   GET  /api/works/:token/comments`);
     console.log(`   POST /api/works/:token/comments`);
     console.log(`   POST /api/works/:token/upload`);
-    console.log(`📁 Endpoints admin disponíveis:`);
+    console.log(`📁 Endpoints admin - Obras:`);
     console.log(`   GET  /admin/works`);
     console.log(`   POST /admin/works`);
     console.log(`   GET  /admin/works/:id`);
     console.log(`   PUT  /admin/works/:id`);
     console.log(`   DELETE /admin/works/:id`);
+    console.log(`📁 Endpoints admin - Agendamentos:`);
+    console.log(`   GET  /admin/appointments`);
+    console.log(`   GET  /admin/appointments/stats`);
+    console.log(`   GET  /admin/appointments/:id`);
+    console.log(`   PUT  /admin/appointments/:id`);
+    console.log(`   DELETE /admin/appointments/:id`);
+    console.log(`📁 Endpoints admin - Push:`);
+    console.log(`   POST /admin/push/subscribe`);
+    console.log(`   DELETE /admin/push/unsubscribe`);
+    console.log(`   POST /admin/push/test`);
 });

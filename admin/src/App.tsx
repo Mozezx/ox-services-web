@@ -6,6 +6,7 @@ import Works from '../pages/Works'
 import WorkDetail from '../pages/WorkDetail'
 import Timeline from '../pages/Timeline'
 import Upload from '../pages/Upload'
+import Appointments from '../pages/Appointments'
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/appointments" element={<Appointments />} />
             <Route path="/works" element={<Works />} />
             <Route path="/works/:id" element={<WorkDetail />} />
             <Route path="/works/:id/timeline" element={<Timeline />} />

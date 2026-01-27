@@ -25,6 +25,13 @@
   "categories": ["business", "productivity"],
   "shortcuts": [
     {
+      "name": "Agendamentos",
+      "short_name": "Agendamentos",
+      "description": "Ver novos agendamentos",
+      "url": "/admin/index.html#/appointments",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    },
+    {
       "name": "Nova Obra",
       "short_name": "Nova Obra",
       "description": "Criar uma nova obra",

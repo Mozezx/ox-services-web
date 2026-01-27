@@ -1,6 +1,8 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { UserButton } from '@clerk/clerk-react'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../lib/api'
 
 interface LayoutProps {
   children: ReactNode
@@ -9,9 +11,19 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  // Fetch appointment stats for badge
+  const { data: appointmentStats } = useQuery({
+    queryKey: ['appointments-stats'],
+    queryFn: () => api.getAppointmentsStats(),
+    refetchInterval: 30000, // Refetch every 30 seconds
+  })
+
+  const newAppointmentsCount = appointmentStats?.new || 0
   
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { path: '/appointments', label: 'Agendamentos', icon: 'calendar_month', badge: newAppointmentsCount },
     { path: '/works', label: 'Obras', icon: 'construction' },
   ]
   
@@ -64,7 +76,12 @@ const Layout = ({ children }: LayoutProps) => {
                   }`}
                 >
                   <span className="material-symbols-outlined">{item.icon}</span>
-                  <span>{item.label}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {item.badge && item.badge > 0 && (
+                    <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center">
+                      {item.badge > 99 ? '99+' : item.badge}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}
