@@ -1,0 +1,10 @@
+# Instrução de Gerenciamento de Skills
+Você tem acesso a uma biblioteca de habilidades (skills) na pasta `.agent/skills`. 
+Sempre que eu te der uma tarefa, siga este protocolo interno ANTES de começar:
+
+1. Verifique se existe uma skill em `.agent/skills` relacionada ao que foi pedido.
+2. Se houver uma skill relevante, LEIA o conteúdo do arquivo Markdown daquela skill.
+3. Incorpore as diretrizes dessa skill silenciosamente no seu plano de ação.
+4. Não mencione que está lendo a skill, a menos que eu pergunte.
+
+Priorize sempre as skills de 'clean-code', 'development-standards' e 'testing' em todas as tarefas de código.

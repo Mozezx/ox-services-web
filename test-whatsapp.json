@@ -1,0 +1,27 @@
+{
+    "entry": [
+        {
+            "changes": [
+                {
+                    "value": {
+                        "messaging_product": "whatsapp",
+                        "metadata": {
+                            "phone_number_id": "96016282717079"
+                        },
+                        "messages": [
+                            {
+                                "from": "5511999999999",
+                                "id": "wamid.test123",
+                                "timestamp": "1234567890",
+                                "type": "text",
+                                "text": {
+                                    "body": "Hello, I need a quote for aluminum windows"
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
+}

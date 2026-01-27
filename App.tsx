@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import Stats from './components/Stats';
@@ -11,12 +12,13 @@ import Footer from './components/Footer';
 import WhatsAppButton from './components/WhatsAppButton';
 import AIChatWidget from './components/AIChatWidget';
 import { useLanguage } from './context/LanguageContext';
+import WorkPage from './pages/WorkPage';
 
-const App: React.FC = () => {
+const LandingPage: React.FC = () => {
     const { textData } = useLanguage();
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <>
             <Header
                 companyName={textData.companyName}
                 navLinks={textData.navigation}
@@ -41,6 +43,17 @@ const App: React.FC = () => {
             <Footer content={textData.footer} companyName={textData.companyName} />
             <WhatsAppButton phoneNumber={textData.footer.contactInfo.phone} />
             <AIChatWidget webhookUrl="https://n8n.oxservices.org/webhook/oxchat" />
+        </>
+    );
+};
+
+const App: React.FC = () => {
+    return (
+        <div className="flex flex-col min-h-screen">
+            <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/obra/:token" element={<WorkPage />} />
+            </Routes>
         </div>
     );
 };

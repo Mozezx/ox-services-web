@@ -1,0 +1,484 @@
+/* Industrial/Utilitário Premium Theme */
+:root {
+  /* Cores base - Concreto, Aço, Madeira */
+  --concrete-50: #f8f9fa;
+  --concrete-100: #e9ecef;
+  --concrete-200: #dee2e6;
+  --concrete-300: #ced4da;
+  --concrete-400: #adb5bd;
+  --concrete-500: #6c757d;
+  --concrete-600: #495057;
+  --concrete-700: #343a40;
+  --concrete-800: #212529;
+  --concrete-900: #121416;
+  
+  --steel-50: #f0f7ff;
+  --steel-100: #e0efff;
+  --steel-200: #bae0ff;
+  --steel-300: #7cc2ff;
+  --steel-400: #36a0ff;
+  --steel-500: #0d8bf2;
+  --steel-600: #006ed6;
+  --steel-700: #0057ac;
+  --steel-800: #004785;
+  --steel-900: #00315e;
+  
+  --wood-50: #fdf8f3;
+  --wood-100: #f5e9dd;
+  --wood-200: #ecd4bc;
+  --wood-300: #dfb992;
+  --wood-400: #d09a6a;
+  --wood-500: #c17d47;
+  --wood-600: #a8663a;
+  --wood-700: #8a5130;
+  --wood-800: #6f4027;
+  --wood-900: #5a3320;
+  
+  /* Cores de acento */
+  --accent-primary: var(--steel-600);
+  --accent-secondary: var(--wood-500);
+  --accent-danger: #dc3545;
+  --accent-success: #28a745;
+  --accent-warning: #ffc107;
+  
+  /* Texturas e efeitos */
+  --texture-concrete: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23343a40' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+  
+  /* Sombras industriais */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.1);
+  --shadow-industrial: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.15);
+  
+  /* Bordas */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-industrial: 4px 12px 12px 4px;
+  
+  /* Transições */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Gradientes */
+  --gradient-steel: linear-gradient(135deg, var(--steel-500) 0%, var(--steel-700) 100%);
+  --gradient-concrete: linear-gradient(135deg, var(--concrete-100) 0%, var(--concrete-300) 100%);
+  --gradient-wood: linear-gradient(135deg, var(--wood-400) 0%, var(--wood-600) 100%);
+  --gradient-industrial: linear-gradient(135deg, var(--concrete-800) 0%, var(--steel-800) 100%);
+}
+
+/* Estilos base */
+.industrial-bg {
+  background-color: var(--concrete-50);
+  background-image: var(--texture-concrete);
+  background-attachment: fixed;
+}
+
+.industrial-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-industrial);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+.industrial-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.industrial-badge {
+  background: var(--gradient-steel);
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.industrial-progress {
+  height: 8px;
+  background: var(--concrete-200);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.industrial-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--gradient-steel);
+  border-radius: 4px;
+  animation: progress-pulse 2s ease-in-out infinite;
+}
+
+@keyframes progress-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Animações de entrada */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s var(--transition-base) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s var(--transition-base) both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s var(--transition-base) both;
+}
+
+/* Responsividade industrial */
+@media (max-width: 768px) {
+  .industrial-card {
+    border-radius: var(--radius-md);
+    margin: 0 -1rem;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .industrial-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+}
+
+/* Utilitários industriais */
+.border-industrial {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.text-industrial {
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'ss01', 'ss02', 'cv01', 'cv02';
+  letter-spacing: -0.01em;
+}
+
+.text-industrial-display {
+  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+/* Scrollbar industrial */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--concrete-100);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--steel-500);
+  border-radius: 4px;
+  border: 2px solid var(--concrete-100);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--steel-600);
+}
+
+/* Animações avançadas e micro-interações */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(13, 139, 242, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(13, 139, 242, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce-subtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes border-glow {
+  0%, 100% {
+    border-color: var(--steel-300);
+  }
+  50% {
+    border-color: var(--steel-500);
+  }
+}
+
+/* Classes de animação */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--concrete-100) 0%,
+    var(--steel-100) 25%,
+    var(--concrete-100) 50%,
+    var(--steel-100) 75%,
+    var(--concrete-100) 100%
+  );
+  background-size: 200% auto;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s ease-in-out infinite;
+}
+
+.animate-border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+/* Efeitos de hover avançados */
+.hover-lift {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.hover-glow {
+  transition: box-shadow var(--transition-base);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(13, 139, 242, 0.3);
+}
+
+.hover-scale {
+  transition: transform var(--transition-base);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-rotate {
+  transition: transform var(--transition-base);
+}
+
+.hover-rotate:hover {
+  transform: rotate(5deg);
+}
+
+/* Efeitos de focus visíveis */
+.focus-industrial:focus {
+  outline: 2px solid var(--steel-500);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(13, 139, 242, 0.1);
+}
+
+/* Efeitos de loading skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--concrete-100) 25%,
+    var(--concrete-200) 50%,
+    var(--concrete-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Efeitos de texto gradiente */
+.text-gradient-steel {
+  background: linear-gradient(135deg, var(--steel-500) 0%, var(--steel-700) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-wood {
+  background: linear-gradient(135deg, var(--wood-400) 0%, var(--wood-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Efeitos de borda gradiente */
+.border-gradient-steel {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--concrete-50), var(--concrete-50)) padding-box,
+              linear-gradient(135deg, var(--steel-500), var(--steel-700)) border-box;
+}
+
+.border-gradient-wood {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--concrete-50), var(--concrete-50)) padding-box,
+              linear-gradient(135deg, var(--wood-400), var(--wood-600)) border-box;
+}
+
+/* Efeitos de backdrop com blur */
+.backdrop-industrial {
+  backdrop-filter: blur(12px) saturate(180%);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Efeitos de entrada em cascata */
+.stagger-child > * {
+  opacity: 0;
+  animation: slide-up 0.6s var(--transition-base) forwards;
+}
+
+.stagger-child > *:nth-child(1) { animation-delay: 0.1s; }
+.stagger-child > *:nth-child(2) { animation-delay: 0.2s; }
+.stagger-child > *:nth-child(3) { animation-delay: 0.3s; }
+.stagger-child > *:nth-child(4) { animation-delay: 0.4s; }
+.stagger-child > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-child > *:nth-child(6) { animation-delay: 0.6s; }
+
+/* Efeitos de tooltip industrial */
+.industrial-tooltip {
+  position: relative;
+}
+
+.industrial-tooltip::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 0.75rem;
+  background: var(--concrete-800);
+  color: white;
+  font-size: 0.75rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-fast);
+  z-index: 50;
+}
+
+.industrial-tooltip:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Responsividade para animações */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Utilitários de acessibilidade */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Efeitos de transição para dark mode */
+@media (prefers-color-scheme: dark) {
+  .industrial-card {
+    background: rgba(30, 30, 30, 0.92);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .backdrop-industrial {
+    background: rgba(30, 30, 30, 0.85);
+  }
+}

@@ -1,3 +1,7 @@
+# Agent / internal
+.agent
+$null
+
 # Logs
 logs
 *.log

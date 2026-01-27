@@ -87,6 +87,94 @@ interface TextData {
         errorMessage: string;
         fallbackGeneral: string;
     };
+    workpage: {
+        progressTitle: string;
+        timelineTitle: string;
+        commentsTitle: string;
+        shareTitle: string;
+        infoTitle: string;
+        daysWorked: string;
+        photosRecorded: string;
+        videos: string;
+        daysRemaining: string;
+        startDate: string;
+        endDate: string;
+        lastUpdate: string;
+        teamResponsible: string;
+        shareDescription: string;
+        copyLink: string;
+        linkCopied: string;
+        accessToken: string;
+        client: string;
+        status: string;
+        period: string;
+        loading: string;
+        preparing: string;
+        workNotFound: string;
+        workNotFoundDescription: string;
+        backToHome: string;
+        tryAgain: string;
+        statusLabels: {
+            in_progress: string;
+            planned: string;
+            completed: string;
+        };
+        records: (count: number) => string;
+        commentsCount: (count: number) => string;
+        today: string;
+    };
+    comments: {
+        title: string;
+        commentsCount: (count: number) => string;
+        likesCount: (count: number) => string;
+        addComment: string;
+        yourName: string;
+        yourEmail: string;
+        yourComment: string;
+        submitComment: string;
+        submitting: string;
+        submitted: string;
+        approvalNote: string;
+        sortRecent: string;
+        sortPopular: string;
+        sortOldest: string;
+        verified: string;
+        awaitingApproval: string;
+        minutesAgo: (mins: number) => string;
+        hoursAgo: (hours: number) => string;
+        daysAgo: (days: number) => string;
+        yesterday: string;
+        like: string;
+        liked: string;
+        reply: string;
+        share: string;
+        report: string;
+        noComments: string;
+        noCommentsDescription: string;
+        replies: (count: number) => string;
+        showReplies: string;
+        hideReplies: string;
+    };
+    timeline: {
+        emptyTitle: string;
+        emptyDescription: string;
+        photo: string;
+        video: string;
+        note: string;
+        record: string;
+        today: string;
+        yesterday: string;
+        daysAgo: (days: number) => string;
+        like: string;
+        liked: string;
+        comment: string;
+        share: string;
+        download: string;
+        showMore: string;
+        showLess: string;
+        loadFullHistory: string;
+        showingEntries: (current: number, total: number) => string;
+    };
 }
 
 const translations: Record<Language, TextData> = {
@@ -258,6 +346,94 @@ const translations: Record<Language, TextData> = {
             errorMessage: 'Sorry, an error occurred. Please try again or contact us via WhatsApp.',
             fallbackGeneral: 'Got it! We offer the following services:\n\n• **Aluminum Joinery** - Windows and doors\n• **Solar Energy** - PV systems\n• **Bespoke Furniture** - Custom design\n• **EPDM Roofing** - Waterproofing\n\nWhich of these services interests you? Or tell me more about your project!',
         },
+        workpage: {
+            progressTitle: 'Work Progress',
+            timelineTitle: 'Work Timeline',
+            commentsTitle: 'Comments and Observations',
+            shareTitle: 'Share Access',
+            infoTitle: 'Work Information',
+            daysWorked: 'Days worked',
+            photosRecorded: 'Photos recorded',
+            videos: 'Videos',
+            daysRemaining: 'Days remaining',
+            startDate: 'Start date',
+            endDate: 'Estimated completion',
+            lastUpdate: 'Last update',
+            teamResponsible: 'Responsible team',
+            shareDescription: 'Share this link with others so they can follow the work in real time:',
+            copyLink: 'Copy Link',
+            linkCopied: 'Link copied!',
+            accessToken: 'Access token',
+            client: 'Client',
+            status: 'Status',
+            period: 'Period',
+            loading: 'Loading work data...',
+            preparing: 'Preparing the digital construction site',
+            workNotFound: 'Work not found',
+            workNotFoundDescription: 'The access token may be incorrect or this work is no longer available. Check the link or contact the work team.',
+            backToHome: 'Back to home page',
+            tryAgain: 'Try again',
+            statusLabels: {
+                in_progress: '🏗️ In progress',
+                planned: '📅 Planned',
+                completed: '✅ Completed',
+            },
+            records: (count: number) => `${count} ${count === 1 ? 'record' : 'records'}`,
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'comment' : 'comments'}`,
+            today: 'Today',
+        },
+        comments: {
+            title: 'Comments and Feedback',
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'comment' : 'comments'}`,
+            likesCount: (count: number) => `${count} likes`,
+            addComment: 'Add Comment',
+            yourName: 'Your name *',
+            yourEmail: 'Your email (optional)',
+            yourComment: 'Your comment *',
+            submitComment: 'Submit Comment',
+            submitting: 'Submitting...',
+            submitted: '✓ Submitted!',
+            approvalNote: 'Your comment will be visible after team approval.',
+            sortRecent: 'Most recent',
+            sortPopular: 'Most popular',
+            sortOldest: 'Oldest',
+            verified: 'Verified',
+            awaitingApproval: 'Awaiting approval',
+            minutesAgo: (mins: number) => `${mins} min ago`,
+            hoursAgo: (hours: number) => `${hours} h ago`,
+            daysAgo: (days: number) => `${days} days ago`,
+            yesterday: 'Yesterday',
+            like: 'Like',
+            liked: 'Liked',
+            reply: 'Reply',
+            share: 'Share',
+            report: 'Report',
+            noComments: 'No comments yet',
+            noCommentsDescription: 'Be the first to share your observations about the progress of this work.',
+            replies: (count: number) => `${count} ${count === 1 ? 'reply' : 'replies'}`,
+            showReplies: 'Show replies',
+            hideReplies: 'Hide replies',
+        },
+        timeline: {
+            emptyTitle: 'Empty Timeline',
+            emptyDescription: 'There are no records in this work yet. The first record will appear here when the team starts documenting progress.',
+            photo: 'Photo',
+            video: 'Video',
+            note: 'Note',
+            record: 'Record',
+            today: 'Today',
+            yesterday: 'Yesterday',
+            daysAgo: (days: number) => `${days} days ago`,
+            like: 'Like',
+            liked: 'Liked',
+            comment: 'Comment',
+            share: 'Share',
+            download: 'Download',
+            showMore: 'Show more',
+            showLess: 'Show less',
+            loadFullHistory: 'Load full history',
+            showingEntries: (current: number, total: number) => `Showing ${current} of ${total} records`,
+        },
     },
     nl: {
         companyName: 'OX Services',
@@ -426,6 +602,94 @@ const translations: Record<Language, TextData> = {
             initialMessage: 'Hallo! 👋 Ik ben de virtuele assistent van OX Services. Hoe kan ik u vandaag helpen? Welk type dienst zoekt u?',
             errorMessage: 'Sorry, er is een fout opgetreden. Probeer het opnieuw of neem contact met ons op via WhatsApp.',
             fallbackGeneral: 'Begrepen! Wij bieden de volgende diensten aan:\n\n• **Aluminium Schrijnwerk** - Ramen en deuren\n• **Zonne-energie** - PV-systemen\n• **Maatwerk Meubels** - Op maat ontwerp\n• **EPDM Dakbedekking** - Waterdichting\n\nWelke van deze diensten interesseert u? Of vertel me meer over uw project!',
+        },
+        workpage: {
+            progressTitle: 'Werkvoortgang',
+            timelineTitle: 'Werk Tijdlijn',
+            commentsTitle: 'Opmerkingen en Observaties',
+            shareTitle: 'Toegang Delen',
+            infoTitle: 'Werk Informatie',
+            daysWorked: 'Dagen gewerkt',
+            photosRecorded: "Foto's opgenomen",
+            videos: "Video's",
+            daysRemaining: 'Dagen resterend',
+            startDate: 'Startdatum',
+            endDate: 'Verwachte voltooiing',
+            lastUpdate: 'Laatste update',
+            teamResponsible: 'Verantwoordelijk team',
+            shareDescription: 'Deel deze link met anderen zodat ze het werk in realtime kunnen volgen:',
+            copyLink: 'Link Kopiëren',
+            linkCopied: 'Link gekopieerd!',
+            accessToken: 'Toegangstoken',
+            client: 'Klant',
+            status: 'Status',
+            period: 'Periode',
+            loading: 'Werkgegevens laden...',
+            preparing: 'Digitale bouwplaats voorbereiden',
+            workNotFound: 'Werk niet gevonden',
+            workNotFoundDescription: 'Het toegangstoken is mogelijk onjuist or dit werk is niet meer beschikbaar. Controleer de link of neem contact op met het werkteam.',
+            backToHome: 'Terug naar startpagina',
+            tryAgain: 'Opnieuw proberen',
+            statusLabels: {
+                in_progress: '🏗️ In uitvoering',
+                planned: '📅 Gepland',
+                completed: '✅ Voltooid',
+            },
+            records: (count: number) => `${count} ${count === 1 ? 'record' : 'records'}`,
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'opmerking' : 'opmerkingen'}`,
+            today: 'Vandaag',
+        },
+        comments: {
+            title: 'Opmerkingen en Feedback',
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'opmerking' : 'opmerkingen'}`,
+            likesCount: (count: number) => `${count} likes`,
+            addComment: 'Opmerking Toevoegen',
+            yourName: 'Uw naam *',
+            yourEmail: 'Uw e-mail (optioneel)',
+            yourComment: 'Uw opmerking *',
+            submitComment: 'Opmerking Versturen',
+            submitting: 'Versturen...',
+            submitted: '✓ Verzonden!',
+            approvalNote: 'Uw opmerking zal zichtbaar zijn na goedkeuring door het team.',
+            sortRecent: 'Meest recent',
+            sortPopular: 'Meest populair',
+            sortOldest: 'Oudste',
+            verified: 'Geverifieerd',
+            awaitingApproval: 'Wachtend op goedkeuring',
+            minutesAgo: (mins: number) => `${mins} min geleden`,
+            hoursAgo: (hours: number) => `${hours} uur geleden`,
+            daysAgo: (days: number) => `${days} dagen geleden`,
+            yesterday: 'Gisteren',
+            like: 'Like',
+            liked: 'Geliked',
+            reply: 'Antwoorden',
+            share: 'Delen',
+            report: 'Rapporteren',
+            noComments: 'Nog geen opmerkingen',
+            noCommentsDescription: 'Wees de eerste om uw observaties over de voortgang van dit werk te delen.',
+            replies: (count: number) => `${count} ${count === 1 ? 'antwoord' : 'antwoorden'}`,
+            showReplies: 'Antwoorden tonen',
+            hideReplies: 'Antwoorden verbergen',
+        },
+        timeline: {
+            emptyTitle: 'Lege Tijdlijn',
+            emptyDescription: 'Er zijn nog geen records in dit werk. Het eerste record verschijnt hier wanneer het team de voortgang begint te documenteren.',
+            photo: 'Foto',
+            video: 'Video',
+            note: 'Notitie',
+            record: 'Record',
+            today: 'Vandaag',
+            yesterday: 'Gisteren',
+            daysAgo: (days: number) => `${days} dagen geleden`,
+            like: 'Like',
+            liked: 'Geliked',
+            comment: 'Opmerking',
+            share: 'Delen',
+            download: 'Downloaden',
+            showMore: 'Meer tonen',
+            showLess: 'Minder tonen',
+            loadFullHistory: 'Volledige geschiedenis laden',
+            showingEntries: (current: number, total: number) => `Toont ${current} van ${total} records`,
         },
     },
     es: {
@@ -596,6 +860,94 @@ const translations: Record<Language, TextData> = {
             errorMessage: 'Lo siento, ocurrió un error. Por favor, inténtalo de nuevo o contáctanos por WhatsApp.',
             fallbackGeneral: '¡Entendido! Ofrecemos los siguientes servicios:\n\n• **Carpintería de Aluminio** - Ventanas y puertas\n• **Energía Solar** - Sistemas fotovoltaicos\n• **Muebles a Medida** - Diseño exclusivo\n• **Techos EPDM** - Impermeabilización\n\n¿Cuál de estos servicios te interesa? ¡O cuéntame más sobre tu proyecto!',
         },
+        workpage: {
+            progressTitle: 'Progreso del Trabajo',
+            timelineTitle: 'Línea de Tiempo del Trabajo',
+            commentsTitle: 'Comentarios y Observaciones',
+            shareTitle: 'Compartir Acceso',
+            infoTitle: 'Información del Trabajo',
+            daysWorked: 'Días trabajados',
+            photosRecorded: 'Fotos registradas',
+            videos: 'Videos',
+            daysRemaining: 'Días restantes',
+            startDate: 'Fecha de inicio',
+            endDate: 'Finalización estimada',
+            lastUpdate: 'Última actualización',
+            teamResponsible: 'Equipo responsable',
+            shareDescription: 'Comparte este enlace con otros para que puedan seguir el trabajo en tiempo real:',
+            copyLink: 'Copiar Enlace',
+            linkCopied: '¡Enlace copiado!',
+            accessToken: 'Token de acceso',
+            client: 'Cliente',
+            status: 'Estado',
+            period: 'Período',
+            loading: 'Cargando datos del trabajo...',
+            preparing: 'Preparando el sitio de construcción digital',
+            workNotFound: 'Trabajo no encontrado',
+            workNotFoundDescription: 'El token de acceso puede ser incorrecto o este trabajo ya no está disponible. Verifica el enlace o contacta al equipo de trabajo.',
+            backToHome: 'Volver a la página principal',
+            tryAgain: 'Intentar de nuevo',
+            statusLabels: {
+                in_progress: '🏗️ En progreso',
+                planned: '📅 Planificado',
+                completed: '✅ Completado',
+            },
+            records: (count: number) => `${count} ${count === 1 ? 'registro' : 'registros'}`,
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'comentario' : 'comentarios'}`,
+            today: 'Hoy',
+        },
+        comments: {
+            title: 'Comentarios y Retroalimentación',
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'comentario' : 'comentarios'}`,
+            likesCount: (count: number) => `${count} me gusta`,
+            addComment: 'Agregar Comentario',
+            yourName: 'Tu nombre *',
+            yourEmail: 'Tu correo (opcional)',
+            yourComment: 'Tu comentario *',
+            submitComment: 'Enviar Comentario',
+            submitting: 'Enviando...',
+            submitted: '✓ ¡Enviado!',
+            approvalNote: 'Tu comentario será visible después de la aprobación del equipo.',
+            sortRecent: 'Más recientes',
+            sortPopular: 'Más populares',
+            sortOldest: 'Más antiguos',
+            verified: 'Verificado',
+            awaitingApproval: 'Esperando aprobación',
+            minutesAgo: (mins: number) => `hace ${mins} min`,
+            hoursAgo: (hours: number) => `hace ${hours} h`,
+            daysAgo: (days: number) => `hace ${days} días`,
+            yesterday: 'Ayer',
+            like: 'Me gusta',
+            liked: 'Me gusta',
+            reply: 'Responder',
+            share: 'Compartir',
+            report: 'Reportar',
+            noComments: 'Aún no hay comentarios',
+            noCommentsDescription: 'Sé el primero en compartir tus observaciones sobre el progreso de este trabajo.',
+            replies: (count: number) => `${count} ${count === 1 ? 'respuesta' : 'respuestas'}`,
+            showReplies: 'Mostrar respuestas',
+            hideReplies: 'Ocultar respuestas',
+        },
+        timeline: {
+            emptyTitle: 'Línea de Tiempo Vacía',
+            emptyDescription: 'No hay registros en este trabajo todavía. El primer registro aparecerá aquí cuando el equipo comience a documentar el progreso.',
+            photo: 'Foto',
+            video: 'Video',
+            note: 'Nota',
+            record: 'Registro',
+            today: 'Hoy',
+            yesterday: 'Ayer',
+            daysAgo: (days: number) => `hace ${days} días`,
+            like: 'Me gusta',
+            liked: 'Me gusta',
+            comment: 'Comentario',
+            share: 'Compartir',
+            download: 'Descargar',
+            showMore: 'Mostrar más',
+            showLess: 'Mostrar menos',
+            loadFullHistory: 'Cargar historial completo',
+            showingEntries: (current: number, total: number) => `Mostrando ${current} de ${total} registros`,
+        },
     },
     fr: {
         companyName: 'OX Services',
@@ -764,6 +1116,94 @@ const translations: Record<Language, TextData> = {
             initialMessage: 'Bonjour! 👋 Je suis l\'assistant virtuel d\'OX Services. Comment puis-je vous aider aujourd\'hui? Quel type de service recherchez-vous?',
             errorMessage: 'Désolé, une erreur s\'est produite. Veuillez réessayer ou nous contacter via WhatsApp.',
             fallbackGeneral: 'Compris! Nous offrons les services suivants:\n\n• **Menuiserie Aluminium** - Fenêtres et portes\n• **Énergie Solaire** - Systèmes PV\n• **Mobilier Sur Mesure** - Design exclusif\n• **Toiture EPDM** - Étanchéité\n\nLequel de ces services vous intéresse? Ou parlez-moi de votre projet!',
+        },
+        workpage: {
+            progressTitle: 'Progression du Travail',
+            timelineTitle: 'Chronologie du Travail',
+            commentsTitle: 'Commentaires et Observations',
+            shareTitle: 'Partager l\'Accès',
+            infoTitle: 'Informations du Travail',
+            daysWorked: 'Jours travaillés',
+            photosRecorded: 'Photos enregistrées',
+            videos: 'Vidéos',
+            daysRemaining: 'Jours restants',
+            startDate: 'Date de début',
+            endDate: 'Fin estimée',
+            lastUpdate: 'Dernière mise à jour',
+            teamResponsible: 'Équipe responsable',
+            shareDescription: 'Partagez ce lien avec d\'autres pour qu\'ils puissent suivre le travail en temps réel:',
+            copyLink: 'Copier le Lien',
+            linkCopied: 'Lien copié!',
+            accessToken: 'Jeton d\'accès',
+            client: 'Client',
+            status: 'Statut',
+            period: 'Période',
+            loading: 'Chargement des données du travail...',
+            preparing: 'Préparation du chantier numérique',
+            workNotFound: 'Travail non trouvé',
+            workNotFoundDescription: 'Le jeton d\'accès peut être incorrect ou ce travail n\'est plus disponible. Vérifiez le lien ou contactez l\'équipe de travail.',
+            backToHome: 'Retour à la page d\'accueil',
+            tryAgain: 'Réessayer',
+            statusLabels: {
+                in_progress: '🏗️ En cours',
+                planned: '📅 Planifié',
+                completed: '✅ Terminé',
+            },
+            records: (count: number) => `${count} ${count === 1 ? 'enregistrement' : 'enregistrements'}`,
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'commentaire' : 'commentaires'}`,
+            today: 'Aujourd\'hui',
+        },
+        comments: {
+            title: 'Commentaires et Retours',
+            commentsCount: (count: number) => `${count} ${count === 1 ? 'commentaire' : 'commentaires'}`,
+            likesCount: (count: number) => `${count} j\'aime`,
+            addComment: 'Ajouter un Commentaire',
+            yourName: 'Votre nom *',
+            yourEmail: 'Votre email (optionnel)',
+            yourComment: 'Votre commentaire *',
+            submitComment: 'Envoyer le Commentaire',
+            submitting: 'Envoi en cours...',
+            submitted: '✓ Envoyé!',
+            approvalNote: 'Votre commentaire sera visible après approbation de l\'équipe.',
+            sortRecent: 'Plus récents',
+            sortPopular: 'Plus populaires',
+            sortOldest: 'Plus anciens',
+            verified: 'Vérifié',
+            awaitingApproval: 'En attente d\'approbation',
+            minutesAgo: (mins: number) => `il y a ${mins} min`,
+            hoursAgo: (hours: number) => `il y a ${hours} h`,
+            daysAgo: (days: number) => `il y a ${days} jours`,
+            yesterday: 'Hier',
+            like: 'J\'aime',
+            liked: 'J\'aime',
+            reply: 'Répondre',
+            share: 'Partager',
+            report: 'Signaler',
+            noComments: 'Pas encore de commentaires',
+            noCommentsDescription: 'Soyez le premier à partager vos observations sur la progression de ce travail.',
+            replies: (count: number) => `${count} ${count === 1 ? 'réponse' : 'réponses'}`,
+            showReplies: 'Afficher les réponses',
+            hideReplies: 'Masquer les réponses',
+        },
+        timeline: {
+            emptyTitle: 'Chronologie Vide',
+            emptyDescription: 'Il n\'y a encore aucun enregistrement dans ce travail. Le premier enregistrement apparaîtra ici lorsque l\'équipe commencera à documenter la progression.',
+            photo: 'Photo',
+            video: 'Vidéo',
+            note: 'Note',
+            record: 'Enregistrement',
+            today: 'Aujourd\'hui',
+            yesterday: 'Hier',
+            daysAgo: (days: number) => `il y a ${days} jours`,
+            like: 'J\'aime',
+            liked: 'J\'aime',
+            comment: 'Commentaire',
+            share: 'Partager',
+            download: 'Télécharger',
+            showMore: 'Afficher plus',
+            showLess: 'Afficher moins',
+            loadFullHistory: 'Charger l\'historique complet',
+            showingEntries: (current: number, total: number) => `Affichage de ${current} sur ${total} enregistrements`,
         },
     },
 };

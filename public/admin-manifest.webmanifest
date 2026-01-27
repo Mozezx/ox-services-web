@@ -1,0 +1,42 @@
+{
+  "name": "OX Services Admin - Obras",
+  "short_name": "OX Admin Obras",
+  "description": "Painel administrativo para gerenciamento de obras e timeline",
+  "theme_color": "#0B242A",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/admin/",
+  "start_url": "/admin/index.html",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "shortcuts": [
+    {
+      "name": "Nova Obra",
+      "short_name": "Nova Obra",
+      "description": "Criar uma nova obra",
+      "url": "/admin/index.html?action=create-work",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Upload",
+      "short_name": "Upload",
+      "description": "Fazer upload de imagens",
+      "url": "/admin/index.html?action=upload",
+      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+    }
+  ]
+}

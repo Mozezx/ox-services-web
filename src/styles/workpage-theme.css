@@ -1,0 +1,404 @@
+/* WorkPage Theme - OX Services Luxury/Refined */
+:root {
+  /* Cores da OX Services */
+  --ox-primary: #0B242A;
+  --ox-primary-hover: #0f353d;
+  --ox-background-light: #f6f7f8;
+  --ox-background-dark: #131d1f;
+  --ox-accent: #0d8bf2;
+  --ox-accent-hover: #0a7ad9;
+  --ox-success: #28a745;
+  --ox-warning: #ffc107;
+  --ox-danger: #dc3545;
+  
+  /* Tons neutros */
+  --ox-concrete-50: #f8f9fa;
+  --ox-concrete-100: #e9ecef;
+  --ox-concrete-200: #dee2e6;
+  --ox-concrete-300: #ced4da;
+  --ox-concrete-400: #adb5bd;
+  --ox-concrete-500: #6c757d;
+  --ox-concrete-600: #495057;
+  --ox-concrete-700: #343a40;
+  --ox-concrete-800: #212529;
+  --ox-concrete-900: #121416;
+  
+  /* Tons de aço (para timeline) */
+  --ox-steel-50: #f0f7ff;
+  --ox-steel-100: #e0efff;
+  --ox-steel-200: #bae0ff;
+  --ox-steel-300: #7cc2ff;
+  --ox-steel-400: #36a0ff;
+  --ox-steel-500: #0d8bf2;
+  --ox-steel-600: #006ed6;
+  --ox-steel-700: #0057ac;
+  --ox-steel-800: #004785;
+  --ox-steel-900: #00315e;
+  
+  /* Tons de madeira (para vídeo) */
+  --ox-wood-50: #fdf8f3;
+  --ox-wood-100: #f5e9dd;
+  --ox-wood-200: #ecd4bc;
+  --ox-wood-300: #dfb992;
+  --ox-wood-400: #d09a6a;
+  --ox-wood-500: #c17d47;
+  --ox-wood-600: #a8663a;
+  --ox-wood-700: #8a5130;
+  --ox-wood-800: #6f4027;
+  --ox-wood-900: #5a3320;
+  
+  /* Sombras refinadas */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.05);
+  
+  /* Bordas */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+  
+  /* Transições */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Gradientes */
+  --gradient-primary: linear-gradient(135deg, var(--ox-primary) 0%, var(--ox-primary-hover) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--ox-accent) 0%, var(--ox-steel-700) 100%);
+  --gradient-wood: linear-gradient(135deg, var(--ox-wood-400) 0%, var(--ox-wood-600) 100%);
+  --gradient-concrete: linear-gradient(135deg, var(--ox-concrete-100) 0%, var(--ox-concrete-300) 100%);
+}
+
+/* Estilos base */
+.ox-bg-primary {
+  background-color: var(--ox-primary);
+  color: white;
+}
+
+.ox-bg-light {
+  background-color: var(--ox-background-light);
+}
+
+.ox-bg-white {
+  background-color: white;
+}
+
+.ox-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: all var(--transition-base);
+}
+
+.ox-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.ox-card-sm {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.ox-card-lg {
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Tipografia */
+.ox-font-display {
+  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.ox-font-body {
+  font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Badges */
+.ox-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.ox-badge-primary {
+  background: var(--gradient-primary);
+  color: white;
+}
+
+.ox-badge-accent {
+  background: var(--gradient-accent);
+  color: white;
+}
+
+.ox-badge-wood {
+  background: var(--gradient-wood);
+  color: white;
+}
+
+/* Progress bar */
+.ox-progress {
+  height: 8px;
+  background-color: var(--ox-concrete-200);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ox-progress-fill {
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: 4px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Avatar */
+.ox-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.ox-avatar-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 0.875rem;
+}
+
+.ox-avatar-lg {
+  width: 48px;
+  height: 48px;
+  font-size: 1.125rem;
+}
+
+/* Timeline específico */
+.ox-timeline-entry {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding-bottom: 24px;
+}
+
+.ox-timeline-avatar {
+  position: relative;
+  z-index: 2;
+}
+
+.ox-timeline-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ox-timeline-connector {
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--ox-concrete-200), var(--ox-concrete-200) 60%, transparent);
+}
+
+.ox-timeline-media {
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.ox-timeline-media img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ox-timeline-actions {
+  display: flex;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ox-concrete-100);
+  margin-top: 12px;
+}
+
+.ox-timeline-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ox-concrete-600);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  cursor: pointer;
+}
+
+.ox-timeline-action:hover {
+  color: var(--ox-accent);
+}
+
+/* Animações */
+@keyframes ox-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ox-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ox-stagger {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ox-animate-fade-in {
+  animation: ox-fade-in 0.6s var(--transition-base) both;
+}
+
+.ox-animate-slide-up {
+  animation: ox-slide-up 0.6s var(--transition-base) both;
+}
+
+.ox-stagger > * {
+  opacity: 0;
+  animation: ox-stagger 0.5s var(--transition-base) forwards;
+}
+
+.ox-stagger > *:nth-child(1) { animation-delay: 0.1s; }
+.ox-stagger > *:nth-child(2) { animation-delay: 0.2s; }
+.ox-stagger > *:nth-child(3) { animation-delay: 0.3s; }
+.ox-stagger > *:nth-child(4) { animation-delay: 0.4s; }
+.ox-stagger > *:nth-child(5) { animation-delay: 0.5s; }
+
+/* Utilitários */
+.ox-text-primary {
+  color: var(--ox-primary);
+}
+
+.ox-text-accent {
+  color: var(--ox-accent);
+}
+
+.ox-text-concrete-600 {
+  color: var(--ox-concrete-600);
+}
+
+.ox-text-concrete-700 {
+  color: var(--ox-concrete-700);
+}
+
+.ox-border-light {
+  border: 1px solid var(--ox-concrete-200);
+}
+
+.ox-border-accent {
+  border: 1px solid var(--ox-accent);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .ox-timeline-entry {
+    gap: 10px;
+  }
+  
+  .ox-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .ox-card {
+    border-radius: var(--radius-md);
+    margin-left: -1rem;
+    margin-right: -1rem;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+  
+  .ox-card:hover {
+    transform: none;
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ox-concrete-100);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ox-concrete-400);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ox-concrete-500);
+}
+
+/* Estados de foco */
+.ox-focus-ring:focus {
+  outline: 2px solid var(--ox-accent);
+  outline-offset: 2px;
+}
+
+/* Loading skeleton */
+.ox-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--ox-concrete-100) 25%,
+    var(--ox-concrete-200) 50%,
+    var(--ox-concrete-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: ox-skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes ox-skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

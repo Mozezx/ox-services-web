@@ -1,0 +1,74 @@
+{
+  "name": "OX Services - Acompanhamento de Obras",
+  "short_name": "OX Obras",
+  "description": "Acompanhe o desenvolvimento de suas obras através de timeline com fotos e vídeos",
+  "theme_color": "#0B242A",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/pwa-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Dashboard de acompanhamento de obras"
+    },
+    {
+      "src": "/screenshots/mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Timeline de obra em dispositivo móvel"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Nova Obra",
+      "short_name": "Nova",
+      "description": "Criar nova obra para acompanhamento",
+      "url": "/nova-obra",
+      "icons": [{ "src": "/icons/plus-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Minhas Obras",
+      "short_name": "Obras",
+      "description": "Ver todas as obras em andamento",
+      "url": "/obras",
+      "icons": [{ "src": "/icons/list-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+oxobras",
+      "url": "/obra/%s"
+    }
+  ]
+}

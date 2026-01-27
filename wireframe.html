@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wireframe - WorkPage Luxury</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F8F9FA;
+            color: #343A40;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+            color: #0A2A32;
+            margin-bottom: 1rem;
+        }
+        .wireframe-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #E9ECEF;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .primary { background: #0A2A32; }
+        .secondary { background: #C19A6B; }
+        .neutral { background: #6C757D; }
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #C19A6B;
+        }
+        .timeline-entry {
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .timeline-avatar {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #C19A6B, #A87C4A);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .timeline-card {
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .timeline-card h4 {
+            color: #0A2A32;
+            margin-bottom: 8px;
+        }
+        .timeline-meta {
+            font-size: 0.875rem;
+            color: #6C757D;
+            margin-bottom: 12px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #E9ECEF;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #C19A6B, #D4B48C);
+            width: 65%;
+            border-radius: 4px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .stat {
+            background: #F8F9FA;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .comment-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0A2A32;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .comment {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .upload-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #C19A6B, #A87C4A);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(193, 154, 107, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .mobile-only {
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .mobile-only { display: block; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .timeline { padding-left: 30px; }
+            .timeline::before { left: 15px; }
+            .timeline-avatar { left: -25px; width: 32px; height: 32px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Wireframe – WorkPage Luxury/Refined</h1>
+    <p>Paleta: <span class="color-swatch primary"></span>Primary #0A2A32 <span class="color-swatch secondary"></span>Secondary #C19A6B <span class="color-swatch neutral"></span>Neutral #6C757D</p>
+
+    <section class="wireframe-section">
+        <h2>Hero Section</h2>
+        <p><strong>Título da Obra:</strong> Construção Residencial Alto Padrão</p>
+        <p><strong>Cliente:</strong> Silva &amp; Santos</p>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <p>Progresso: <strong>65%</strong></p>
+        <div class="stats-grid">
+            <div class="stat">42 dias trabalhados</div>
+            <div class="stat">18 fotos</div>
+            <div class="stat">7 vídeos</div>
+            <div class="stat">23 dias restantes</div>
+        </div>
+    </section>
+
+    <section class="wireframe-section">
+        <h2>Timeline (Estilo Facebook)</h2>
+        <div class="timeline">
+            <div class="timeline-entry">
+                <div class="timeline-avatar">JS</div>
+                <div class="timeline-card">
+                    <h4>Fundação concluída</h4>
+                    <div class="timeline-meta">Por João Silva • Hoje • Foto</div>
+                    <p>Concretagem da fundação finalizada com sucesso. Materiais de alta qualidade utilizados.</p>
+                    <div style="background: #E9ECEF; height: 150px; border-radius: 8px; margin: 12px 0;"></div>
+                    <div style="color: #6C757D; font-size: 0.875rem;">3 curtidas • 2 comentários</div>
+                </div>
+            </div>
+            <div class="timeline-entry">
+                <div class="timeline-avatar">MR</div>
+                <div class="timeline-card">
+                    <h4>Instalação elétrica</h4>
+                    <div class="timeline-meta">Por Maria Rodrigues • 2 dias atrás • Vídeo</div>
+                    <p>Passagem de conduítes e cabeamento elétrico nas paredes.</p>
+                    <div style="background: #0A2A32; height: 150px; border-radius: 8px; margin: 12px 0; display: flex; align-items: center; justify-content: center; color: white;">Thumbnail do Vídeo</div>
+                    <div style="color: #6C757D; font-size: 0.875rem;">5 curtidas • 1 comentário</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="wireframe-section">
+        <h2>Comentários</h2>
+        <div class="comment">
+            <div class="comment-avatar">CS</div>
+            <div>
+                <strong>Carlos Santos</strong> <span style="color: #6C757D; font-size: 0.875rem;">há 1 hora</span>
+                <p>Ótimo progresso! Quando começa a etapa de reboco?</p>
+            </div>
+        </div>
+        <div class="comment">
+            <div class="comment-avatar">OA</div>
+            <div>
+                <strong>Obra Admin</strong> <span style="color: #6C757D; font-size: 0.875rem;">há 30 min</span>
+                <p>O reboco está programado para a próxima semana.</p>
+            </div>
+        </div>
+        <div style="margin-top: 20px; padding: 16px; background: #F8F9FA; border-radius: 8px;">
+            <strong>Adicionar comentário</strong>
+            <div style="background: white; height: 80px; border-radius: 6px; margin: 10px 0; border: 1px solid #E9ECEF;"></div>
+            <button style="background: #0A2A32; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 500;">Enviar</button>
+        </div>
+    </section>
+
+    <button class="upload-btn" title="Upload">+</button>
+
+    <div class="mobile-only" style="margin-top: 20px; padding: 12px; background: #E9ECEF; border-radius: 8px; font-size: 0.875rem;">
+        <strong>Nota:</strong> Em dispositivos móveis a timeline fica alinhada à esquerda com avatar menor.
+    </div>
+
+    <script>
+        document.querySelector('.upload-btn').addEventListener('click', function() {
+            alert('Modal de upload seria aberto aqui.');
+        });
+    </script>
+</body>
