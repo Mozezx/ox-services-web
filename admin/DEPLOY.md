@@ -86,45 +86,71 @@ npm run build
 # Servir arquivos estáticos da pasta 'dist' no subdomínio obras.oxservices.org
 ```
 
-### 4. Configuração do Nginx (Exemplo)
+### 4. Configuração do Nginx (obras.oxservices.org)
+
+**Importante:** o frontend admin chama `/api/admin/...` e `/api/push/...`. O backend expõe `/admin/...` e `/api/push/...`. O Nginx deve remover o prefixo `/api` ao repassar para o backend **apenas** nas rotas que começam com `/api` (rewrite abaixo).
+
+**502 Bad Gateway** = o Nginx não consegue falar com o backend. Confira:
+1. Backend rodando: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4000/api/push/vapid-public-key` (deve retornar 200 ou 404, não erro de conexão).
+2. Se usar PM2: `pm2 status` e `pm2 logs`.
+3. Porta correta no `proxy_pass` (4000).
+
 ```nginx
 server {
     server_name obras.oxservices.org;
     
-    # Frontend Admin
+    # Frontend Admin — build:admin gera admin/dist
+    root /var/www/ox-services-web/admin/dist;
+    index index.html;
+    
     location / {
-        root /caminho/para/ox-services-web/dist;
         try_files $uri $uri/ /index.html;
     }
     
-    # API Backend
-    location /api {
-        proxy_pass http://localhost:4000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+    # Manifest e assets — evitar fallback para index.html
+    location ~* \.(webmanifest|json|ico|png|svg|woff2)$ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=86400";
     }
     
-    # Admin API
-    location /admin {
-        proxy_pass http://localhost:4000;
+    # API admin: frontend chama /api/admin/...; backend espera /admin/...
+    location /api/admin/ {
+        rewrite ^/api(/admin/.*) $1 break;
+        proxy_pass http://127.0.0.1:4000;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
     
-    # Uploads
-    location /uploads {
-        alias /caminho/para/ox-services-web/public/uploads;
+    # API push e outras rotas /api/... (ex.: /api/push/vapid-public-key) — backend já usa /api/...
+    location /api/ {
+        proxy_pass http://127.0.0.1:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    
+    # Uploads — backend salva em backend/public/uploads
+    location /uploads/ {
+        alias /var/www/ox-services-web/backend/public/uploads/;
         expires 30d;
         add_header Cache-Control "public, immutable";
     }
 }
 ```
+
+Ajuste `root` e `alias` se o projeto estiver em outro caminho (ex.: `/caminho/para/ox-services-web`).
+
+**Checklist rápido (502 / manifest / logo):**
+1. Backend rodando: `cd /var/www/ox-services-web/backend && node server.js` ou, com PM2, `cd backend && pm2 start server.js --name ox-backend`.
+2. Testar backend: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4000/api/push/vapid-public-key` → 200.
+3. Nginx `root` = `.../admin/dist` (resultado de `npm run build:admin`), **não** a pasta `dist` do site principal.
+4. `location /api/admin/` com `rewrite` **antes** de `location /api/`.
+5. Recarregar Nginx após editar: `sudo nginx -t && sudo systemctl reload nginx`.
 
 ### 5. Configuração Clerk
 1. Acesse https://dashboard.clerk.com
