@@ -35,7 +35,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const MAX_IMAGE_MB = 20;
-const MAX_VIDEO_MB = 250;
+const MAX_VIDEO_MB = 300;
 
 const upload = multer({
   storage,

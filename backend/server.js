@@ -744,7 +744,7 @@ const coverUploadMw = cloudinary.isConfigured()
   : upload.single('cover');
 
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;   // 20 MB
-const MAX_VIDEO_BYTES = 250 * 1024 * 1024;  // 250 MB
+const MAX_VIDEO_BYTES = 300 * 1024 * 1024;  // 300 MB
 
 // POST /admin/upload/cover - Upload de imagem de capa para Cloudinary
 app.post('/admin/upload/cover', coverUploadMw, async (req, res) => {
@@ -819,7 +819,7 @@ app.post('/admin/works/:id/timeline/upload', timelineUploadMw, async (req, res) 
       return res.status(413).json({ error: 'Imagem: máximo 20 MB' });
     }
     if (detectedType === 'video' && size > MAX_VIDEO_BYTES) {
-      return res.status(413).json({ error: 'Vídeo: máximo 250 MB' });
+      return res.status(413).json({ error: 'Vídeo: máximo 300 MB' });
     }
 
     let mediaUrl;

@@ -117,7 +117,7 @@ graph TB
 
 ### Processamento de Mídia
 - **Imagens**: redimensionamento (max 1920px), compressão (qualidade 80%) com Sharp. Limite: 20MB.
-- **Vídeos**: transcodificação para MP4 H.264, geração de thumbnail com FFmpeg. Limite: 250MB.
+- **Vídeos**: transcodificação para MP4 H.264, geração de thumbnail com FFmpeg. Limite: 300MB.
 - **Armazenamento**: Sistema de arquivos local do VPS (ex: `/var/media/works/{work_id}/{timestamp}_{filename}`). URLs servidas via express.static em `/media`.
 
 ### Autenticação
@@ -223,7 +223,7 @@ CREATE TABLE comments (
 
 ## Considerações de Segurança
 - Validação de tipos de arquivo (somente imagens e vídeos).
-- Limites de tamanho (20MB imagem, 250MB vídeo).
+- Limites de tamanho (20MB imagem, 300MB vídeo).
 - Sanitização de inputs (XSS).
 - Token único e secreto, tratar como senha.
 - Clerk JWT validation com segregação de roles.

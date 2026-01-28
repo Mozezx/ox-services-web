@@ -173,7 +173,7 @@ const Upload = () => {
                 />
               </label>
               <p className="text-sm text-text-light mt-4">
-                JPG, PNG, GIF, MP4, MOV • Máximo 100MB por arquivo
+                JPG, PNG, GIF, MP4, MOV • Imagens até 20MB, vídeos até 300MB
               </p>
             </div>
           </div>

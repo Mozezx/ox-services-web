@@ -60,6 +60,10 @@ function uploadTimelineEntryWithProgress(
         reject(new Error('Sessão expirada'))
         return
       }
+      if (xhr.status === 413) {
+        reject(new Error('Arquivo muito grande. Imagens: máx 20 MB; vídeos: máx 300 MB.'))
+        return
+      }
       try {
         const data = JSON.parse(xhr.responseText || '{}')
         if (xhr.status >= 200 && xhr.status < 300) resolve(data as TimelineEntry)

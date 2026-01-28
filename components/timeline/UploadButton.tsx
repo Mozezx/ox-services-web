@@ -58,9 +58,9 @@ const UploadButton: React.FC<UploadButtonProps> = ({ workToken, onUploadSuccess 
         }
         
         // Validar tamanho
-        const maxSize = uploadType === 'video' ? 250 * 1024 * 1024 : 20 * 1024 * 1024;
+        const maxSize = uploadType === 'video' ? 300 * 1024 * 1024 : 20 * 1024 * 1024;
         if (selectedFile.size > maxSize) {
-            alert(`Arquivo muito grande. Tamanho máximo: ${uploadType === 'video' ? '250MB' : '20MB'}`);
+            alert(`Arquivo muito grande. Tamanho máximo: ${uploadType === 'video' ? '300MB' : '20MB'}`);
             return;
         }
         
@@ -407,7 +407,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ workToken, onUploadSuccess 
                                                         <div className="text-sm text-concrete-500 mt-1">
                                                             {uploadType === 'image'
                                                                 ? 'JPG, PNG, GIF até 20MB'
-                                                                : 'MP4, MOV, AVI até 250MB'}
+                                                                : 'MP4, MOV, AVI até 300MB'}
                                                         </div>
                                                     </div>
                                                     <div className="mt-4 inline-flex items-center gap-2 text-xs text-concrete-400">

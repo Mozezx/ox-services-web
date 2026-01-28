@@ -310,7 +310,7 @@ const Timeline = () => {
                 <span className="material-symbols-outlined text-primary">photo</span>
               </div>
               <h3 className="font-medium mb-2">Formatos Suportados</h3>
-              <p className="text-sm text-text-light">JPG, PNG, GIF, MP4, MOV até 100MB</p>
+              <p className="text-sm text-text-light">JPG, PNG, GIF, MP4, MOV • Imagens até 20MB, vídeos até 300MB</p>
             </div>
             <div className="p-4 border border-border rounded-lg">
               <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center mb-3">
