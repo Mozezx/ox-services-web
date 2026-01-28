@@ -18,11 +18,10 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: path.resolve(__dirname, 'dist'),
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'index.html'),
-      },
+      input: path.join(__dirname, 'index.html'),
     },
   },
   plugins: [
@@ -102,7 +101,6 @@ export default defineConfig({
       devOptions: {
         enabled: false,
         type: 'module',
-        navigateFallback: 'index.html',
       }
     })
   ],
