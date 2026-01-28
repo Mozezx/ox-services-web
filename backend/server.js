@@ -743,6 +743,9 @@ const coverUploadMw = cloudinary.isConfigured()
   ? upload.uploadMemory.single('cover')
   : upload.single('cover');
 
+const MAX_IMAGE_BYTES = 20 * 1024 * 1024;   // 20 MB
+const MAX_VIDEO_BYTES = 250 * 1024 * 1024;  // 250 MB
+
 // POST /admin/upload/cover - Upload de imagem de capa para Cloudinary
 app.post('/admin/upload/cover', coverUploadMw, async (req, res) => {
   try {
@@ -752,9 +755,13 @@ app.post('/admin/upload/cover', coverUploadMw, async (req, res) => {
       return res.status(400).json({ error: 'Nenhum arquivo enviado' });
     }
 
-    // Verificar se é uma imagem
     if (!file.mimetype.startsWith('image')) {
       return res.status(400).json({ error: 'Apenas imagens são permitidas para capa' });
+    }
+
+    const size = file.size ?? file.buffer?.length ?? 0;
+    if (size > MAX_IMAGE_BYTES) {
+      return res.status(413).json({ error: 'Imagem de capa: máximo 20 MB' });
     }
 
     let imageUrl;
@@ -807,6 +814,14 @@ app.post('/admin/works/:id/timeline/upload', timelineUploadMw, async (req, res) 
     }
 
     const detectedType = file.mimetype.startsWith('image') ? 'image' : 'video';
+    const size = file.size ?? file.buffer?.length ?? 0;
+    if (detectedType === 'image' && size > MAX_IMAGE_BYTES) {
+      return res.status(413).json({ error: 'Imagem: máximo 20 MB' });
+    }
+    if (detectedType === 'video' && size > MAX_VIDEO_BYTES) {
+      return res.status(413).json({ error: 'Vídeo: máximo 250 MB' });
+    }
+
     let mediaUrl;
     let thumbnailUrl = null;
 

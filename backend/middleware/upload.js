@@ -34,16 +34,18 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const MAX_IMAGE_MB = 20;
+const MAX_VIDEO_MB = 250;
+
 const upload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
+  limits: { fileSize: MAX_VIDEO_MB * 1024 * 1024 },
   fileFilter
 });
 
-// Para Cloudinary: mantém o arquivo em memória (req.file.buffer)
 const uploadMemory = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
+  limits: { fileSize: MAX_VIDEO_MB * 1024 * 1024 },
   fileFilter
 });
 
