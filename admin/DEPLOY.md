@@ -68,8 +68,15 @@ Execute o SQL em `plans/database-schema.md` e em `backend/schema-admin-auth.sql`
 cd backend
 npm install
 npm start
-# ou use PM2: pm2 start server.js --name "ox-admin-backend"
 ```
+**Manter rodando com PM2 (evita 502 ao reiniciar o VPS):**
+```bash
+cd /var/www/ox-services-web/backend
+pm2 start ecosystem.config.cjs
+pm2 save
+pm2 startup   # opcional: inicia o PM2 no boot
+```
+Para reiniciar: `pm2 restart ox-backend`. Para logs: `pm2 logs ox-backend`.
 
 #### Frontend
 ```bash
