@@ -2,16 +2,19 @@ import { ReactNode, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '../context/AuthContext'
+import { UploadQueueProvider, useUploadQueue } from '../context/UploadQueueContext'
+import UploadQueueBar from './UploadQueueBar'
 import { api } from '../lib/api'
 
 interface LayoutProps {
   children: ReactNode
 }
 
-const Layout = ({ children }: LayoutProps) => {
+function LayoutInner({ children }: LayoutProps) {
   const location = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { logout } = useAuth()
+  const { jobs } = useUploadQueue()
 
   // Fetch appointment stats for badge
   const { data: appointmentStats } = useQuery({
@@ -32,6 +35,8 @@ const Layout = ({ children }: LayoutProps) => {
 
   const closeSidebar = () => setIsSidebarOpen(false)
   
+  const hasQueue = jobs.length > 0
+
   return (
     <div className="min-h-screen flex bg-background">
       {/* Mobile Overlay */}
@@ -164,12 +169,19 @@ const Layout = ({ children }: LayoutProps) => {
         </header>
         
         {/* Content */}
-        <div className="flex-1 p-4 lg:p-8 overflow-x-hidden">
+        <div className={`flex-1 p-4 lg:p-8 overflow-x-hidden ${hasQueue ? 'pb-32' : ''}`}>
           {children}
         </div>
       </main>
+      <UploadQueueBar />
     </div>
   )
 }
 
-export default Layout
+export default function Layout(props: LayoutProps) {
+  return (
+    <UploadQueueProvider>
+      <LayoutInner {...props} />
+    </UploadQueueProvider>
+  )
+}

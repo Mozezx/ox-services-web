@@ -3,18 +3,21 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { api, Work } from '../lib/api'
 import { useToast } from '../components/Toast'
+import { useUploadQueue } from '../context/UploadQueueContext'
+
+const MAX_IMAGE_MB = 20
+const MAX_VIDEO_MB = 250
 
 const Upload = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { addToast } = useToast()
+  const { addJobs } = useUploadQueue()
   
   const [files, setFiles] = useState<File[]>([])
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(new Date().toISOString().split('T')[0])
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
   const [isDragOver, setIsDragOver] = useState(false)
 
   // Fetch work details
@@ -35,8 +38,10 @@ const Upload = () => {
         addToast('warning', `${file.name}: Formato não suportado`)
         return false
       }
-      if (file.size > 100 * 1024 * 1024) { // 100MB
-        addToast('warning', `${file.name}: Arquivo muito grande (máx 100MB)`)
+      const isVideo = file.type.startsWith('video/')
+      const maxMb = isVideo ? MAX_VIDEO_MB : MAX_IMAGE_MB
+      if (file.size > maxMb * 1024 * 1024) {
+        addToast('warning', `${file.name}: Máx ${maxMb} MB`)
         return false
       }
       return true
@@ -65,57 +70,25 @@ const Upload = () => {
     setFiles(prev => prev.filter((_, i) => i !== index))
   }
   
-  const handleUpload = async () => {
+  const handleUpload = () => {
     if (files.length === 0) {
       addToast('warning', 'Selecione pelo menos um arquivo')
       return
     }
-    
     if (!title.trim()) {
       addToast('warning', 'Digite um título para a atualização')
       return
     }
-    
     if (!id) {
       addToast('error', 'ID da obra não encontrado')
       return
     }
-    
-    setIsUploading(true)
-    setUploadProgress(0)
-    
-    try {
-      // Upload each file
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        
-        // Update progress
-        setUploadProgress(Math.round(((i + 0.5) / files.length) * 100))
-        
-        await api.uploadTimelineEntry(id, file, {
-          title: files.length === 1 ? title : `${title} (${i + 1}/${files.length})`,
-          description: files.length === 1 ? description : `${description}`,
-          date,
-          type: file.type.startsWith('video') ? 'video' : 'image'
-        })
-        
-        setUploadProgress(Math.round(((i + 1) / files.length) * 100))
-      }
-      
-      addToast('success', `Upload concluído! ${files.length} arquivo(s) enviado(s).`)
-      
-      // Redirect to timeline
-      setTimeout(() => {
-        navigate(`/works/${id}/timeline`)
-      }, 1000)
-      
-    } catch (error) {
-      console.error('Upload error:', error)
-      addToast('error', 'Erro ao fazer upload. Tente novamente.')
-    } finally {
-      setIsUploading(false)
-      setUploadProgress(0)
-    }
+    addJobs(id, work?.name, files, { title, description, date })
+    addToast('info', `${files.length} arquivo(s) na fila. Enviando em segundo plano. Pode navegar.`)
+    setFiles([])
+    setTitle('')
+    setDescription('')
+    navigate(`/works/${id}/timeline`)
   }
   
   const getFileIcon = (file: File) => {
@@ -156,20 +129,11 @@ const Upload = () => {
         </div>
         <button
           onClick={handleUpload}
-          disabled={isUploading || files.length === 0 || !title.trim()}
+          disabled={files.length === 0 || !title.trim()}
           className="btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isUploading ? (
-            <>
-              <div className="spinner !w-4 !h-4"></div>
-              Enviando... {uploadProgress}%
-            </>
-          ) : (
-            <>
-              <span className="material-symbols-outlined">cloud_upload</span>
-              Enviar {files.length > 0 && `(${files.length})`}
-            </>
-          )}
+          <span className="material-symbols-outlined">cloud_upload</span>
+          Enviar em segundo plano {files.length > 0 && `(${files.length})`}
         </button>
       </div>
       

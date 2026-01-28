@@ -33,6 +33,46 @@ async function adminFetch(
   return res
 }
 
+function uploadTimelineEntryWithProgress(
+  workId: string,
+  file: File,
+  metadata: { title: string; description: string; date: string; type: 'image' | 'video' },
+  onProgress: (pct: number) => void
+): Promise<TimelineEntry> {
+  const form = new FormData()
+  form.append('file', file)
+  form.append('title', metadata.title)
+  form.append('description', metadata.description)
+  form.append('date', metadata.date)
+  form.append('type', metadata.type)
+  const token = getToken()
+  const url = `${API_BASE}/admin/works/${workId}/timeline/upload`
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', url)
+    if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
+    })
+    xhr.onload = () => {
+      if (xhr.status === 401) {
+        clearTokenAndRedirect()
+        reject(new Error('Sessão expirada'))
+        return
+      }
+      try {
+        const data = JSON.parse(xhr.responseText || '{}')
+        if (xhr.status >= 200 && xhr.status < 300) resolve(data as TimelineEntry)
+        else reject(new Error(data.error || `Erro ${xhr.status}`))
+      } catch {
+        reject(new Error('Resposta inválida'))
+      }
+    }
+    xhr.onerror = () => reject(new Error('Erro de rede'))
+    xhr.send(form)
+  })
+}
+
 /** URL pública da página da obra para o cliente */
 export function getClientWorkPageUrl(token: string): string {
   const base = (import.meta.env.VITE_PUBLIC_SITE_URL || '').replace(/\/$/, '')
@@ -147,21 +187,16 @@ class AdminAPI {
     file: File,
     metadata: { title: string; description: string; date: string; type: 'image' | 'video' }
   ): Promise<TimelineEntry> {
-    const form = new FormData()
-    form.append('file', file)
-    form.append('title', metadata.title)
-    form.append('description', metadata.description)
-    form.append('date', metadata.date)
-    form.append('type', metadata.type)
-    const headers: Record<string, string> = {}
-    const t = getToken()
-    if (t) headers['Authorization'] = `Bearer ${t}`
-    const r = await adminFetch(`${API_BASE}/admin/works/${workId}/timeline/upload`, {
-      method: 'POST',
-      headers,
-      body: form,
-    })
-    return r.json()
+    return uploadTimelineEntryWithProgress(workId, file, metadata, () => {})
+  }
+
+  uploadTimelineEntryWithProgress(
+    workId: string,
+    file: File,
+    metadata: { title: string; description: string; date: string; type: 'image' | 'video' },
+    onProgress: (pct: number) => void
+  ): Promise<TimelineEntry> {
+    return uploadTimelineEntryWithProgress(workId, file, metadata, onProgress)
   }
 
   async deleteTimelineEntry(entryId: string): Promise<void> {
