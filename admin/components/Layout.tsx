@@ -1,8 +1,7 @@
 import { ReactNode, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { UserButton } from '@clerk/clerk-react'
 import { useQuery } from '@tanstack/react-query'
-import { useSkipClerk } from '../context/SkipClerkContext'
+import { useAuth } from '../context/AuthContext'
 import { api } from '../lib/api'
 
 interface LayoutProps {
@@ -12,7 +11,7 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const skipClerk = useSkipClerk()
+  const { logout } = useAuth()
 
   // Fetch appointment stats for badge
   const { data: appointmentStats } = useQuery({
@@ -110,17 +109,21 @@ const Layout = ({ children }: LayoutProps) => {
         {/* User */}
         <div className="p-4 border-t border-primary-light">
           <div className="flex items-center gap-3">
-            {skipClerk ? (
-              <div className="w-8 h-8 rounded-full bg-secondary/30 flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-sm text-white">person</span>
-              </div>
-            ) : (
-              <UserButton afterSignOutUrl="/" />
-            )}
+            <div className="w-8 h-8 rounded-full bg-secondary/30 flex items-center justify-center flex-shrink-0">
+              <span className="material-symbols-outlined text-sm text-white">person</span>
+            </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium truncate">Administrador</p>
-              <p className="text-xs text-white/70 truncate">{skipClerk ? 'Modo sem login' : 'Painel de controle'}</p>
+              <p className="text-xs text-white/70 truncate">Painel de controle</p>
             </div>
+            <button
+              type="button"
+              onClick={() => { closeSidebar(); logout(); }}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              title="Sair"
+            >
+              <span className="material-symbols-outlined text-lg">logout</span>
+            </button>
           </div>
         </div>
       </aside>

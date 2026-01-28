@@ -4,7 +4,9 @@ const nodemailer = require('nodemailer');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const webpush = require('web-push');
-const verifyClerkAuth = require('./middleware/clerkAuth');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const verifyJwt = require('./middleware/jwtAuth');
 const db = require('./db');
 const upload = require('./middleware/upload');
 const cloudinary = require('./cloudinary');
@@ -614,8 +616,40 @@ app.post('/api/works/:token/upload', async (req, res) => {
 });
 
 // ========== ENDPOINTS ADMIN (PROTEGIDOS) ==========
-// Aplicar middleware de autenticação Clerk a todas as rotas /admin
-app.use('/admin', verifyClerkAuth);
+// Login (rota pública dentro de /admin; middleware ignora /auth/login)
+app.post('/admin/auth/login', async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email e senha obrigatórios' });
+  }
+  if (!process.env.JWT_SECRET) {
+    return res.status(500).json({ error: 'JWT_SECRET não configurado' });
+  }
+  try {
+    const user = await db.queryOne(
+      'SELECT id, email, password_hash FROM admin_users WHERE email = $1',
+      [email.trim().toLowerCase()]
+    );
+    if (!user) {
+      return res.status(401).json({ error: 'Email ou senha incorretos' });
+    }
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok) {
+      return res.status(401).json({ error: 'Email ou senha incorretos' });
+    }
+    const token = jwt.sign(
+      { sub: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    res.json({ token });
+  } catch (e) {
+    console.error('Login error:', e);
+    res.status(500).json({ error: 'Erro ao fazer login' });
+  }
+});
+
+app.use('/admin', verifyJwt);
 
 // GET /admin/works - Listar obras
 app.get('/admin/works', async (req, res) => {
@@ -1121,6 +1155,8 @@ app.listen(PORT, () => {
     console.log(`   GET  /api/works/:token/comments`);
     console.log(`   POST /api/works/:token/comments`);
     console.log(`   POST /api/works/:token/upload`);
+    console.log(`📁 Endpoints admin - Auth:`);
+    console.log(`   POST /admin/auth/login`);
     console.log(`📁 Endpoints admin - Obras:`);
     console.log(`   GET  /admin/works`);
     console.log(`   POST /admin/works`);

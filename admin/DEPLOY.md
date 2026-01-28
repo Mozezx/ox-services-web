@@ -23,7 +23,8 @@ Sistema administrativo completo para gerenciamento de obras e timeline, com aute
 ### Frontend Admin (React + TypeScript)
 - **Porta**: 3000 (compartilhada com frontend principal)
 - **Páginas**:
-  - `/admin/index.html` - Página de login/entrada
+  - `/login` - Login (e‑mail/senha)
+  - `/admin/index.html` - Entrada
   - `/dashboard` - Dashboard com estatísticas
   - `/works` - Lista e CRUD de obras
   - `/works/:id` - Detalhes da obra
@@ -37,38 +38,28 @@ Sistema administrativo completo para gerenciamento de obras e timeline, com aute
 #### Backend (.env)
 ```env
 PORT=4000
-CLERK_SECRET_KEY=sk_test_2LapiQkcOJGHVzWw4kS2lmEQnWuDt2xLXfJtHGlhuE
-SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=sua-chave-servico
+DATABASE_URL=postgresql://...
+JWT_SECRET=seu_segredo_jwt_forte   # ex.: openssl rand -base64 32
+```
+(opcional: SMTP_*, VAPID_*, CLOUDINARY_* — ver `backend/env-vps-template.txt`)
+
+**Primeiro admin:** execute `backend/schema-admin-auth.sql`, depois:
+```bash
+cd backend
+ADMIN_EMAIL=admin@oxservices.org ADMIN_PASSWORD=sua_senha node seed-admin.js
 ```
 
-#### Frontend Admin (variáveis no **build** – Vite injeta em tempo de build)
-
-**Modo sem Clerk (recomendado se `failed_to_load_clerk_js_timeout`):**  
-O admin pode rodar **sem** Clerk. Nesse modo não há tela de login; o backend aceita o token fixo `test-token`. Use em dev ou quando o Clerk der problema em produção.
-
-```env
-VITE_ADMIN_SKIP_CLERK=true
-```
-Ou deixe `VITE_CLERK_PUBLISHABLE_KEY` **vazio/não definido** – também ativa o modo sem Clerk.
-
-**Modo com Clerk:**  
-Para usar login com Clerk, defina a chave **publishable** (não a secret):
-```env
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_...   # ou pk_live_... em produção
-```
-O build do admin precisa ser feito **com** essas variáveis (ex.: `admin/.env` ou no CI).
-
+#### Frontend Admin (build)
 **Link da obra (copiar link):**
 ```env
 VITE_PUBLIC_SITE_URL=https://oxservices.org
 ```
 (Em dev, sem essa variável, o link usa localhost.)
 
-### 2. Banco de Dados (Supabase)
-Execute o SQL em `plans/database-schema.md` para criar as tabelas:
-- `works` - Obras
-- `timeline_entries` - Entradas da timeline
+### 2. Banco de Dados
+Execute o SQL em `plans/database-schema.md` e em `backend/schema-admin-auth.sql`:
+- `works`, `timeline_entries`, etc. (schema principal)
+- `admin_users` (login admin)
 
 ### 3. Deploy no VPS
 
@@ -152,12 +143,8 @@ Ajuste `root` e `alias` se o projeto estiver em outro caminho (ex.: `/caminho/pa
 4. `location /api/admin/` com `rewrite` **antes** de `location /api/`.
 5. Recarregar Nginx após editar: `sudo nginx -t && sudo systemctl reload nginx`.
 
-### 5. Configuração Clerk
-1. Acesse https://dashboard.clerk.com
-2. Configure as URLs de callback:
-   - `https://obras.oxservices.org`
-   - `http://localhost:3000` (desenvolvimento)
-3. Configure as permissões de usuário/admin conforme necessário
+### 5. Autenticação admin
+Login com e‑mail/senha (JWT). Usuários em `admin_users`. Criar o primeiro com `seed-admin.js` (ver variáveis de ambiente).
 
 ## Funcionalidades Implementadas
 
@@ -170,7 +157,7 @@ Ajuste `root` e `alias` se o projeto estiver em outro caminho (ex.: `/caminho/pa
 - [x] CORS configurado
 
 ### ✅ Frontend Admin
-- [x] Autenticação com Clerk
+- [x] Login com e‑mail/senha (JWT)
 - [x] Dashboard com estatísticas
 - [x] Listagem e CRUD de obras
 - [x] Páginas de detalhes da obra
@@ -190,13 +177,14 @@ Ajuste `root` e `alias` se o projeto estiver em outro caminho (ex.: `/caminho/pa
 ### Backend
 ```bash
 cd backend
-# Testar endpoints
-curl -H "Authorization: Bearer test-token" http://localhost:4000/admin/works
+# Login (troque email/senha pelo admin criado)
+curl -X POST http://localhost:4000/admin/auth/login -H "Content-Type: application/json" -d '{"email":"admin@oxservices.org","password":"sua_senha"}'
+# Usar o token retornado em Authorization: Bearer <token> para /admin/*
 ```
 
 ### Frontend
-1. Acesse `http://localhost:3000/admin/index.html`
-2. Faça login com Clerk
+1. Acesse `http://localhost:3001` (dev admin) ou `https://obras.oxservices.org`
+2. Faça login com e‑mail e senha do admin
 3. Teste todas as funcionalidades
 
 ## Próximos Passos (Opcionais)

@@ -12,10 +12,12 @@ PORT=4000
 # 85.31.239.235 = host remoto para conectar do seu PC. No VPS Hostinger use localhost.
 DATABASE_URL=postgresql://ox_user:SENHA_DO_OX_USER@85.31.239.235:5432/ox_services
 
-# --- Clerk (autenticação do admin em obras.oxservices.org) ---
-# Use chaves de TESTE até o SSL de produção estar ativo (pk_test_... / sk_test_...)
-CLERK_SECRET_KEY=sk_test_...
-CLERK_PUBLISHABLE_KEY=pk_test_dG9sZXJhbnQtcXVldHphbC0zMi5jbGVyay5hY2NvdW50cy5kZXYk
+# --- Autenticação admin (própria, JWT) ---
+# Gere um segredo forte: openssl rand -base64 32
+JWT_SECRET=seu_segredo_jwt_muito_longo_e_aleatorio
+
+# Criar primeiro admin: execute schema-admin-auth.sql, depois:
+# ADMIN_EMAIL=admin@oxservices.org ADMIN_PASSWORD=sua_senha node seed-admin.js
 
 # --- E-mail (formulário de contato do site principal) ---
 SMTP_HOST=smtp.hostinger.com

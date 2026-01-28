@@ -174,7 +174,7 @@ cp admin/public/sw-push.js admin/dist/
 ## 9. Testar no celular
 
 1. Abra o admin em **HTTPS** no celular (ex.: `https://admin.oxservices.org`).
-2. Faça login (Clerk).
+2. Faça login (e-mail/senha).
 3. Quando o navegador pedir permissão para notificações, aceite.
 4. Deixe o admin em segundo plano ou feche o app.
 5. No site principal, envie um agendamento pelo formulário de contato.

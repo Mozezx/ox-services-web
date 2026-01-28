@@ -1,20 +1,45 @@
-import { useAuth } from '@clerk/clerk-react'
-
-// Usar caminho relativo para o proxy configurado no Vite
 const API_BASE = '/api'
+const TOKEN_KEY = 'admin_token'
+
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(TOKEN_KEY)
+}
+
+function clearTokenAndRedirect(): void {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(TOKEN_KEY)
+  window.location.href = '/login'
+}
+
+async function adminFetch(
+  url: string,
+  opts: RequestInit & { skipAuth?: boolean } = {}
+): Promise<Response> {
+  const { skipAuth, ...rest } = opts
+  const headers = new Headers(rest.headers as HeadersInit)
+  if (!skipAuth) {
+    const t = getToken()
+    if (t) headers.set('Authorization', `Bearer ${t}`)
+  }
+  if (!headers.has('Content-Type') && rest.body && typeof rest.body === 'string') {
+    headers.set('Content-Type', 'application/json')
+  }
+  const res = await fetch(url, { ...rest, headers })
+  if (res.status === 401 && url.indexOf('/auth/login') === -1) {
+    clearTokenAndRedirect()
+    throw new Error('Sessão expirada')
+  }
+  return res
+}
 
 /** URL pública da página da obra para o cliente */
 export function getClientWorkPageUrl(token: string): string {
-  // Se tiver variável de ambiente configurada, usa ela
   const base = (import.meta.env.VITE_PUBLIC_SITE_URL || '').replace(/\/$/, '')
   if (base) return `${base}/obra/${token}`
-  
-  // Em desenvolvimento (localhost), usa porta 3000
   if (typeof window !== 'undefined' && window.location.hostname.includes('localhost')) {
     return `${window.location.origin.replace(':3001', ':3000')}/obra/${token}`
   }
-  
-  // Em produção, sempre usa o domínio principal
   return `https://oxservices.org/obra/${token}`
 }
 
@@ -65,216 +90,194 @@ export interface AppointmentStats {
 }
 
 class AdminAPI {
-  private getAuthHeader(): HeadersInit {
-    // Em desenvolvimento, usar token fixo
-    // Em produção, obter do Clerk
-    const token = 'test-token' // Para desenvolvimento
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    }
+  private authHeaders(): HeadersInit {
+    const t = getToken()
+    const h: Record<string, string> = {}
+    if (t) h['Authorization'] = `Bearer ${t}`
+    h['Content-Type'] = 'application/json'
+    return h
   }
 
-  // Works
   async getWorks(): Promise<Work[]> {
-    const response = await fetch(`${API_BASE}/admin/works`, {
-      headers: this.getAuthHeader(),
-    })
-    const data = await response.json()
+    const r = await adminFetch(`${API_BASE}/admin/works`, { headers: this.authHeaders() })
+    const data = await r.json()
     return data.works || []
   }
 
   async getWork(id: string): Promise<Work> {
-    const response = await fetch(`${API_BASE}/admin/works/${id}`, {
-      headers: this.getAuthHeader(),
-    })
-    return response.json()
+    const r = await adminFetch(`${API_BASE}/admin/works/${id}`, { headers: this.authHeaders() })
+    return r.json()
   }
 
   async createWork(work: Omit<Work, 'id' | 'access_token' | 'created_at'>): Promise<Work> {
-    const response = await fetch(`${API_BASE}/admin/works`, {
+    const r = await adminFetch(`${API_BASE}/admin/works`, {
       method: 'POST',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
       body: JSON.stringify(work),
     })
-    return response.json()
+    return r.json()
   }
 
   async updateWork(id: string, updates: Partial<Work>): Promise<Work> {
-    const response = await fetch(`${API_BASE}/admin/works/${id}`, {
+    const r = await adminFetch(`${API_BASE}/admin/works/${id}`, {
       method: 'PUT',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
       body: JSON.stringify(updates),
     })
-    return response.json()
+    return r.json()
   }
 
   async deleteWork(id: string): Promise<void> {
-    await fetch(`${API_BASE}/admin/works/${id}`, {
+    await adminFetch(`${API_BASE}/admin/works/${id}`, {
       method: 'DELETE',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
     })
   }
 
-  // Timeline
   async getTimelineEntries(workId: string): Promise<TimelineEntry[]> {
-    const response = await fetch(`${API_BASE}/admin/works/${workId}/timeline`, {
-      headers: this.getAuthHeader(),
+    const r = await adminFetch(`${API_BASE}/admin/works/${workId}/timeline`, {
+      headers: this.authHeaders(),
     })
-    const data = await response.json()
+    const data = await r.json()
     return data.entries || []
   }
 
   async uploadTimelineEntry(
     workId: string,
     file: File,
-    metadata: {
-      title: string
-      description: string
-      date: string
-      type: 'image' | 'video'
-    }
+    metadata: { title: string; description: string; date: string; type: 'image' | 'video' }
   ): Promise<TimelineEntry> {
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('title', metadata.title)
-    formData.append('description', metadata.description)
-    formData.append('date', metadata.date)
-    formData.append('type', metadata.type)
-
-    const response = await fetch(`${API_BASE}/admin/works/${workId}/timeline/upload`, {
+    const form = new FormData()
+    form.append('file', file)
+    form.append('title', metadata.title)
+    form.append('description', metadata.description)
+    form.append('date', metadata.date)
+    form.append('type', metadata.type)
+    const headers: Record<string, string> = {}
+    const t = getToken()
+    if (t) headers['Authorization'] = `Bearer ${t}`
+    const r = await adminFetch(`${API_BASE}/admin/works/${workId}/timeline/upload`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer test-token`,
-      },
-      body: formData,
+      headers,
+      body: form,
     })
-    return response.json()
+    return r.json()
   }
 
   async deleteTimelineEntry(entryId: string): Promise<void> {
-    await fetch(`${API_BASE}/admin/timeline/${entryId}`, {
+    await adminFetch(`${API_BASE}/admin/timeline/${entryId}`, {
       method: 'DELETE',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
     })
   }
 
-  async updateTimelineEntry(entryId: string, updates: Partial<TimelineEntry>): Promise<TimelineEntry> {
-    const response = await fetch(`${API_BASE}/admin/timeline/${entryId}`, {
+  async updateTimelineEntry(
+    entryId: string,
+    updates: Partial<TimelineEntry>
+  ): Promise<TimelineEntry> {
+    const r = await adminFetch(`${API_BASE}/admin/timeline/${entryId}`, {
       method: 'PUT',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
       body: JSON.stringify(updates),
     })
-    return response.json()
+    return r.json()
   }
 
   async reorderTimelineEntries(workId: string, order: string[]): Promise<void> {
-    await fetch(`${API_BASE}/admin/works/${workId}/timeline/reorder`, {
+    await adminFetch(`${API_BASE}/admin/works/${workId}/timeline/reorder`, {
       method: 'PUT',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
       body: JSON.stringify({ order }),
     })
   }
 
-  // Appointments
   async getAppointments(status?: string): Promise<Appointment[]> {
-    const url = status 
+    const url = status
       ? `${API_BASE}/admin/appointments?status=${status}`
       : `${API_BASE}/admin/appointments`
-    const response = await fetch(url, {
-      headers: this.getAuthHeader(),
-    })
-    const data = await response.json()
+    const r = await adminFetch(url, { headers: this.authHeaders() })
+    const data = await r.json()
     return data.appointments || []
   }
 
   async getAppointment(id: string): Promise<Appointment> {
-    const response = await fetch(`${API_BASE}/admin/appointments/${id}`, {
-      headers: this.getAuthHeader(),
+    const r = await adminFetch(`${API_BASE}/admin/appointments/${id}`, {
+      headers: this.authHeaders(),
     })
-    return response.json()
+    return r.json()
   }
 
   async getAppointmentsStats(): Promise<AppointmentStats> {
-    const response = await fetch(`${API_BASE}/admin/appointments/stats`, {
-      headers: this.getAuthHeader(),
+    const r = await adminFetch(`${API_BASE}/admin/appointments/stats`, {
+      headers: this.authHeaders(),
     })
-    return response.json()
+    return r.json()
   }
 
   async updateAppointment(id: string, status: string): Promise<Appointment> {
-    const response = await fetch(`${API_BASE}/admin/appointments/${id}`, {
+    const r = await adminFetch(`${API_BASE}/admin/appointments/${id}`, {
       method: 'PUT',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
       body: JSON.stringify({ status }),
     })
-    return response.json()
+    return r.json()
   }
 
   async deleteAppointment(id: string): Promise<void> {
-    await fetch(`${API_BASE}/admin/appointments/${id}`, {
+    await adminFetch(`${API_BASE}/admin/appointments/${id}`, {
       method: 'DELETE',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
     })
   }
 
-  // Push Notifications
   async getVapidPublicKey(): Promise<string | null> {
     try {
-      const response = await fetch(`${API_BASE}/push/vapid-public-key`)
-      if (!response.ok) return null
-      const data = await response.json()
-      return data.publicKey || null
+      const r = await fetch(`${API_BASE}/push/vapid-public-key`)
+      if (!r.ok) return null
+      const d = await r.json()
+      return d.publicKey || null
     } catch {
       return null
     }
   }
 
   async subscribePush(subscription: PushSubscription): Promise<void> {
-    const subscriptionJson = subscription.toJSON()
-    await fetch(`${API_BASE}/admin/push/subscribe`, {
+    const j = subscription.toJSON()
+    await adminFetch(`${API_BASE}/admin/push/subscribe`, {
       method: 'POST',
-      headers: this.getAuthHeader(),
-      body: JSON.stringify({
-        endpoint: subscriptionJson.endpoint,
-        keys: subscriptionJson.keys,
-      }),
+      headers: this.authHeaders(),
+      body: JSON.stringify({ endpoint: j.endpoint, keys: j.keys }),
     })
   }
 
   async unsubscribePush(endpoint: string): Promise<void> {
-    await fetch(`${API_BASE}/admin/push/unsubscribe`, {
+    await adminFetch(`${API_BASE}/admin/push/unsubscribe`, {
       method: 'DELETE',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
       body: JSON.stringify({ endpoint }),
     })
   }
 
   async testPushNotification(): Promise<void> {
-    await fetch(`${API_BASE}/admin/push/test`, {
+    await adminFetch(`${API_BASE}/admin/push/test`, {
       method: 'POST',
-      headers: this.getAuthHeader(),
+      headers: this.authHeaders(),
     })
   }
 
-  // Upload de imagem de capa
   async uploadCoverImage(file: File): Promise<{ url: string }> {
-    const formData = new FormData()
-    formData.append('cover', file)
-
-    const response = await fetch(`${API_BASE}/admin/upload/cover`, {
+    const form = new FormData()
+    form.append('cover', file)
+    const headers: Record<string, string> = {}
+    const t = getToken()
+    if (t) headers['Authorization'] = `Bearer ${t}`
+    const r = await adminFetch(`${API_BASE}/admin/upload/cover`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer test-token`,
-      },
-      body: formData,
+      headers,
+      body: form,
     })
-
-    if (!response.ok) {
-      throw new Error('Erro ao fazer upload da imagem')
-    }
-
-    return response.json()
+    if (!r.ok) throw new Error('Erro ao fazer upload da imagem')
+    return r.json()
   }
 }
 

@@ -208,7 +208,7 @@ const Dashboard = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm">Autenticação</span>
-                <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full font-medium">Clerk</span>
+                <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full font-medium">JWT</span>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-border">
