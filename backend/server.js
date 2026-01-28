@@ -20,23 +20,32 @@ if (process.env.DATABASE_URL) {
 }
 
 // ========== CONFIGURAÇÃO WEB PUSH ==========
-// Configurar VAPID keys para push notifications
+// Configurar VAPID keys para push notifications (falha silenciosa se inválidas)
+let vapidConfigured = false;
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
-    webpush.setVapidDetails(
-        process.env.VAPID_EMAIL || 'mailto:admin@oxservices.org',
-        process.env.VAPID_PUBLIC_KEY,
-        process.env.VAPID_PRIVATE_KEY
-    );
-    console.log('✅ Web Push configurado com VAPID keys');
-} else {
-    console.warn('⚠️ VAPID keys não configuradas - Push notifications desativadas');
-    console.warn('   Gere as chaves com: npx web-push generate-vapid-keys');
+    try {
+        webpush.setVapidDetails(
+            process.env.VAPID_EMAIL || 'mailto:admin@oxservices.org',
+            process.env.VAPID_PUBLIC_KEY,
+            process.env.VAPID_PRIVATE_KEY
+        );
+        vapidConfigured = true;
+        console.log('✅ Web Push configurado com VAPID keys');
+    } catch (e) {
+        console.warn('⚠️ VAPID keys inválidas - Push notifications desativadas:', e.message);
+        console.warn('   Remova VAPID_* do .env ou gere novas chaves: npx web-push generate-vapid-keys');
+    }
+}
+if (!vapidConfigured) {
+    if (!process.env.VAPID_PUBLIC_KEY && !process.env.VAPID_PRIVATE_KEY) {
+        console.warn('⚠️ VAPID keys não configuradas - Push notifications desativadas');
+        console.warn('   Gere as chaves com: npx web-push generate-vapid-keys');
+    }
 }
 
 // Função para enviar push notification para todos os subscribers
 async function sendPushNotificationToAll(title, body, data = {}) {
-    if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
-        console.log('Push notifications desativadas - VAPID keys não configuradas');
+    if (!vapidConfigured) {
         return;
     }
 
@@ -332,7 +341,7 @@ app.post('/api/appointments', async (req, res) => {
 
 // GET /api/push/vapid-public-key - Obter chave pública VAPID (público)
 app.get('/api/push/vapid-public-key', (req, res) => {
-    if (!process.env.VAPID_PUBLIC_KEY) {
+    if (!vapidConfigured || !process.env.VAPID_PUBLIC_KEY) {
         return res.status(404).json({ error: 'VAPID key não configurada' });
     }
     res.json({ publicKey: process.env.VAPID_PUBLIC_KEY });
