@@ -235,28 +235,6 @@ const Upload = () => {
               </div>
             </div>
           )}
-
-          {/* Upload Progress */}
-          {isUploading && (
-            <div className="card">
-              <h2 className="text-lg font-semibold mb-4">Progresso do Upload</h2>
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Enviando arquivos...</span>
-                  <span className="font-medium">{uploadProgress}%</span>
-                </div>
-                <div className="h-3 bg-border rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
-                </div>
-                <p className="text-xs text-text-light mt-2">
-                  Não feche esta página durante o upload
-                </p>
-              </div>
-            </div>
-          )}
         </div>
         
         {/* Sidebar - Metadata */}
