@@ -30,7 +30,7 @@ function uploadBuffer(buffer, options = {}) {
     return Promise.reject(new Error('Cloudinary não configurado'));
   }
 
-  const folder = options.folder || 'ox-services/obras';
+  const folder = options.folder || 'ox-uploads/obras';
   const resourceType = options.resourceType || 'image';
 
   return new Promise((resolve, reject) => {

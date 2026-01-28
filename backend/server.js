@@ -832,7 +832,7 @@ app.post('/admin/works/:id/timeline/upload', timelineUploadMw, async (req, res) 
         return res.status(400).json({ error: 'Arquivo não disponível para upload' });
       }
       const result = await cloudinary.uploadBuffer(file.buffer, {
-        folder: `ox-services/obras/${id}`,
+        folder: `ox-uploads/obras/${id}`,
         resourceType,
       });
       mediaUrl = result.secure_url;

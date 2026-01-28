@@ -29,4 +29,4 @@ CLOUDINARY_API_SECRET=sua_api_secret
 - **Com Cloudinary configurado:** o arquivo é enviado em memória para o Cloudinary; em `timeline_entries` ficam as URLs retornadas (ex.: `https://res.cloudinary.com/...`).
 - **Sem Cloudinary:** o arquivo é salvo em `public/uploads/works/{work_id}/` e em `timeline_entries` ficam caminhos como `/uploads/works/...`.
 
-Os arquivos no Cloudinary ficam na pasta `ox-services/obras/{work_id}/`. Para vídeos, é gerada uma URL de thumbnail (frame inicial em JPG).
+Os arquivos no Cloudinary ficam na pasta `ox-uploads/obras/{work_id}/` (capas em `ox-uploads/covers/`). Para vídeos, é gerada uma URL de thumbnail (frame inicial em JPG).
