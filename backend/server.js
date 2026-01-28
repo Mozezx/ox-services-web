@@ -100,25 +100,29 @@ app.use(express.json());
 // Servir arquivos de upload
 app.use('/uploads', express.static('public/uploads'));
 
-// Configurar transporter do Nodemailer
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: true, // true para porta 465
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
-
-// Verificar conexão SMTP
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('❌ Erro na configuração SMTP:', error);
-    } else {
-        console.log('✅ Servidor SMTP pronto para enviar e-mails');
-    }
-});
+// SMTP opcional – só configura e verifica se variáveis estiverem definidas
+let transporter = null;
+const smtpConfigured = !!(process.env.SMTP_HOST && process.env.SMTP_USER);
+if (smtpConfigured) {
+    transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT) || 465,
+        secure: true,
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+    });
+    transporter.verify((err) => {
+        if (err) {
+            console.warn('⚠️ SMTP não disponível – e-mails desativados:', err.message);
+        } else {
+            console.log('✅ Servidor SMTP pronto para enviar e-mails');
+        }
+    });
+} else {
+    console.warn('⚠️ SMTP não configurado (SMTP_HOST, SMTP_USER) – e-mails desativados');
+}
 
 // Dados mockados temporários (substituir por banco de dados)
 const works = [
@@ -202,14 +206,17 @@ app.get('/', (req, res) => {
 app.post('/contact', async (req, res) => {
     const { fullName, company, email, phone, message } = req.body;
 
-    // Validação básica
     if (!fullName || !email || !message) {
         return res.status(400).json({
             error: 'Campos obrigatórios: fullName, email, message'
         });
     }
+    if (!transporter) {
+        return res.status(503).json({
+            error: 'Envio de e-mail temporariamente indisponível'
+        });
+    }
 
-    // Configurar e-mail
     const mailOptions = {
         from: `"OX Services Website" <${process.env.SMTP_USER}>`,
         to: process.env.EMAIL_TO,
