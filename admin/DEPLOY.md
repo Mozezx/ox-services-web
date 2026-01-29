@@ -84,71 +84,218 @@ npm run build
 # Servir arquivos estáticos da pasta 'dist' no subdomínio obras.oxservices.org
 ```
 
-### 4. Configuração do Nginx (obras.oxservices.org)
+### 4. Nginx — Passo a passo (VPS)
 
-**Importante:** o frontend admin chama `/api/admin/...` e `/api/push/...`. O backend expõe `/admin/...` e `/api/push/...`. O Nginx deve remover o prefixo `/api` ao repassar para o backend **apenas** nas rotas que começam com `/api` (rewrite abaixo).
+Você tem **dois sites**:
+- **Admin**: `obras.oxservices.org` → painel de obras (React em `admin/dist` + API).
+- **Site principal**: `oxservices.org` → landing + página do cliente `/obra/:token` (React em `dist` + API).
 
-**502 Bad Gateway** = o Nginx não consegue falar com o backend. Confira:
-1. Backend rodando: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4000/api/push/vapid-public-key` (deve retornar 200 ou 404, não erro de conexão).
-2. Se usar PM2: `pm2 status` e `pm2 logs`.
-3. Porta correta no `proxy_pass` (4000).
+Execute tudo no VPS como `root` ou com `sudo`.
 
-```nginx
-server {
-    server_name obras.oxservices.org;
-    
-    # Frontend Admin — build:admin gera admin/dist
-    root /var/www/ox-services-web/admin/dist;
-    index index.html;
-    
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-    
-    # Manifest e assets — evitar fallback para index.html
-    location ~* \.(webmanifest|json|ico|png|svg|woff2)$ {
-        try_files $uri =404;
-        add_header Cache-Control "public, max-age=86400";
-    }
-    
-    # API admin: frontend chama /api/admin/...; backend espera /admin/...
-    location /api/admin/ {
-        rewrite ^/api(/admin/.*) $1 break;
-        proxy_pass http://127.0.0.1:4000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-    
-    # API push e outras rotas /api/... (ex.: /api/push/vapid-public-key) — backend já usa /api/...
-    location /api/ {
-        proxy_pass http://127.0.0.1:4000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-    
-    # Uploads — backend salva em backend/public/uploads
-    location /uploads/ {
-        alias /var/www/ox-services-web/backend/public/uploads/;
-        expires 30d;
-        add_header Cache-Control "public, immutable";
-    }
-}
+---
+
+#### 4.1 Arquivos de configuração no projeto
+
+Os configs prontos estão no repositório:
+- **Admin**: `admin/obras-nginx.conf`
+- **Site principal**: `admin/oxservices-nginx.conf`
+
+No VPS, o Nginx usa:
+- `/etc/nginx/sites-available/obras.oxservices.org` → admin
+- `/etc/nginx/sites-available/oxservices` → site principal  
+(Se o seu arquivo do site principal tiver outro nome, use o que já existe e substitua o conteúdo.)
+
+---
+
+#### 4.2 Admin (obras.oxservices.org)
+
+1. Abrir o arquivo:
+   ```bash
+   sudo nano /etc/nginx/sites-available/obras.oxservices.org
+   ```
+
+2. Colar o conteúdo de `admin/obras-nginx.conf` (ou o bloco abaixo). Ajustar `root` e `alias` se o projeto não estiver em `/var/www/ox-services-web`.
+
+   ```nginx
+   # /etc/nginx/sites-available/obras.oxservices.org
+
+   server {
+       listen 443 ssl;
+       server_name obras.oxservices.org;
+
+       ssl_certificate /etc/letsencrypt/live/obras.oxservices.org/fullchain.pem;
+       ssl_certificate_key /etc/letsencrypt/live/obras.oxservices.org/privkey.pem;
+       include /etc/letsencrypt/options-ssl-nginx.conf;
+       ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+       client_max_body_size 300M;
+
+       root /var/www/ox-services-web/admin/dist;
+       index index.html;
+
+       location / {
+           try_files $uri $uri/ /index.html;
+       }
+
+       location ~* \.(webmanifest|json|ico|png|svg|woff2)$ {
+           try_files $uri =404;
+           add_header Cache-Control "public, max-age=86400";
+       }
+
+       location /api/admin/ {
+           rewrite ^/api(/admin/.*) $1 break;
+           proxy_pass http://127.0.0.1:4000;
+           proxy_http_version 1.1;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+
+       location /api/ {
+           proxy_pass http://127.0.0.1:4000;
+           proxy_http_version 1.1;
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+       }
+
+       location /uploads/ {
+           alias /var/www/ox-services-web/backend/public/uploads/;
+           expires 30d;
+           add_header Cache-Control "public, immutable";
+       }
+   }
+
+   server {
+       if ($host = obras.oxservices.org) {
+           return 301 https://$host$request_uri;
+       }
+       listen 80;
+       server_name obras.oxservices.org;
+       return 404;
+   }
+   ```
+
+3. Salvar e sair: `Ctrl+O`, Enter, `Ctrl+X`.
+
+---
+
+#### 4.3 Site principal (oxservices.org)
+
+1. Abrir o arquivo (nome pode variar; no exemplo é `oxservices`):
+   ```bash
+   sudo nano /etc/nginx/sites-available/oxservices
+   ```
+
+2. Colar o conteúdo de `admin/oxservices-nginx.conf` (ou o bloco abaixo). Ajustar caminhos se precisar.
+
+   ```nginx
+   # /etc/nginx/sites-available/oxservices — site principal + /obra/:token
+
+   server {
+       server_name oxservices.org www.oxservices.org 85.31.239.235;
+       root /var/www/ox-services-web/dist;
+       index index.html;
+
+       gzip on;
+       gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
+
+       location /api/ {
+           proxy_pass http://127.0.0.1:4000;
+           proxy_http_version 1.1;
+           proxy_set_header Upgrade $http_upgrade;
+           proxy_set_header Connection 'upgrade';
+           proxy_set_header Host $host;
+           proxy_set_header X-Real-IP $remote_addr;
+           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+           proxy_set_header X-Forwarded-Proto $scheme;
+           proxy_cache_bypass $http_upgrade;
+       }
+
+       location ^~ /uploads/ {
+           alias /var/www/ox-services-web/backend/public/uploads/;
+           expires 30d;
+           add_header Cache-Control "public, immutable";
+       }
+
+       location ^~ /services/ {
+           alias /var/www/ox-services-web/services/;
+           try_files $uri $uri.html =404;
+       }
+
+       location / {
+           try_files $uri $uri/ /index.html;
+       }
+
+       location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+           expires 1y;
+           add_header Cache-Control "public, immutable";
+       }
+
+       listen 443 ssl;
+       ssl_certificate /etc/letsencrypt/live/oxservices.org-0001/fullchain.pem;
+       ssl_certificate_key /etc/letsencrypt/live/oxservices.org-0001/privkey.pem;
+       include /etc/letsencrypt/options-ssl-nginx.conf;
+       ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+   }
+
+   server {
+       if ($host = www.oxservices.org) { return 301 https://$host$request_uri; }
+       if ($host = oxservices.org) { return 301 https://$host$request_uri; }
+       listen 80;
+       server_name oxservices.org www.oxservices.org 85.31.239.235;
+       return 404;
+   }
+   ```
+
+3. **Importante:** Confirme os caminhos do SSL. O exemplo usa `oxservices.org-0001`. No seu servidor pode ser `oxservices.org`. Verifique:
+   ```bash
+   ls /etc/letsencrypt/live/
+   ```
+   e ajuste `ssl_certificate` e `ssl_certificate_key` se for diferente.
+
+4. Salvar e sair: `Ctrl+O`, Enter, `Ctrl+X`.
+
+---
+
+#### 4.4 Habilitar os sites (se ainda não estiverem)
+
+```bash
+sudo ln -sf /etc/nginx/sites-available/obras.oxservices.org /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/oxservices /etc/nginx/sites-enabled/
 ```
 
-Ajuste `root` e `alias` se o projeto estiver em outro caminho (ex.: `/caminho/para/ox-services-web`).
+(Se `oxservices` no seu VPS tiver outro nome em `sites-available`, use esse nome no `ln`.)
 
-**Checklist rápido (502 / manifest / logo):**
-1. Backend rodando: `cd /var/www/ox-services-web/backend && node server.js` ou, com PM2, `cd backend && pm2 start server.js --name ox-backend`.
-2. Testar backend: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4000/api/push/vapid-public-key` → 200.
-3. Nginx `root` = `.../admin/dist` (resultado de `npm run build:admin`), **não** a pasta `dist` do site principal.
-4. `location /api/admin/` com `rewrite` **antes** de `location /api/`.
-5. Recarregar Nginx após editar: `sudo nginx -t && sudo systemctl reload nginx`.
+---
+
+#### 4.5 Testar e recarregar o Nginx
+
+```bash
+sudo nginx -t
+```
+
+Se aparecer `syntax is ok` e `test is successful`:
+
+```bash
+sudo systemctl reload nginx
+```
+
+---
+
+#### 4.6 Checklist rápido
+
+| O quê | Comando / verificação |
+|-------|------------------------|
+| Backend a correr | `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4000/api/push/vapid-public-key` → `200` |
+| PM2 | `pm2 status` — `ox-backend` (ou o nome que usou) deve estar online |
+| Admin build | `root` do admin = `/var/www/ox-services-web/admin/dist` (não a `dist` do site principal) |
+| Uploads | `alias` = `/var/www/ox-services-web/backend/public/uploads/` |
+| 502 Bad Gateway | Backend parado ou porta errada; confirme que o backend está na porta 4000 |
+
+**502 = Nginx não chega ao backend.** Confira backend, PM2 e `proxy_pass http://127.0.0.1:4000`.
 
 ### 5. Autenticação admin
 Login com e‑mail/senha (JWT). Usuários em `admin_users`. Criar o primeiro com `seed-admin.js` (ver variáveis de ambiente).

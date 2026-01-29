@@ -57,9 +57,11 @@ function LayoutInner({ children }: LayoutProps) {
         {/* Logo */}
         <div className="p-6 border-b border-primary-light">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="material-symbols-outlined text-primary">construction</span>
-            </div>
+            <img
+              src="/logo.png"
+              alt="OX Services"
+              className="w-10 h-10 object-contain flex-shrink-0 rounded-lg bg-white/5"
+            />
             <div className="min-w-0">
               <h1 className="font-bold text-lg truncate">OX Services</h1>
               <p className="text-sm text-white/70">Admin Obras</p>

@@ -373,6 +373,7 @@ const Timeline: React.FC<TimelineProps> = ({ entries }) => {
                                                         alt={entry.title}
                                                         className="w-full h-auto md:max-h-80 object-cover"
                                                         loading="lazy"
+                                                        onError={(e) => { e.currentTarget.src = '/placeholder.png'; }}
                                                     />
                                                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">

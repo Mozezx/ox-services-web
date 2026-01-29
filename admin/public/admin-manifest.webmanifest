@@ -3,12 +3,13 @@
   "short_name": "OX Admin",
   "description": "Painel administrativo para gerenciamento de obras e timeline",
   "theme_color": "#0B242A",
-  "background_color": "#ffffff",
+  "background_color": "#0B242A",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
   "start_url": "/",
   "icons": [
-    { "src": "/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+    { "src": "/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
