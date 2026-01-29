@@ -6,7 +6,7 @@ interface WhatsAppButtonProps {
     message?: string;
 }
 
-const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ phoneNumber, message = "Olá! Gostaria de mais informações." }) => {
+const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ phoneNumber, message = "Hello! I would like more information." }) => {
     // Remove caracteres não numéricos do telefone
     const cleanPhone = phoneNumber.replace(/\D/g, '');
     const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
@@ -17,7 +17,7 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ phoneNumber, message = 
             target="_blank"
             rel="noopener noreferrer"
             className="whatsapp-button fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#20bd5a] rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-            aria-label="Fale conosco no WhatsApp"
+            aria-label="Contact us on WhatsApp"
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
