@@ -69,8 +69,9 @@ const Works = () => {
   })
 
   const closeCreateModal = () => {
-    searchParams.delete('action')
-    setSearchParams(searchParams)
+    const next = new URLSearchParams(searchParams)
+    next.delete('action')
+    setSearchParams(next)
   }
 
   const openCreateModal = () => {
@@ -184,6 +185,7 @@ const Works = () => {
           <p className="text-text-light">Gerencie todas as obras do sistema</p>
         </div>
         <button
+          type="button"
           onClick={openCreateModal}
           className="btn btn-primary"
         >
@@ -272,7 +274,7 @@ const Works = () => {
               : 'Crie sua primeira obra para começar'}
           </p>
           {!search && statusFilter === 'all' && (
-            <button onClick={openCreateModal} className="btn btn-primary">
+            <button type="button" onClick={openCreateModal} className="btn btn-primary">
               <span className="material-symbols-outlined">add</span>
               Criar Primeira Obra
             </button>

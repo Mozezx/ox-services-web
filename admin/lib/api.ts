@@ -159,6 +159,10 @@ class AdminAPI {
       headers: this.authHeaders(),
       body: JSON.stringify(work),
     })
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || `Erro ${r.status}`)
+    }
     return r.json()
   }
 
