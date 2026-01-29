@@ -31,6 +31,63 @@ interface TimelineProps {
     entries: TimelineEntry[];
 }
 
+// Video modal para reproduzir vídeos
+interface VideoModalProps {
+    entry: TimelineEntry;
+    onClose: () => void;
+}
+
+const VideoModal: React.FC<VideoModalProps> = ({ entry, onClose }) => {
+    const videoRef = React.useRef<HTMLVideoElement>(null);
+
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'hidden';
+        videoRef.current?.play().catch(() => {});
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [onClose]);
+
+    return (
+        <div
+            className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+            onClick={onClose}
+        >
+            <button
+                onClick={onClose}
+                className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-10"
+                aria-label="Close"
+            >
+                <X className="w-6 h-6" />
+            </button>
+            <div
+                className="max-w-[90vw] max-h-[85vh] w-full flex flex-col items-center"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <video
+                    ref={videoRef}
+                    src={entry.mediaUrl}
+                    controls
+                    playsInline
+                    className="max-w-full max-h-[80vh] rounded-lg"
+                    poster={entry.thumbnailUrl}
+                />
+                <div className="mt-4 px-4 py-2 bg-white/10 rounded-lg max-w-[90vw]">
+                    <h3 className="text-white font-semibold">{entry.title}</h3>
+                    {entry.description && (
+                        <p className="text-white/70 text-sm mt-1 line-clamp-2">{entry.description}</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // Lightbox Component para visualizar imagens em tela cheia
 interface LightboxProps {
     images: TimelineEntry[];
@@ -153,6 +210,7 @@ const Timeline: React.FC<TimelineProps> = ({ entries }) => {
     const [likedEntries, setLikedEntries] = useState<Set<string>>(new Set());
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [videoModalEntry, setVideoModalEntry] = useState<TimelineEntry | null>(null);
 
     // Filter only images for lightbox navigation
     const imageEntries = entries.filter(e => e.type === 'image' && e.mediaUrl);
@@ -310,6 +368,14 @@ const Timeline: React.FC<TimelineProps> = ({ entries }) => {
                 />
             )}
 
+            {/* Video modal */}
+            {videoModalEntry && (
+                <VideoModal
+                    entry={videoModalEntry}
+                    onClose={() => setVideoModalEntry(null)}
+                />
+            )}
+
             <div className="space-y-4">
                 {entries.map((entry, index) => {
                     const colors = getTypeColor(entry.type);
@@ -384,7 +450,11 @@ const Timeline: React.FC<TimelineProps> = ({ entries }) => {
                                                     </div>
                                                 </div>
                                             ) : entry.type === 'video' ? (
-                                                <div className="relative aspect-video bg-[#0B242A] group cursor-pointer">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setVideoModalEntry(entry)}
+                                                    className="relative w-full aspect-video bg-[#0B242A] group cursor-pointer block text-left"
+                                                >
                                                     <div 
                                                         className="absolute inset-0 bg-cover bg-center"
                                                         style={{ backgroundImage: `url('${entry.thumbnailUrl || entry.mediaUrl}')` }}
@@ -402,7 +472,7 @@ const Timeline: React.FC<TimelineProps> = ({ entries }) => {
                                                             {textData.timeline.video}
                                                         </span>
                                                     </div>
-                                                </div>
+                                                </button>
                                             ) : null}
                                         </div>
                                     )}
