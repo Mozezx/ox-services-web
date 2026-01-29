@@ -753,10 +753,8 @@ app.delete('/admin/works/:id', async (req, res) => {
   }
 });
 
-// Multer middleware para upload de imagem de capa
-const coverUploadMw = cloudinary.isConfigured()
-  ? upload.uploadMemory.single('cover')
-  : upload.single('cover');
+// Multer: capa sempre em memory (Cloudinary usa buffer; local escreve buffer em uploads/covers)
+const coverUploadMw = upload.uploadMemory.single('cover');
 
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024;   // 20 MB
 const MAX_VIDEO_BYTES = 300 * 1024 * 1024;  // 300 MB
@@ -792,14 +790,17 @@ app.post('/admin/upload/cover', coverUploadMw, async (req, res) => {
       });
       imageUrl = result.secure_url;
     } else {
-      // Fallback: disco local
-      const fs = require('fs');
+      // Fallback: disco local (file.buffer existe porque usamos uploadMemory)
       const path = require('path');
+      const fs = require('fs');
       const coversDir = path.join(__dirname, 'public', 'uploads', 'covers');
       if (!fs.existsSync(coversDir)) {
         fs.mkdirSync(coversDir, { recursive: true });
       }
-      const filename = `${Date.now()}_${file.originalname}`;
+      const base = path.basename(file.originalname || 'cover').replace(/\s/g, '_');
+      const ext = path.extname(base) || '.jpg';
+      const name = path.basename(base, ext) || 'cover';
+      const filename = `${Date.now()}_${name}${ext}`;
       const filepath = path.join(coversDir, filename);
       fs.writeFileSync(filepath, file.buffer);
       imageUrl = `/uploads/covers/${filename}`;
