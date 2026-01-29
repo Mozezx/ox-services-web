@@ -9,11 +9,11 @@ interface ImageGalleryProps {
 
 const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  const baseUrl = 'http://localhost:4000'
 
   const getMediaUrl = (url: string) => {
+    if (!url) return ''
     if (url.startsWith('http')) return url
-    return `${baseUrl}${url}`
+    return url
   }
 
   const openLightbox = (index: number) => {

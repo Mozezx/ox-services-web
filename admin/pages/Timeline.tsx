@@ -20,7 +20,11 @@ const Timeline = () => {
   const [editEntry, setEditEntry] = useState<TimelineEntry | null>(null)
   const [deleteEntry, setDeleteEntry] = useState<TimelineEntry | null>(null)
 
-  const baseUrl = 'http://localhost:4000'
+  const getMediaUrl = (url: string) => {
+    if (!url) return ''
+    if (url.startsWith('http')) return url
+    return url
+  }
 
   // Fetch work details
   const { data: work } = useQuery<Work>({
@@ -73,11 +77,6 @@ const Timeline = () => {
     if (deleteEntry) {
       await deleteMutation.mutateAsync(deleteEntry.id)
     }
-  }
-
-  const getMediaUrl = (url: string) => {
-    if (url.startsWith('http')) return url
-    return `${baseUrl}${url}`
   }
 
   if (error) {
