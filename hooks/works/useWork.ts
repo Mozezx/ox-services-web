@@ -75,11 +75,16 @@ const fetchWorkData = async (token: string): Promise<WorkData> => {
     return response.json();
 };
 
+/** Intervalo de refetch para atualizações em tempo real na tela do cliente (ms) */
+const WORK_REFETCH_INTERVAL = 15_000;
+
 export const useWork = (token: string) => {
     return useQuery({
         queryKey: ['work', token],
         queryFn: () => fetchWorkData(token),
         enabled: !!token,
+        refetchInterval: WORK_REFETCH_INTERVAL,
+        refetchIntervalInBackground: false,
     });
 };
 
