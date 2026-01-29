@@ -151,7 +151,7 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
   ]
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       {/* Nome da Obra */}
       <div>
         <label className="block text-sm font-medium text-text mb-1.5">
@@ -347,15 +347,16 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
           <p className="text-red-500 text-sm mt-1">{errors.cover_image_url}</p>
         )}
 
-        {/* Campo oculto para URL manual (fallback) */}
+        {/* Campo para URL manual (fallback); type="text" evita validação url para /uploads/... */}
         <details className="mt-2">
           <summary className="text-xs text-text-light cursor-pointer hover:text-primary">
             Ou insira uma URL manualmente
           </summary>
           <input
-            type="url"
+            type="text"
+            name="cover_image_url"
             className="input mt-2 text-sm"
-            placeholder="https://exemplo.com/imagem.jpg"
+            placeholder="https://exemplo.com/imagem.jpg ou /uploads/covers/..."
             value={formData.cover_image_url}
             onChange={(e) => handleChange('cover_image_url', e.target.value)}
           />
