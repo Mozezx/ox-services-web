@@ -22,8 +22,8 @@ self.addEventListener('push', (event) => {
   let data = {
     title: 'OX Services Admin',
     body: 'Nova notificação',
-    icon: '/logo.png',
-    badge: '/logo.png',
+    icon: '/notification-icon.png',
+    badge: '/notification-icon.png',
     data: { url: '/appointments' }
   };
 
@@ -37,8 +37,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/logo.png',
-    badge: data.badge || '/logo.png',
+    icon: data.icon || '/notification-icon.png',
+    badge: data.badge || '/notification-icon.png',
     vibrate: [200, 100, 200],
     silent: false,
     tag: 'ox-appointment-' + Date.now(),
@@ -46,7 +46,7 @@ self.addEventListener('push', (event) => {
     requireInteraction: true,
     data: data.data || { url: '/appointments' },
     actions: [
-      { action: 'view', title: 'Ver agendamento', icon: '/logo.png' },
+      { action: 'view', title: 'Ver agendamento', icon: '/notification-icon.png' },
       { action: 'dismiss', title: 'Dispensar' }
     ]
   };

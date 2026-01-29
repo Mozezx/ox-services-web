@@ -45,6 +45,9 @@ if (!vapidConfigured) {
     }
 }
 
+// Base URL do admin (para ícone da notificação push em URL absoluta — necessário no mobile)
+const ADMIN_APP_URL = (process.env.ADMIN_APP_URL || 'https://obras.oxservices.org').replace(/\/$/, '');
+
 // Função para enviar push notification para todos os subscribers
 async function sendPushNotificationToAll(title, body, data = {}) {
     if (!vapidConfigured) {
@@ -57,11 +60,12 @@ async function sendPushNotificationToAll(title, body, data = {}) {
 
         console.log(`📤 Enviando push para ${subscriptions.length} dispositivo(s)...`);
 
+        const iconUrl = `${ADMIN_APP_URL}/notification-icon.png`;
         const payload = JSON.stringify({
             title,
             body,
-            icon: '/logo.png',
-            badge: '/logo.png',
+            icon: iconUrl,
+            badge: iconUrl,
             data: {
                 url: '/appointments',
                 ...data

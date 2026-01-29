@@ -30,3 +30,7 @@ EMAIL_TO=contato@oxservices.be
 CLOUDINARY_CLOUD_NAME=seu_cloud_name
 CLOUDINARY_API_KEY=sua_api_key
 CLOUDINARY_API_SECRET=sua_api_secret
+
+# --- Push notifications (ícone na barra do celular) ---
+# URL do admin (obras.oxservices.org). Usado para ícone da notificação em URL absoluta.
+# ADMIN_APP_URL=https://obras.oxservices.org
