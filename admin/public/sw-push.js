@@ -40,25 +40,25 @@ self.addEventListener('push', (event) => {
     icon: data.icon || '/logo.png',
     badge: data.badge || '/logo.png',
     vibrate: [200, 100, 200],
+    silent: false,
     tag: 'ox-appointment-' + Date.now(),
     renotify: true,
     requireInteraction: true,
     data: data.data || { url: '/appointments' },
     actions: [
-      {
-        action: 'view',
-        title: 'Ver agendamento',
-        icon: '/logo.png'
-      },
-      {
-        action: 'dismiss',
-        title: 'Dispensar'
-      }
+      { action: 'view', title: 'Ver agendamento', icon: '/logo.png' },
+      { action: 'dismiss', title: 'Dispensar' }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(data.title, options).then(() => {
+      return self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    }).then((clientList) => {
+      clientList.forEach((client) => {
+        client.postMessage({ type: 'PUSH_APPOINTMENT', payload: data });
+      });
+    })
   );
 });
 
@@ -72,21 +72,19 @@ self.addEventListener('notificationclick', (event) => {
     return;
   }
 
-  const urlToOpen = event.notification.data?.url || '/appointments';
+  const path = event.notification.data?.url || '/appointments';
+  const urlToOpen = path.startsWith('http') ? path : new URL(path, self.location.origin).href;
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientList) => {
-        // Check if there's already a window/tab open
         for (const client of clientList) {
-          if (client.url.includes(self.location.origin)) {
-            // Focus existing window and navigate to appointments
+          if (client.url && client.url.startsWith(self.location.origin)) {
             client.focus();
             client.navigate(urlToOpen);
             return;
           }
         }
-        // Open new window if no existing window found
         return clients.openWindow(urlToOpen);
       })
   );

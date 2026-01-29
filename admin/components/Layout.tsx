@@ -1,10 +1,12 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../context/AuthContext'
 import { UploadQueueProvider, useUploadQueue } from '../context/UploadQueueContext'
+import { useToast } from './Toast'
 import UploadQueueBar from './UploadQueueBar'
 import { api } from '../lib/api'
+import { setupPushNotifications, playNotificationSound } from '../lib/push'
 
 interface LayoutProps {
   children: ReactNode
@@ -15,6 +17,29 @@ function LayoutInner({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { logout } = useAuth()
   const { jobs } = useUploadQueue()
+  const { addToast } = useToast()
+  const queryClient = useQueryClient()
+  const pushSetupDone = useRef(false)
+
+  // Push: setup (apenas quando logado) e listener para novo agendamento
+  useEffect(() => {
+    if (pushSetupDone.current) return
+    pushSetupDone.current = true
+    setTimeout(() => setupPushNotifications(), 1000)
+  }, [])
+
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'PUSH_APPOINTMENT') {
+        playNotificationSound()
+        addToast('info', 'Novo agendamento! Abra Agendamentos para ver.')
+        queryClient.invalidateQueries({ queryKey: ['appointments-stats'] })
+        queryClient.invalidateQueries({ queryKey: ['appointments'] })
+      }
+    }
+    navigator.serviceWorker?.addEventListener?.('message', onMessage)
+    return () => navigator.serviceWorker?.removeEventListener?.('message', onMessage)
+  }, [addToast, queryClient])
 
   // Fetch appointment stats for badge
   const { data: appointmentStats } = useQuery({
