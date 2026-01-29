@@ -4,12 +4,9 @@ import {
     Video, 
     FileText, 
     ChevronRight, 
-    ZoomIn, 
-    Play, 
     Download, 
     Share2, 
     Heart, 
-    MessageCircle, 
     X,
     ChevronLeft,
     Calendar,
@@ -31,7 +28,62 @@ interface TimelineProps {
     entries: TimelineEntry[];
 }
 
-// Video modal para reproduzir vídeos
+// Inline video: play in timeline, aspect ratio from recording (portrait/landscape)
+interface InlineVideoProps {
+    entry: TimelineEntry;
+    videoLabel: string;
+    onExpand?: () => void;
+}
+
+const InlineVideo: React.FC<InlineVideoProps> = ({ entry, videoLabel, onExpand }) => {
+    const [aspect, setAspect] = useState<{ w: number; h: number } | null>(null);
+
+    const onLoadedMetadata = useCallback((e: React.SyntheticEvent<HTMLVideoElement>) => {
+        const v = e.currentTarget;
+        const w = v.videoWidth;
+        const h = v.videoHeight;
+        if (w > 0 && h > 0) setAspect({ w, h });
+    }, []);
+
+    const ratio = aspect ? `${aspect.w} / ${aspect.h}` : '16 / 9';
+
+    return (
+        <div className="relative w-full bg-[#0B242A] rounded-lg overflow-hidden">
+            <div
+                className="w-full max-h-[min(70vh,720px)] overflow-hidden flex items-center justify-center mx-auto"
+                style={{ aspectRatio: ratio }}
+            >
+                <video
+                    src={entry.mediaUrl}
+                    poster={entry.thumbnailUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    onLoadedMetadata={onLoadedMetadata}
+                    className="w-full h-full object-contain"
+                />
+            </div>
+            <div className="absolute top-2 left-2 flex items-center gap-2 pointer-events-none">
+                <span className="px-2 py-1 bg-black/70 backdrop-blur-sm rounded-lg text-xs text-white font-medium">
+                    {videoLabel}
+                </span>
+                {onExpand && (
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onExpand(); }}
+                        className="p-1.5 rounded-lg bg-black/70 backdrop-blur-sm text-white hover:bg-black/80 transition-colors pointer-events-auto"
+                        title="Expand"
+                        aria-label="Expand video"
+                    >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                    </button>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// Video modal para tela cheia (expand)
 interface VideoModalProps {
     entry: TimelineEntry;
     onClose: () => void;
@@ -450,29 +502,11 @@ const Timeline: React.FC<TimelineProps> = ({ entries }) => {
                                                     </div>
                                                 </div>
                                             ) : entry.type === 'video' ? (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setVideoModalEntry(entry)}
-                                                    className="relative w-full aspect-video bg-[#0B242A] group cursor-pointer block text-left"
-                                                >
-                                                    <div 
-                                                        className="absolute inset-0 bg-cover bg-center"
-                                                        style={{ backgroundImage: `url('${entry.thumbnailUrl || entry.mediaUrl}')` }}
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors" />
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                            <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                                                                <Play className="w-5 h-5 text-[#0B242A] ml-0.5" fill="currentColor" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="absolute bottom-3 left-3">
-                                                        <span className="px-2 py-1 bg-black/70 backdrop-blur-sm rounded-lg text-xs text-white font-medium">
-                                                            {textData.timeline.video}
-                                                        </span>
-                                                    </div>
-                                                </button>
+                                                <InlineVideo
+                                                    entry={entry}
+                                                    videoLabel={textData.timeline.video}
+                                                    onExpand={() => setVideoModalEntry(entry)}
+                                                />
                                             ) : null}
                                         </div>
                                     )}

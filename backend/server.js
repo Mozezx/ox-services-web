@@ -399,6 +399,17 @@ function getTotalDays(startDate, endDate) {
     return Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 }
 
+/** Dias trabalhados: do início até hoje OU até o fim da obra, se já terminou. */
+function getDaysWorked(startDate, endDate) {
+    const start = new Date(startDate);
+    const now = new Date();
+    if (now < start) return 0;
+    if (!endDate) return getDaysSince(startDate);
+    const end = new Date(endDate);
+    if (now >= end) return getTotalDays(startDate, endDate);
+    return getDaysSince(startDate);
+}
+
 // GET /api/works/:token - Retorna obra e timeline pelo access_token
 app.get('/api/works/:token', async (req, res) => {
     const { token } = req.params;
@@ -469,7 +480,7 @@ app.get('/api/works/:token', async (req, res) => {
         
         const stats = {
             progress: calculateProgress(work.start_date, work.end_date, work.status),
-            daysWorked: getDaysSince(work.start_date),
+            daysWorked: getDaysWorked(work.start_date, work.end_date),
             daysRemaining: getDaysUntil(work.end_date),
             totalDays: getTotalDays(work.start_date, work.end_date),
             photosCount,
