@@ -20,7 +20,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
     return (
         <a
             href={serviceUrl}
-            target="_blank"
             rel="noopener noreferrer"
             className="group relative overflow-hidden rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300 block"
         >

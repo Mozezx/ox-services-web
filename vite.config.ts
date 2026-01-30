@@ -32,33 +32,17 @@ export default defineConfig(({ mode }) => {
             scope: '/',
             start_url: '/',
             icons: [
-              {
-                src: 'pwa-64x64.png',
-                sizes: '64x64',
-                type: 'image/png'
-              },
-              {
-                src: 'pwa-192x192.png',
-                sizes: '192x192',
-                type: 'image/png'
-              },
-              {
-                src: 'pwa-512x512.png',
-                sizes: '512x512',
-                type: 'image/png',
-                purpose: 'any'
-              },
-              {
-                src: 'maskable-icon-512x512.png',
-                sizes: '512x512',
-                type: 'image/png',
-                purpose: 'maskable'
-              }
+              { src: 'placeholder.png', sizes: '64x64', type: 'image/png' },
+              { src: 'placeholder.png', sizes: '192x192', type: 'image/png' },
+              { src: 'placeholder.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+              { src: 'placeholder.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
             ]
           },
           workbox: {
             globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
             maximumFileSizeToCacheInBytes: 4 * 1024 * 1024, // 4 MB (material-symbols.woff2)
+            navigateFallback: '/index.html',
+            navigateFallbackDenylist: [/^\/services\//, /^\/api\//],
             runtimeCaching: [
               {
                 urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
