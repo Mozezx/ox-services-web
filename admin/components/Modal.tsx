@@ -50,10 +50,10 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }: ModalProps) =>
         aria-hidden="true"
       />
       
-      {/* Modal */}
+      {/* Modal - modal-panel garante texto escuro em fundo branco */}
       <div 
         ref={modalRef}
-        className={`relative w-full ${sizeClasses[size]} bg-surface rounded-xl shadow-2xl transform transition-all animate-modal-enter`}
+        className={`modal-panel relative w-full ${sizeClasses[size]} bg-surface rounded-xl shadow-2xl transform transition-all animate-modal-enter`}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">

@@ -113,19 +113,19 @@ const Upload = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-text-light">
-        <Link to="/works" className="hover:text-primary">Obras</Link>
-        <span className="material-symbols-outlined text-xs">chevron_right</span>
-        <Link to={`/works/${id}`} className="hover:text-primary">{work?.name || 'Detalhes'}</Link>
-        <span className="material-symbols-outlined text-xs">chevron_right</span>
-        <span className="text-text">Upload</span>
+      <nav className="flex items-center gap-2 text-sm text-white">
+        <Link to="/works" className="text-white hover:text-white/90">Obras</Link>
+        <span className="material-symbols-outlined text-xs text-white">chevron_right</span>
+        <Link to={`/works/${id}`} className="text-white hover:text-white/90">{work?.name || 'Detalhes'}</Link>
+        <span className="material-symbols-outlined text-xs text-white">chevron_right</span>
+        <span className="text-white">Upload</span>
       </nav>
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text">Upload de Mídia</h1>
-          <p className="text-text-light">Adicione imagens e vídeos à timeline</p>
+          <h1 className="text-2xl font-bold text-white">Upload de Mídia</h1>
+          <p className="text-white/80">Adicione imagens e vídeos à timeline</p>
         </div>
         <button
           onClick={handleUpload}

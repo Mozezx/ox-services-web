@@ -60,8 +60,8 @@ const ConfirmDialog = ({
         onClick={onClose}
       />
       
-      {/* Dialog */}
-      <div className="relative w-full max-w-md bg-surface rounded-xl shadow-2xl p-6 animate-modal-enter">
+      {/* Dialog - modal-panel garante texto escuro em fundo branco */}
+      <div className="modal-panel relative w-full max-w-md bg-surface rounded-xl shadow-2xl p-6 animate-modal-enter">
         <div className="flex flex-col items-center text-center">
           {/* Icon */}
           <div className={`w-16 h-16 ${styles.iconBg} rounded-full flex items-center justify-center mb-4`}>

@@ -31,10 +31,17 @@ function LayoutInner({ children }: LayoutProps) {
   useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       if (e.data?.type === 'PUSH_APPOINTMENT') {
-        playNotificationSound()
-        addToast('info', 'Novo agendamento! Abra Agendamentos para ver.')
-        queryClient.invalidateQueries({ queryKey: ['appointments-stats'] })
-        queryClient.invalidateQueries({ queryKey: ['appointments'] })
+        const payload = e.data.payload
+        if (payload?.data?.toolOrderId) {
+          playNotificationSound()
+          addToast('info', 'Novo pedido de ferramentas! Abra Pedidos para ver.')
+          queryClient.invalidateQueries({ queryKey: ['tool-orders'] })
+        } else {
+          playNotificationSound()
+          addToast('info', 'Novo agendamento! Abra Agendamentos para ver.')
+          queryClient.invalidateQueries({ queryKey: ['appointments-stats'] })
+          queryClient.invalidateQueries({ queryKey: ['appointments'] })
+        }
       }
     }
     navigator.serviceWorker?.addEventListener?.('message', onMessage)
@@ -45,15 +52,27 @@ function LayoutInner({ children }: LayoutProps) {
   const { data: appointmentStats } = useQuery({
     queryKey: ['appointments-stats'],
     queryFn: () => api.getAppointmentsStats(),
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 30000,
+  })
+
+  // Fetch pending tool orders count for badge
+  const { data: pendingToolOrders = [] } = useQuery({
+    queryKey: ['tool-orders', 'pending'],
+    queryFn: () => api.getToolOrders({ status: 'pending' }),
+    refetchInterval: 30000,
   })
 
   const newAppointmentsCount = appointmentStats?.new || 0
-  
+  const pendingToolOrdersCount = pendingToolOrders.length
+
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
     { path: '/appointments', label: 'Agendamentos', icon: 'calendar_month', badge: newAppointmentsCount },
     { path: '/works', label: 'Obras', icon: 'construction' },
+    { path: '/technicians', label: 'Técnicos', icon: 'engineering' },
+    { path: '/inventory', label: 'Inventário', icon: 'inventory_2' },
+    { path: '/tools', label: 'Ferramentas', icon: 'build' },
+    { path: '/tool-orders', label: 'Pedidos de ferramentas', icon: 'shopping_cart', badge: pendingToolOrdersCount },
   ]
   
   const isActive = (path: string) => location.pathname.startsWith(path)
@@ -63,7 +82,7 @@ function LayoutInner({ children }: LayoutProps) {
   const hasQueue = jobs.length > 0
 
   return (
-    <div className="min-h-screen flex bg-background">
+    <div className="min-h-screen flex" style={{ backgroundColor: 'var(--background)' }}>
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div 
@@ -168,7 +187,7 @@ function LayoutInner({ children }: LayoutProps) {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden p-2 hover:bg-background rounded-lg transition-colors"
+              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors text-primary"
               aria-label="Abrir menu"
             >
               <span className="material-symbols-outlined">menu</span>
@@ -195,8 +214,8 @@ function LayoutInner({ children }: LayoutProps) {
           </div>
         </header>
         
-        {/* Content */}
-        <div className={`flex-1 p-4 lg:p-8 overflow-x-hidden ${hasQueue ? 'pb-32' : ''}`}>
+        {/* Content - fundo azul; títulos e descrições brancos (layout-content) */}
+        <div className={`layout-content flex-1 p-4 lg:p-8 overflow-x-hidden ${hasQueue ? 'pb-32' : ''}`}>
           {children}
         </div>
       </main>

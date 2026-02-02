@@ -1,4 +1,8 @@
 const API_BASE = '/api'
+// Em desenvolvimento, upload de foto de ferramenta vai direto ao backend (evita 404 do proxy).
+const BACKEND_ORIGIN =
+  (import.meta as { env?: { DEV?: boolean; VITE_API_ORIGIN?: string } }).env?.VITE_API_ORIGIN ??
+  ((import.meta as { env?: { DEV?: boolean } }).env?.DEV === true ? 'http://localhost:4000' : '')
 const TOKEN_KEY = 'admin_token'
 
 function getToken(): string | null {
@@ -131,6 +135,59 @@ export interface AppointmentStats {
   read: number
   contacted: number
   completed: number
+}
+
+export interface Technician {
+  id: string
+  email: string
+  full_name: string | null
+  created_at: string
+}
+
+export interface TechnicianInventoryItem {
+  technician_id: string
+  technician_name: string
+  tools: Array<{ tool_id: string; tool_name: string; quantity: number }>
+  total_items: number
+}
+
+export interface WorkAssignment {
+  id: string
+  work_id: string
+  technician_id: string
+  assigned_at: string
+  email: string
+  full_name: string | null
+}
+
+export interface Tool {
+  id: string
+  name: string
+  description: string | null
+  image_url: string | null
+  stock_quantity: number | null
+  active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface ToolOrderItem {
+  id: string
+  tool_id: string
+  tool_name: string
+  tool_description: string | null
+  quantity: number
+}
+
+export interface ToolOrder {
+  id: string
+  technician_id: string
+  technician_name?: string
+  technician_email?: string
+  status: 'pending' | 'approved' | 'rejected'
+  notes: string | null
+  created_at: string
+  updated_at: string
 }
 
 class AdminAPI {
@@ -320,6 +377,185 @@ class AdminAPI {
       body: form,
     })
     if (!r.ok) throw new Error('Erro ao fazer upload da imagem')
+    return r.json()
+  }
+
+  async uploadToolImage(file: File): Promise<{ url: string }> {
+    const form = new FormData()
+    form.append('image', file)
+    const headers: Record<string, string> = {}
+    const t = getToken()
+    if (t) headers['Authorization'] = `Bearer ${t}`
+    // Em dev usa o backend direto (BACKEND_ORIGIN) para evitar 404 do proxy
+    const uploadUrl = BACKEND_ORIGIN
+      ? `${BACKEND_ORIGIN.replace(/\/$/, '')}/admin/upload/tool-image`
+      : `${API_BASE}/admin/upload/tool-image`
+    const r = await fetch(uploadUrl, {
+      method: 'POST',
+      headers,
+      body: form,
+    })
+    if (r.status === 401) {
+      clearTokenAndRedirect()
+      throw new Error('Sessão expirada')
+    }
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || 'Erro ao fazer upload da foto')
+    }
+    return r.json()
+  }
+
+  // Technicians
+  async getTechnicians(): Promise<Technician[]> {
+    const r = await adminFetch(`${API_BASE}/admin/technicians`, { headers: this.authHeaders() })
+    const data = await r.json()
+    return data.technicians || []
+  }
+
+  async getTechnicianInventory(): Promise<TechnicianInventoryItem[]> {
+    const r = await adminFetch(`${API_BASE}/admin/technicians/inventory`, { headers: this.authHeaders() })
+    const data = await r.json()
+    return data.technicians || []
+  }
+
+  async recordToolReturn(body: { technician_id: string; tool_id: string; quantity: number; notes?: string }): Promise<void> {
+    const r = await adminFetch(`${API_BASE}/admin/tool-returns`, {
+      method: 'POST',
+      headers: this.authHeaders(),
+      body: JSON.stringify(body),
+    })
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || 'Erro ao registar devolução')
+    }
+  }
+
+  async createTechnician(body: { email: string; password: string; full_name?: string }): Promise<Technician> {
+    const r = await adminFetch(`${API_BASE}/admin/technicians`, {
+      method: 'POST',
+      headers: this.authHeaders(),
+      body: JSON.stringify(body),
+    })
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || 'Erro ao criar técnico')
+    }
+    return r.json()
+  }
+
+  async getTechnician(id: string): Promise<Technician> {
+    const r = await adminFetch(`${API_BASE}/admin/technicians/${id}`, { headers: this.authHeaders() })
+    return r.json()
+  }
+
+  async updateTechnician(id: string, body: { email?: string; full_name?: string; password?: string }): Promise<Technician> {
+    const r = await adminFetch(`${API_BASE}/admin/technicians/${id}`, {
+      method: 'PUT',
+      headers: this.authHeaders(),
+      body: JSON.stringify(body),
+    })
+    return r.json()
+  }
+
+  async deleteTechnician(id: string): Promise<void> {
+    await adminFetch(`${API_BASE}/admin/technicians/${id}`, {
+      method: 'DELETE',
+      headers: this.authHeaders(),
+    })
+  }
+
+  // Work assignments
+  async getWorkAssignments(workId: string): Promise<WorkAssignment[]> {
+    const r = await adminFetch(`${API_BASE}/admin/works/${workId}/assignments`, { headers: this.authHeaders() })
+    const data = await r.json()
+    return data.assignments || []
+  }
+
+  async addWorkAssignment(workId: string, technicianId: string): Promise<WorkAssignment> {
+    const r = await adminFetch(`${API_BASE}/admin/works/${workId}/assignments`, {
+      method: 'POST',
+      headers: this.authHeaders(),
+      body: JSON.stringify({ technician_id: technicianId }),
+    })
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || 'Erro ao atribuir')
+    }
+    return r.json()
+  }
+
+  async removeWorkAssignment(workId: string, technicianId: string): Promise<void> {
+    await adminFetch(`${API_BASE}/admin/works/${workId}/assignments/${technicianId}`, {
+      method: 'DELETE',
+      headers: this.authHeaders(),
+    })
+  }
+
+  // Tools
+  async getTools(active?: boolean): Promise<Tool[]> {
+    const q = active !== undefined ? `?active=${active}` : ''
+    const r = await adminFetch(`${API_BASE}/admin/tools${q}`, { headers: this.authHeaders() })
+    const data = await r.json()
+    return data.tools || []
+  }
+
+  async createTool(body: { name: string; description?: string; image_url?: string; stock_quantity?: number; active?: boolean }): Promise<Tool> {
+    const r = await adminFetch(`${API_BASE}/admin/tools`, {
+      method: 'POST',
+      headers: this.authHeaders(),
+      body: JSON.stringify(body),
+    })
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || 'Erro ao criar ferramenta')
+    }
+    return r.json()
+  }
+
+  async getTool(id: string): Promise<Tool> {
+    const r = await adminFetch(`${API_BASE}/admin/tools/${id}`, { headers: this.authHeaders() })
+    return r.json()
+  }
+
+  async updateTool(id: string, body: Partial<Tool>): Promise<Tool> {
+    const r = await adminFetch(`${API_BASE}/admin/tools/${id}`, {
+      method: 'PUT',
+      headers: this.authHeaders(),
+      body: JSON.stringify(body),
+    })
+    return r.json()
+  }
+
+  async deleteTool(id: string): Promise<void> {
+    await adminFetch(`${API_BASE}/admin/tools/${id}`, {
+      method: 'DELETE',
+      headers: this.authHeaders(),
+    })
+  }
+
+  // Tool orders
+  async getToolOrders(params?: { status?: string; technician_id?: string }): Promise<ToolOrder[]> {
+    const search = new URLSearchParams()
+    if (params?.status && params.status !== 'all') search.set('status', params.status)
+    if (params?.technician_id) search.set('technician_id', params.technician_id)
+    const q = search.toString() ? `?${search.toString()}` : ''
+    const r = await adminFetch(`${API_BASE}/admin/tool-orders${q}`, { headers: this.authHeaders() })
+    const data = await r.json()
+    return data.orders || []
+  }
+
+  async getToolOrder(id: string): Promise<{ order: ToolOrder & { technician_name?: string; technician_email?: string }; items: ToolOrderItem[] }> {
+    const r = await adminFetch(`${API_BASE}/admin/tool-orders/${id}`, { headers: this.authHeaders() })
+    return r.json()
+  }
+
+  async updateToolOrderStatus(id: string, status: 'pending' | 'approved' | 'rejected'): Promise<ToolOrder> {
+    const r = await adminFetch(`${API_BASE}/admin/tool-orders/${id}`, {
+      method: 'PUT',
+      headers: this.authHeaders(),
+      body: JSON.stringify({ status }),
+    })
     return r.json()
   }
 }

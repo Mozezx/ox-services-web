@@ -3,30 +3,24 @@ import { useAuth } from '../context/AuthContext'
 import Layout from '../components/Layout'
 import Login from '../pages/Login'
 import Dashboard from '../pages/Dashboard'
-import Works from '../pages/Works'
+import MyWorks from '../pages/MyWorks'
 import WorkDetail from '../pages/WorkDetail'
-import Timeline from '../pages/Timeline'
 import Upload from '../pages/Upload'
-import Appointments from '../pages/Appointments'
-import Technicians from '../pages/Technicians'
-import Inventory from '../pages/Inventory'
-import Tools from '../pages/Tools'
-import ToolOrders from '../pages/ToolOrders'
+import Shop from '../pages/Shop'
+import Cart from '../pages/Cart'
+import MyOrders from '../pages/MyOrders'
 
 const AppRoutes = () => (
   <Layout>
     <Routes>
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/appointments" element={<Appointments />} />
-      <Route path="/works" element={<Works />} />
+      <Route path="/works" element={<MyWorks />} />
       <Route path="/works/:id" element={<WorkDetail />} />
-      <Route path="/works/:id/timeline" element={<Timeline />} />
       <Route path="/works/:id/upload" element={<Upload />} />
-      <Route path="/technicians" element={<Technicians />} />
-      <Route path="/inventory" element={<Inventory />} />
-      <Route path="/tools" element={<Tools />} />
-      <Route path="/tool-orders" element={<ToolOrders />} />
+      <Route path="/shop" element={<Shop />} />
+      <Route path="/cart" element={<Cart />} />
+      <Route path="/orders" element={<MyOrders />} />
     </Routes>
   </Layout>
 )

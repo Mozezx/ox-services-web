@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, Work, TimelineEntry, getClientWorkPageUrl } from '../lib/api'
+import { api, Work, TimelineEntry, getClientWorkPageUrl, WorkAssignment, Technician } from '../lib/api'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import WorkForm, { WorkFormData } from '../components/WorkForm'
@@ -17,6 +17,8 @@ const WorkDetail = () => {
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
+  const [selectedTechnicianId, setSelectedTechnicianId] = useState('')
 
   // Fetch work details
   const { data: work, isLoading: isLoadingWork, error: workError } = useQuery<Work>({
@@ -30,6 +32,47 @@ const WorkDetail = () => {
     queryKey: ['timeline', id],
     queryFn: () => api.getTimelineEntries(id!),
     enabled: !!id,
+  })
+
+  // Fetch work assignments
+  const { data: assignments = [], isLoading: isLoadingAssignments } = useQuery<WorkAssignment[]>({
+    queryKey: ['work-assignments', id],
+    queryFn: () => api.getWorkAssignments(id!),
+    enabled: !!id,
+  })
+
+  // Fetch all technicians (for assign modal)
+  const { data: technicians = [] } = useQuery<Technician[]>({
+    queryKey: ['technicians'],
+    queryFn: () => api.getTechnicians(),
+    enabled: isAssignModalOpen,
+  })
+
+  const assignedIds = new Set(assignments.map((a) => a.technician_id))
+  const availableTechnicians = technicians.filter((t) => !assignedIds.has(t.id))
+
+  const addAssignmentMutation = useMutation({
+    mutationFn: (technicianId: string) => api.addWorkAssignment(id!, technicianId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['work-assignments', id] })
+      addToast('success', 'Técnico atribuído com sucesso!')
+      setIsAssignModalOpen(false)
+      setSelectedTechnicianId('')
+    },
+    onError: (err: Error) => {
+      addToast('error', err.message || 'Erro ao atribuir técnico.')
+    },
+  })
+
+  const removeAssignmentMutation = useMutation({
+    mutationFn: (technicianId: string) => api.removeWorkAssignment(id!, technicianId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['work-assignments', id] })
+      addToast('success', 'Atribuição removida.')
+    },
+    onError: () => {
+      addToast('error', 'Erro ao remover atribuição.')
+    },
   })
 
   // Update work mutation
@@ -148,25 +191,25 @@ const WorkDetail = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-text-light">
-        <Link to="/works" className="hover:text-primary">Obras</Link>
-        <span className="material-symbols-outlined text-xs">chevron_right</span>
-        <span className="text-text">{work.name}</span>
+      <nav className="flex items-center gap-2 text-sm text-white">
+        <Link to="/works" className="text-white hover:text-white/90">Obras</Link>
+        <span className="material-symbols-outlined text-xs text-white">chevron_right</span>
+        <span className="text-white">{work.name}</span>
       </nav>
 
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl font-bold text-text">{work.name}</h1>
+            <h1 className="text-2xl font-bold text-white">{work.name}</h1>
             <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${getStatusColor(work.status)}`}>
               {getStatusText(work.status)}
             </span>
           </div>
-          <p className="text-text-light">Detalhes e gerenciamento da obra</p>
+          <p className="text-white/80">Detalhes e gerenciamento da obra</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link to={`/works/${id}/timeline`} className="btn btn-outline">
+          <Link to={`/works/${id}/timeline`} className="btn btn-outline text-white border-white/50 hover:bg-white/10 hover:border-white/70">
             <span className="material-symbols-outlined">photo_library</span>
             Timeline
           </Link>
@@ -275,6 +318,51 @@ const WorkDetail = () => {
         
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Assigned technicians */}
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Técnicos atribuídos</h2>
+              <button
+                type="button"
+                onClick={() => setIsAssignModalOpen(true)}
+                className="btn btn-outline text-sm"
+              >
+                <span className="material-symbols-outlined text-sm">person_add</span>
+                Atribuir
+              </button>
+            </div>
+            {isLoadingAssignments ? (
+              <div className="flex justify-center py-4">
+                <span className="material-symbols-outlined animate-spin text-primary">progress_activity</span>
+              </div>
+            ) : assignments.length === 0 ? (
+              <p className="text-sm text-text-light">Nenhum técnico atribuído.</p>
+            ) : (
+              <ul className="space-y-2">
+                {assignments.map((a) => (
+                  <li
+                    key={a.id}
+                    className="flex items-center justify-between gap-2 py-2 border-b border-border last:border-0"
+                  >
+                    <div>
+                      <p className="font-medium text-sm">{a.full_name || a.email}</p>
+                      <p className="text-xs text-text-light">{a.email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeAssignmentMutation.mutate(a.technician_id)}
+                      className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition-colors"
+                      title="Remover atribuição"
+                      disabled={removeAssignmentMutation.isPending}
+                    >
+                      <span className="material-symbols-outlined text-sm">person_remove</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
           {/* Client Info */}
           <div className="card">
             <h2 className="text-lg font-semibold mb-4">Informações do Cliente</h2>
@@ -299,7 +387,7 @@ const WorkDetail = () => {
               <div className="pt-4 border-t border-border">
                 <p className="text-sm text-text-light mb-2">Link de Acesso do Cliente</p>
                 <div className="flex items-center gap-2">
-                  <code className="flex-1 bg-background px-3 py-2 rounded text-xs font-mono truncate" title={getClientWorkPageUrl(work.access_token)}>
+                  <code className="client-access-link flex-1 bg-background px-3 py-2 rounded text-xs font-mono truncate text-white" title={getClientWorkPageUrl(work.access_token)}>
                     {getClientWorkPageUrl(work.access_token)}
                   </code>
                   <button 
@@ -320,30 +408,30 @@ const WorkDetail = () => {
           {/* Stats */}
           <div className="card">
             <h2 className="text-lg font-semibold mb-4">Estatísticas</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-background rounded-lg">
-                <p className="text-2xl font-bold text-primary">{timelineEntries.length}</p>
-                <p className="text-xs text-text-light">Registros</p>
+            <div className="grid grid-cols-2 gap-4 stats-cards-primary">
+              <div className="text-center p-3 bg-primary rounded-lg">
+                <p className="text-2xl font-bold text-white">{timelineEntries.length}</p>
+                <p className="text-xs text-white/80">Registros</p>
               </div>
-              <div className="text-center p-3 bg-background rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">
+              <div className="text-center p-3 bg-primary rounded-lg">
+                <p className="text-2xl font-bold text-white">
                   {timelineEntries.filter(e => e.type === 'image').length}
                 </p>
-                <p className="text-xs text-text-light">Fotos</p>
+                <p className="text-xs text-white/80">Fotos</p>
               </div>
-              <div className="text-center p-3 bg-background rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">
+              <div className="text-center p-3 bg-primary rounded-lg">
+                <p className="text-2xl font-bold text-white">
                   {timelineEntries.filter(e => e.type === 'video').length}
                 </p>
-                <p className="text-xs text-text-light">Vídeos</p>
+                <p className="text-xs text-white/80">Vídeos</p>
               </div>
-              <div className="text-center p-3 bg-background rounded-lg">
-                <p className="text-2xl font-bold text-green-600">
+              <div className="text-center p-3 bg-primary rounded-lg">
+                <p className="text-2xl font-bold text-white">
                   {work.start_date && work.end_date
                     ? Math.ceil((new Date(work.end_date).getTime() - new Date(work.start_date).getTime()) / (1000 * 60 * 60 * 24))
                     : '-'}
                 </p>
-                <p className="text-xs text-text-light">Dias</p>
+                <p className="text-xs text-white/80">Dias</p>
               </div>
             </div>
           </div>
@@ -398,6 +486,50 @@ const WorkDetail = () => {
           onCancel={() => setIsEditModalOpen(false)}
           isLoading={updateMutation.isPending}
         />
+      </Modal>
+
+      {/* Assign technician modal */}
+      <Modal
+        isOpen={isAssignModalOpen}
+        onClose={() => { setIsAssignModalOpen(false); setSelectedTechnicianId(''); }}
+        title="Atribuir técnico"
+        size="md"
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            if (selectedTechnicianId) addAssignmentMutation.mutate(selectedTechnicianId)
+          }}
+          className="space-y-4"
+        >
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">Técnico</label>
+            <select
+              value={selectedTechnicianId}
+              onChange={(e) => setSelectedTechnicianId(e.target.value)}
+              className="input w-full"
+              required
+            >
+              <option value="">Selecione um técnico</option>
+              {availableTechnicians.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.full_name || t.email} ({t.email})
+                </option>
+              ))}
+            </select>
+            {availableTechnicians.length === 0 && technicians.length > 0 && (
+              <p className="text-sm text-text-light mt-1">Todos os técnicos já estão atribuídos a esta obra.</p>
+            )}
+          </div>
+          <div className="flex justify-end gap-2 pt-2">
+            <button type="button" onClick={() => setIsAssignModalOpen(false)} className="btn btn-outline">
+              Cancelar
+            </button>
+            <button type="submit" className="btn btn-primary" disabled={!selectedTechnicianId || addAssignmentMutation.isPending}>
+              {addAssignmentMutation.isPending ? 'Atribuindo...' : 'Atribuir'}
+            </button>
+          </div>
+        </form>
       </Modal>
 
       {/* Delete Confirmation Dialog */}

@@ -7,24 +7,17 @@
     --primary: #0B242A;
     --primary-light: #1A3A42;
     --secondary: #D4AF37;
-    --secondary-light: #E8C766;
     --background: #0B242A;
     --surface: #FFFFFF;
     --text: #1E293B;
     --text-light: #64748B;
     --border: #E2E8F0;
-    --success: #10B981;
-    --warning: #F59E0B;
-    --error: #EF4444;
-    --info: #3B82F6;
   }
-
   body {
     @apply font-sans antialiased;
     background-color: var(--background);
     color: #fff;
   }
-
   #root {
     @apply min-h-screen flex flex-col;
     background-color: var(--background);
@@ -35,11 +28,9 @@
   .btn {
     @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded font-medium text-sm transition-colors cursor-pointer border-none outline-none;
   }
-
   .btn-primary {
     @apply bg-primary text-white hover:bg-primary-light;
   }
-
   /* Botões primários fora dos cards: fundo branco, texto e ícones azul (primary) */
   .layout-content .btn-primary,
   .layout-content .btn-primary *,
@@ -83,15 +74,9 @@
     color: #fff !important;
   }
 
-  .btn-secondary {
-    @apply bg-secondary hover:bg-secondary-light;
-    color: var(--primary);
-  }
-
   .btn-outline {
-    @apply bg-transparent border border-border text-text hover:bg-background;
+    @apply bg-transparent border border-border text-text hover:bg-surface;
   }
-
   .card {
     @apply bg-surface rounded-lg p-6 shadow text-text;
   }
@@ -101,35 +86,11 @@
   .layout-content .card,
   .layout-content .card * { color: var(--text) !important; }
   .layout-content .card .text-text-light { color: var(--text-light) !important; }
-  /* Stats dentro do card (caixas bg-background): texto branco */
-  .layout-content .card .stats-in-card,
-  .layout-content .card .stats-in-card * { color: #fff !important; }
-  .layout-content .card .stats-in-card .text-white\/80 { opacity: 0.8; }
-  /* Estatísticas (Registros, Fotos, Vídeos, Dias): card azul, texto branco */
-  .layout-content .card .stats-cards-primary,
-  .layout-content .card .stats-cards-primary * { color: #fff !important; }
-  .layout-content .card .stats-cards-primary .text-white\/80 { opacity: 0.8; }
-  /* Link de acesso do cliente: texto branco no fundo escuro */
-  .layout-content .card .client-access-link { color: #fff !important; }
-  /* Dentro de card, blocos com fundo escuro (Email, Telefone, Empresa em Agendamentos): texto branco */
-  .layout-content .card .bg-background,
-  .layout-content .card .bg-background * { color: #fff !important; }
-  .layout-content .card .bg-background .text-text-light { color: rgba(255,255,255,0.8) !important; }
-  .layout-content .card .bg-background a,
-  .layout-content .card .bg-background .text-primary { color: #fff !important; }
-  .layout-content .card .bg-background a:hover { color: rgba(255,255,255,0.9) !important; }
-  .layout-content .card .bg-background .material-symbols-outlined { color: #fff !important; }
   /* Modal / diálogo (fundo branco): texto escuro para legibilidade */
   .layout-content .modal-panel,
   .layout-content .modal-panel * { color: var(--text) !important; }
   .layout-content .modal-panel .text-text-light { color: var(--text-light) !important; }
   .layout-content .modal-panel .text-red-600 { color: #dc2626 !important; }
-  /* Dentro do modal, blocos com fundo escuro (Email, Telefone, Mensagem): texto branco */
-  .layout-content .modal-panel .bg-background,
-  .layout-content .modal-panel .bg-background * { color: #fff !important; }
-  .layout-content .modal-panel .bg-background .text-text-light { color: rgba(255,255,255,0.8) !important; }
-  .layout-content .modal-panel .bg-background a { color: #fff !important; }
-  .layout-content .modal-panel .bg-background a:hover { color: rgba(255,255,255,0.9) !important; }
   /* Elementos com fundo azul/escuro: texto branco */
   .layout-content .bg-background,
   .layout-content .bg-background * { color: #fff !important; }
@@ -137,8 +98,6 @@
   .layout-content .bg-primary * { color: #fff !important; }
   .layout-content .hover\:bg-background:hover,
   .layout-content .hover\:bg-background:hover * { color: #fff !important; }
-  .layout-content .hover\:bg-background\/50:hover,
-  .layout-content .hover\:bg-background\/50:hover * { color: #fff !important; }
   .layout-content .hover\:bg-primary-light:hover,
   .layout-content .hover\:bg-primary-light:hover * { color: #fff !important; }
   /* Botões outline em cards/modais: no hover (fundo azul) texto e ícones brancos */
@@ -166,111 +125,24 @@
   .input {
     @apply w-full px-4 py-3 border border-border rounded text-sm transition-colors focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10;
   }
-
-  .container {
-    @apply w-full max-w-7xl mx-auto px-4;
-  }
-
-  .spinner {
-    @apply w-6 h-6 border-2 border-border border-t-primary rounded-full animate-spin;
-  }
 }
 
-/* Material icons */
 .material-symbols-outlined {
-  font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 24;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   @apply text-xl;
 }
 
-/* Animations */
 @keyframes modal-enter {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }
-
-@keyframes toast-enter {
-  from {
-    opacity: 0;
-    transform: translateX(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .animate-modal-enter {
   animation: modal-enter 0.2s ease-out;
 }
-
-.animate-toast-enter {
-  animation: toast-enter 0.3s ease-out;
-}
-
-.animate-skeleton {
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
-}
-
 .animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+  animation: fadeIn 0.2s ease-out;
 }
-
-/* Custom scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #94A3B8;
-}
-
-/* Image gallery lightbox */
-.lightbox-overlay {
-  @apply fixed inset-0 z-[60] bg-black/90 flex items-center justify-center;
-}
-
-/* Drag and drop styles */
-.drag-over {
-  @apply border-primary bg-primary/5;
-}
-
-.dragging {
-  @apply opacity-50;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

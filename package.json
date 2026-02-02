@@ -9,7 +9,10 @@
     "preview": "vite preview",
     "dev:admin": "cd admin && vite --config vite.config.ts",
     "build:admin": "cd admin && vite build --config vite.config.ts",
-    "preview:admin": "cd admin && vite preview --config vite.config.ts"
+    "preview:admin": "cd admin && vite preview --config vite.config.ts",
+    "dev:technician": "cd technician && vite --config vite.config.ts",
+    "build:technician": "cd technician && vite build --config vite.config.ts",
+    "preview:technician": "cd technician && vite preview --config vite.config.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",

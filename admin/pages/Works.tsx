@@ -181,8 +181,8 @@ const Works = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text">Obras</h1>
-          <p className="text-text-light">Gerencie todas as obras do sistema</p>
+          <h1 className="text-2xl font-bold text-white">Obras</h1>
+          <p className="text-white/80">Gerencie todas as obras do sistema</p>
         </div>
         <button
           type="button"
@@ -226,29 +226,29 @@ const Works = () => {
           </div>
         </div>
         
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-border">
+        {/* Stats - dentro do card; .stats-in-card força texto branco */}
+        <div className="stats-in-card grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-border">
           <div className="text-center p-3 bg-background rounded-lg">
-            <p className="text-2xl font-bold text-text">{works.length}</p>
-            <p className="text-xs text-text-light">Total de Obras</p>
+            <p className="text-2xl font-bold text-white">{works.length}</p>
+            <p className="text-xs text-white/80">Total de Obras</p>
           </div>
           <div className="text-center p-3 bg-background rounded-lg">
-            <p className="text-2xl font-bold text-amber-600">
+            <p className="text-2xl font-bold text-white">
               {works.filter(w => w.status === 'in_progress').length}
             </p>
-            <p className="text-xs text-text-light">Em Andamento</p>
+            <p className="text-xs text-white/80">Em Andamento</p>
           </div>
           <div className="text-center p-3 bg-background rounded-lg">
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold text-white">
               {works.filter(w => w.status === 'completed').length}
             </p>
-            <p className="text-xs text-text-light">Concluídas</p>
+            <p className="text-xs text-white/80">Concluídas</p>
           </div>
           <div className="text-center p-3 bg-background rounded-lg">
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-2xl font-bold text-white">
               {works.filter(w => w.status === 'planned').length}
             </p>
-            <p className="text-xs text-text-light">Planejadas</p>
+            <p className="text-xs text-white/80">Planejadas</p>
           </div>
         </div>
       </div>

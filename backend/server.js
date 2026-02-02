@@ -7,6 +7,7 @@ const webpush = require('web-push');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const verifyJwt = require('./middleware/jwtAuth');
+const verifyTechnicianJwt = require('./middleware/technicianAuth');
 const db = require('./db');
 const upload = require('./middleware/upload');
 const cloudinary = require('./cloudinary');
@@ -97,6 +98,47 @@ async function sendPushNotificationToAll(title, body, data = {}) {
         await Promise.allSettled(sendPromises);
     } catch (error) {
         console.error('Erro ao buscar subscriptions:', error);
+    }
+
+    // Also send to admin FCM tokens (APK)
+    await sendFcmToAdmins(title, body, data);
+}
+
+// Send FCM notifications to admin devices (for APK)
+const FCM_SERVER_KEY = process.env.FCM_SERVER_KEY;
+async function sendFcmToAdmins(title, body, data = {}) {
+    if (!FCM_SERVER_KEY) return;
+    try {
+        const result = await db.query('SELECT fcm_token FROM admin_fcm_tokens');
+        const tokens = (result.rows || []).map((r) => r.fcm_token).filter(Boolean);
+        if (tokens.length === 0) return;
+        const url = 'https://fcm.googleapis.com/fcm/send';
+        for (const token of tokens) {
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `key=${FCM_SERVER_KEY}`,
+                    },
+                    body: JSON.stringify({
+                        to: token,
+                        notification: { title, body },
+                        data: { url: data.url || '/appointments', ...data },
+                    }),
+                });
+                if (!res.ok) {
+                    const text = await res.text();
+                    if (res.status === 401 || (text && (text.includes('InvalidRegistration') || text.includes('NotRegistered')))) {
+                        await db.query('DELETE FROM admin_fcm_tokens WHERE fcm_token = $1', [token]);
+                    }
+                }
+            } catch (e) {
+                console.error('FCM send error:', e.message);
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao enviar FCM:', error);
     }
 }
 
@@ -352,13 +394,16 @@ app.post('/api/appointments', async (req, res) => {
     }
 });
 
-// GET /api/push/vapid-public-key - Obter chave pública VAPID (público)
-app.get('/api/push/vapid-public-key', (req, res) => {
+// GET vapid-public-key - Obter chave pública VAPID (público)
+// Rota sem /api para quando o proxy do admin reescreve /api -> '' (ex.: /push/vapid-public-key)
+function handleVapidPublicKey(req, res) {
     if (!vapidConfigured || !process.env.VAPID_PUBLIC_KEY) {
-        return res.status(404).json({ error: 'VAPID key não configurada' });
+        return res.status(200).json({ publicKey: null });
     }
     res.json({ publicKey: process.env.VAPID_PUBLIC_KEY });
-});
+}
+app.get('/api/push/vapid-public-key', handleVapidPublicKey);
+app.get('/push/vapid-public-key', handleVapidPublicKey);
 
 // ========== ENDPOINTS PARA OBRAS (PÚBLICOS) ==========
 
@@ -665,6 +710,7 @@ app.post('/admin/auth/login', async (req, res) => {
 });
 
 app.use('/admin', verifyJwt);
+app.use('/api/admin', verifyJwt);
 
 // GET /admin/works - Listar obras
 app.get('/admin/works', async (req, res) => {
@@ -753,6 +799,458 @@ app.delete('/admin/works/:id', async (req, res) => {
   }
 });
 
+// ========== ENDPOINTS ADMIN - TÉCNICOS ==========
+// GET /admin/technicians/inventory - Inventário: ferramentas que cada técnico possui (pedidos aprovados menos devoluções)
+app.get('/admin/technicians/inventory', async (req, res) => {
+  try {
+    const allTechs = await db.query('SELECT id, full_name FROM technician_users ORDER BY full_name, id');
+    const techList = allTechs.rows || [];
+    const result = await db.query(`
+      WITH order_qty AS (
+        SELECT o.technician_id, toi.tool_id, SUM(toi.quantity)::INTEGER AS qty
+        FROM tool_orders o
+        JOIN tool_order_items toi ON toi.tool_order_id = o.id
+        WHERE o.status = 'approved'
+        GROUP BY o.technician_id, toi.tool_id
+      ),
+      return_qty AS (
+        SELECT technician_id, tool_id, SUM(quantity)::INTEGER AS qty
+        FROM tool_returns
+        GROUP BY technician_id, tool_id
+      )
+      SELECT u.id AS technician_id, u.full_name AS technician_name, t.id AS tool_id, t.name AS tool_name,
+             GREATEST(0, oq.qty - COALESCE(rq.qty, 0))::INTEGER AS quantity
+      FROM order_qty oq
+      JOIN technician_users u ON u.id = oq.technician_id
+      JOIN tools t ON t.id = oq.tool_id
+      LEFT JOIN return_qty rq ON rq.technician_id = oq.technician_id AND rq.tool_id = oq.tool_id
+      WHERE (oq.qty - COALESCE(rq.qty, 0)) > 0
+      ORDER BY u.full_name, t.name
+    `);
+    const rows = result.rows || [];
+    const byTechnician = new Map();
+    for (const row of rows) {
+      const id = row.technician_id;
+      if (!byTechnician.has(id)) {
+        byTechnician.set(id, { technician_id: id, technician_name: row.technician_name, tools: [], total_items: 0 });
+      }
+      const entry = byTechnician.get(id);
+      entry.tools.push({ tool_id: row.tool_id, tool_name: row.tool_name, quantity: row.quantity });
+      entry.total_items += row.quantity;
+    }
+    const technicians = techList.map((u) => ({
+      technician_id: u.id,
+      technician_name: u.full_name || 'Sem nome',
+      tools: byTechnician.get(u.id)?.tools || [],
+      total_items: byTechnician.get(u.id)?.total_items ?? 0,
+    }));
+    res.json({ technicians });
+  } catch (error) {
+    if (error.code === '42P01') return res.json({ technicians: [] });
+    console.error('GET /admin/technicians/inventory:', error);
+    res.status(500).json({ error: error.message || 'Erro ao buscar inventário' });
+  }
+});
+
+// POST /admin/tool-returns - Marcar ferramenta(s) como devolvida(s) pelo técnico
+app.post('/admin/tool-returns', async (req, res) => {
+  try {
+    const { technician_id, tool_id, quantity, notes } = req.body;
+    if (!technician_id || !tool_id || !quantity || quantity < 1) {
+      return res.status(400).json({ error: 'technician_id, tool_id e quantity (>= 1) são obrigatórios' });
+    }
+    const qty = parseInt(quantity, 10);
+    if (isNaN(qty) || qty < 1) {
+      return res.status(400).json({ error: 'quantity deve ser um número positivo' });
+    }
+    const orderQty = await db.queryOne(
+      `SELECT COALESCE(SUM(toi.quantity), 0)::INTEGER AS qty
+       FROM tool_orders o
+       JOIN tool_order_items toi ON toi.tool_order_id = o.id
+       WHERE o.technician_id = $1 AND toi.tool_id = $2 AND o.status = 'approved'`,
+      [technician_id, tool_id]
+    );
+    const returnedQty = await db.queryOne(
+      `SELECT COALESCE(SUM(quantity), 0)::INTEGER AS qty FROM tool_returns WHERE technician_id = $1 AND tool_id = $2`,
+      [technician_id, tool_id]
+    );
+    const available = (orderQty?.qty ?? 0) - (returnedQty?.qty ?? 0);
+    if (qty > available) {
+      return res.status(400).json({ error: `O técnico possui apenas ${available} unidade(s) desta ferramenta. Não é possível devolver ${qty}.` });
+    }
+    await db.query(
+      `INSERT INTO tool_returns (technician_id, tool_id, quantity, notes) VALUES ($1, $2, $3, $4)`,
+      [technician_id, tool_id, qty, notes || null]
+    );
+    res.status(201).json({ ok: true, message: 'Devolução registada.' });
+  } catch (error) {
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabela tool_returns não existe. Execute schema-tool-returns.sql.' });
+    console.error('POST /admin/tool-returns:', error);
+    res.status(500).json({ error: error.message || 'Erro ao registar devolução' });
+  }
+});
+
+// GET /admin/technicians - Listar técnicos
+app.get('/admin/technicians', async (req, res) => {
+  try {
+    const result = await db.query('SELECT id, email, full_name, created_at FROM technician_users ORDER BY full_name, email');
+    const data = result.rows || [];
+    res.json({ technicians: data, total: data.length });
+  } catch (error) {
+    if (error.code === '42P01') return res.json({ technicians: [], total: 0 });
+    console.error('GET /admin/technicians:', error);
+    res.status(500).json({ error: error.message || 'Erro ao buscar técnicos' });
+  }
+});
+
+// POST /admin/technicians - Criar técnico
+app.post('/admin/technicians', async (req, res) => {
+  try {
+    const { email, password, full_name } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email e senha obrigatórios' });
+    }
+    const password_hash = await bcrypt.hash(password, 10);
+    const result = await db.query(
+      `INSERT INTO technician_users (email, password_hash, full_name)
+       VALUES ($1, $2, $3)
+       RETURNING id, email, full_name, created_at`,
+      [email.trim().toLowerCase(), password_hash, full_name || null]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    if (error.code === '23505') return res.status(400).json({ error: 'Email já cadastrado' });
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabela technician_users não existe. Execute schema-technicians-tools.sql na base de dados.' });
+    console.error('POST /admin/technicians:', error);
+    res.status(500).json({ error: error.message || 'Erro ao criar técnico' });
+  }
+});
+
+// GET /admin/technicians/:id - Obter técnico
+app.get('/admin/technicians/:id', async (req, res) => {
+  try {
+    const data = await db.queryOne(
+      'SELECT id, email, full_name, created_at FROM technician_users WHERE id = $1',
+      [req.params.id]
+    );
+    if (!data) return res.status(404).json({ error: 'Técnico não encontrado' });
+    res.json(data);
+  } catch (error) {
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabela technician_users não existe. Execute schema-technicians-tools.sql.' });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar técnico' });
+  }
+});
+
+// PUT /admin/technicians/:id - Atualizar técnico
+app.put('/admin/technicians/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { email, full_name, password } = req.body;
+    const updates = [];
+    const values = [];
+    let i = 1;
+    if (email !== undefined) {
+      updates.push(`email = $${i}`);
+      values.push(email.trim().toLowerCase());
+      i++;
+    }
+    if (full_name !== undefined) {
+      updates.push(`full_name = $${i}`);
+      values.push(full_name);
+      i++;
+    }
+    if (password !== undefined && password !== '') {
+      updates.push(`password_hash = $${i}`);
+      values.push(await bcrypt.hash(password, 10));
+      i++;
+    }
+    if (updates.length === 0) return res.status(400).json({ error: 'Nenhum campo válido para atualizar' });
+    values.push(id);
+    const result = await db.query(
+      `UPDATE technician_users SET ${updates.join(', ')} WHERE id = $${i} RETURNING id, email, full_name, created_at`,
+      values
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Técnico não encontrado' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    if (error.code === '23505') return res.status(400).json({ error: 'Email já cadastrado' });
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabela technician_users não existe. Execute schema-technicians-tools.sql.' });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao atualizar técnico' });
+  }
+});
+
+// DELETE /admin/technicians/:id - Remover técnico
+app.delete('/admin/technicians/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM technician_users WHERE id = $1', [id]);
+    res.status(204).end();
+  } catch (error) {
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabela technician_users não existe. Execute schema-technicians-tools.sql.' });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao excluir técnico' });
+  }
+});
+
+// ========== ENDPOINTS ADMIN - ATRIBUIÇÃO DE OBRAS ==========
+// GET /admin/works/:id/assignments - Listar técnicos atribuídos à obra
+app.get('/admin/works/:id/assignments', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      `SELECT wa.id, wa.work_id, wa.technician_id, wa.assigned_at,
+              t.email, t.full_name
+       FROM work_assignments wa
+       JOIN technician_users t ON t.id = wa.technician_id
+       WHERE wa.work_id = $1
+       ORDER BY wa.assigned_at DESC`,
+      [id]
+    );
+    const data = result.rows || [];
+    res.json({ assignments: data, total: data.length });
+  } catch (error) {
+    if (error.code === '42P01') return res.json({ assignments: [], total: 0 });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar atribuições' });
+  }
+});
+
+// POST /admin/works/:id/assignments - Atribuir técnico
+app.post('/admin/works/:id/assignments', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { technician_id } = req.body;
+    if (!technician_id) return res.status(400).json({ error: 'technician_id obrigatório' });
+    await db.query(
+      `INSERT INTO work_assignments (work_id, technician_id)
+       VALUES ($1, $2)
+       ON CONFLICT (work_id, technician_id) DO NOTHING
+       RETURNING *`,
+      [id, technician_id]
+    );
+    const assignment = await db.queryOne(
+      `SELECT wa.*, t.email, t.full_name FROM work_assignments wa
+       JOIN technician_users t ON t.id = wa.technician_id
+       WHERE wa.work_id = $1 AND wa.technician_id = $2`,
+      [id, technician_id]
+    );
+    res.status(201).json(assignment || { work_id: id, technician_id });
+  } catch (error) {
+    if (error.code === '23503') return res.status(400).json({ error: 'Obra ou técnico não encontrado' });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao atribuir técnico' });
+  }
+});
+
+// DELETE /admin/works/:id/assignments/:technicianId - Remover atribuição
+app.delete('/admin/works/:id/assignments/:technicianId', async (req, res) => {
+  try {
+    const { id, technicianId } = req.params;
+    await db.query('DELETE FROM work_assignments WHERE work_id = $1 AND technician_id = $2', [id, technicianId]);
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao remover atribuição' });
+  }
+});
+
+// ========== ENDPOINTS ADMIN - FERRAMENTAS (LOJA) ==========
+// GET /admin/tools - Listar ferramentas
+app.get('/admin/tools', async (req, res) => {
+  try {
+    const { active } = req.query;
+    let query = 'SELECT * FROM tools';
+    const params = [];
+    if (active !== undefined && active !== '') {
+      query += ' WHERE active = $1';
+      params.push(active === 'true');
+    }
+    query += ' ORDER BY name';
+    const result = await db.query(query, params);
+    const data = result.rows || [];
+    res.json({ tools: data, total: data.length });
+  } catch (error) {
+    if (error.code === '42P01') return res.json({ tools: [], total: 0 });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar ferramentas' });
+  }
+});
+
+// POST /admin/tools - Criar ferramenta
+app.post('/admin/tools', async (req, res) => {
+  try {
+    const { name, description, image_url, stock_quantity, active } = req.body;
+    if (!name) return res.status(400).json({ error: 'name obrigatório' });
+    const result = await db.query(
+      `INSERT INTO tools (name, description, image_url, stock_quantity, active)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [name, description || null, image_url || null, stock_quantity != null ? stock_quantity : null, active !== false]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao criar ferramenta' });
+  }
+});
+
+// GET /admin/tools/:id - Obter ferramenta
+app.get('/admin/tools/:id', async (req, res) => {
+  try {
+    const data = await db.queryOne('SELECT * FROM tools WHERE id = $1', [req.params.id]);
+    if (!data) return res.status(404).json({ error: 'Ferramenta não encontrada' });
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar ferramenta' });
+  }
+});
+
+// PUT /admin/tools/:id - Atualizar ferramenta
+app.put('/admin/tools/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const allowed = ['name', 'description', 'image_url', 'stock_quantity', 'active'];
+    const setClause = [];
+    const values = [];
+    let i = 1;
+    for (const key of allowed) {
+      if (key in updates) {
+        setClause.push(`${key} = $${i}`);
+        values.push(updates[key]);
+        i++;
+      }
+    }
+    if (setClause.length === 0) return res.status(400).json({ error: 'Nenhum campo válido para atualizar' });
+    values.push(id);
+    const result = await db.query(
+      `UPDATE tools SET ${setClause.join(', ')} WHERE id = $${i} RETURNING *`,
+      values
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Ferramenta não encontrada' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao atualizar ferramenta' });
+  }
+});
+
+// DELETE /admin/tools/:id - Remover ferramenta
+app.delete('/admin/tools/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.query('DELETE FROM tools WHERE id = $1', [id]);
+    res.status(204).end();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao excluir ferramenta' });
+  }
+});
+
+// ========== ENDPOINTS ADMIN - PEDIDOS DE FERRAMENTAS ==========
+// GET /admin/tool-orders - Listar pedidos
+app.get('/admin/tool-orders', async (req, res) => {
+  try {
+    const { status, technician_id } = req.query;
+    let query = `
+      SELECT o.*, t.full_name as technician_name, t.email as technician_email
+      FROM tool_orders o
+      JOIN technician_users t ON t.id = o.technician_id
+      WHERE 1=1`;
+    const params = [];
+    let i = 1;
+    if (status && status !== 'all') {
+      query += ` AND o.status = $${i}`;
+      params.push(status);
+      i++;
+    }
+    if (technician_id) {
+      query += ` AND o.technician_id = $${i}`;
+      params.push(technician_id);
+      i++;
+    }
+    query += ' ORDER BY o.created_at DESC';
+    const result = await db.query(query, params);
+    const orders = result.rows || [];
+    res.json({ orders, total: orders.length });
+  } catch (error) {
+    if (error.code === '42P01') return res.json({ orders: [], total: 0 });
+    console.error('GET /admin/tool-orders:', error);
+    res.status(500).json({ error: error.message || 'Erro ao buscar pedidos' });
+  }
+});
+
+// GET /admin/tool-orders/:id - Detalhe do pedido
+app.get('/admin/tool-orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await db.queryOne(
+      `SELECT o.*, t.full_name as technician_name, t.email as technician_email
+       FROM tool_orders o
+       JOIN technician_users t ON t.id = o.technician_id
+       WHERE o.id = $1`,
+      [id]
+    );
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado' });
+    const itemsResult = await db.query(
+      `SELECT toi.*, t.name as tool_name, t.description as tool_description
+       FROM tool_order_items toi
+       JOIN tools t ON t.id = toi.tool_id
+       WHERE toi.tool_order_id = $1`,
+      [id]
+    );
+    const items = itemsResult.rows || [];
+    res.json({
+      order: {
+        id: order.id,
+        technician_id: order.technician_id,
+        technician_name: order.technician_name,
+        technician_email: order.technician_email,
+        status: order.status,
+        notes: order.notes,
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+      },
+      items: items.map(i => ({
+        id: i.id,
+        tool_id: i.tool_id,
+        tool_name: i.tool_name,
+        tool_description: i.tool_description,
+        quantity: i.quantity,
+      })),
+    });
+  } catch (error) {
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabelas tool_orders/tool_order_items não existem. Execute schema-technicians-tools.sql.' });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar pedido' });
+  }
+});
+
+// PUT /admin/tool-orders/:id - Atualizar status (approved, rejected)
+app.put('/admin/tool-orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const valid = ['pending', 'approved', 'rejected'];
+    if (!status || !valid.includes(status)) {
+      return res.status(400).json({ error: 'Status inválido (pending, approved, rejected)' });
+    }
+    const result = await db.query(
+      'UPDATE tool_orders SET status = $1 WHERE id = $2 RETURNING *',
+      [status, id]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Pedido não encontrado' });
+    res.json(result.rows[0]);
+  } catch (error) {
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabela tool_orders não existe. Execute schema-technicians-tools.sql.' });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao atualizar pedido' });
+  }
+});
+
 // Multer: capa sempre em memory (Cloudinary usa buffer; local escreve buffer em uploads/covers)
 const coverUploadMw = upload.uploadMemory.single('cover');
 
@@ -812,6 +1310,55 @@ app.post('/admin/upload/cover', coverUploadMw, async (req, res) => {
     res.status(500).json({ error: 'Erro ao fazer upload da imagem de capa' });
   }
 });
+
+// POST /admin/upload/tool-image (e /api/admin/upload/tool-image) - Upload de foto de ferramenta
+const toolImageUploadMw = upload.uploadMemory.single('image');
+async function handleToolImageUpload(req, res) {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+    }
+    if (!file.mimetype.startsWith('image')) {
+      return res.status(400).json({ error: 'Apenas imagens são permitidas' });
+    }
+    const size = file.size ?? file.buffer?.length ?? 0;
+    if (size > MAX_IMAGE_BYTES) {
+      return res.status(413).json({ error: 'Imagem: máximo 20 MB' });
+    }
+    let imageUrl;
+    if (cloudinary.isConfigured()) {
+      if (!file.buffer) {
+        return res.status(400).json({ error: 'Arquivo não disponível para upload' });
+      }
+      const result = await cloudinary.uploadBuffer(file.buffer, {
+        folder: 'ox-services/tools',
+        resourceType: 'image',
+      });
+      imageUrl = result.secure_url;
+    } else {
+      const path = require('path');
+      const fs = require('fs');
+      const toolsDir = path.join(__dirname, 'public', 'uploads', 'tools');
+      if (!fs.existsSync(toolsDir)) {
+        fs.mkdirSync(toolsDir, { recursive: true });
+      }
+      const base = path.basename(file.originalname || 'tool').replace(/\s/g, '_');
+      const ext = path.extname(base) || '.jpg';
+      const name = path.basename(base, ext) || 'tool';
+      const filename = `${Date.now()}_${name}${ext}`;
+      const filepath = path.join(toolsDir, filename);
+      fs.writeFileSync(filepath, file.buffer);
+      imageUrl = `/uploads/tools/${filename}`;
+    }
+    res.json({ url: imageUrl });
+  } catch (error) {
+    console.error('Erro no upload de foto da ferramenta:', error);
+    res.status(500).json({ error: 'Erro ao fazer upload da foto' });
+  }
+}
+app.post('/admin/upload/tool-image', toolImageUploadMw, handleToolImageUpload);
+app.post('/api/admin/upload/tool-image', toolImageUploadMw, handleToolImageUpload);
 
 // Multer: usar memory quando Cloudinary está configurado (upload via buffer)
 const timelineUploadMw = cloudinary.isConfigured()
@@ -1176,6 +1723,319 @@ app.post('/admin/push/test', async (req, res) => {
     }
 });
 
+// POST /admin/push/fcm-register - Registrar token FCM (para APK admin)
+app.post('/admin/push/fcm-register', async (req, res) => {
+    try {
+        const adminUserId = req.user?.id;
+        if (!adminUserId) return res.status(401).json({ error: 'Não autenticado' });
+        const { fcm_token, device_id } = req.body || {};
+        if (!fcm_token) return res.status(400).json({ error: 'fcm_token obrigatório' });
+        const deviceId = device_id || null;
+        await db.query(
+            'DELETE FROM admin_fcm_tokens WHERE admin_user_id = $1 AND (device_id IS NOT DISTINCT FROM $2)',
+            [adminUserId, deviceId]
+        );
+        await db.query(
+            'INSERT INTO admin_fcm_tokens (admin_user_id, fcm_token, device_id) VALUES ($1, $2, $3)',
+            [adminUserId, fcm_token, deviceId]
+        );
+        res.json({ success: true, message: 'Token FCM registrado' });
+    } catch (error) {
+        if (error.code === '42P01') return res.status(400).json({ error: 'Tabela admin_fcm_tokens não existe. Execute schema-admin-fcm.sql' });
+        console.error('Erro ao registrar FCM:', error);
+        res.status(500).json({ error: 'Erro ao registrar token FCM' });
+    }
+});
+
+// ========== ENDPOINTS TECHNICIAN ==========
+const technicianRouter = express.Router();
+const JWT_SECRET_TECH = process.env.JWT_SECRET_TECHNICIAN || process.env.JWT_SECRET;
+
+// POST /technician/auth/login - Login (public, no auth middleware)
+technicianRouter.post('/auth/login', async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password required' });
+  }
+  if (!JWT_SECRET_TECH) {
+    return res.status(500).json({ error: 'JWT secret not configured' });
+  }
+  try {
+    const tech = await db.queryOne(
+      'SELECT id, email, password_hash FROM technician_users WHERE email = $1',
+      [email.trim().toLowerCase()]
+    );
+    if (!tech) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    const ok = await bcrypt.compare(password, tech.password_hash);
+    if (!ok) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+    const token = jwt.sign(
+      { sub: tech.id, email: tech.email },
+      JWT_SECRET_TECH,
+      { expiresIn: '7d' }
+    );
+    res.json({ token });
+  } catch (e) {
+    console.error('Technician login error:', e);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
+technicianRouter.use(verifyTechnicianJwt);
+
+// GET /technician/works - List works assigned to this technician
+technicianRouter.get('/works', async (req, res) => {
+  try {
+    const technicianId = req.technician.id;
+    const result = await db.query(
+      `SELECT w.* FROM works w
+       INNER JOIN work_assignments wa ON wa.work_id = w.id
+       WHERE wa.technician_id = $1
+       ORDER BY w.created_at DESC`,
+      [technicianId]
+    );
+    const works = result.rows || [];
+    res.json({ works, total: works.length });
+  } catch (error) {
+    if (error.code === '42P01') {
+      return res.json({ works: [], total: 0 });
+    }
+    console.error('Technician works list error:', error);
+    res.status(500).json({ error: 'Failed to list works' });
+  }
+});
+
+// GET /technician/works/:id - Work detail (only if assigned)
+technicianRouter.get('/works/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const technicianId = req.technician.id;
+    const assignment = await db.queryOne(
+      'SELECT 1 FROM work_assignments WHERE work_id = $1 AND technician_id = $2',
+      [id, technicianId]
+    );
+    if (!assignment) {
+      return res.status(403).json({ error: 'Not assigned to this work' });
+    }
+    const work = await db.queryOne('SELECT * FROM works WHERE id = $1', [id]);
+    if (!work) return res.status(404).json({ error: 'Work not found' });
+    const timelineResult = await db.query(
+      'SELECT * FROM timeline_entries WHERE work_id = $1 ORDER BY date DESC, created_at DESC',
+      [id]
+    );
+    const timeline = timelineResult.rows || [];
+    res.json({
+      work: {
+        id: work.id,
+        name: work.name,
+        description: work.description,
+        client_name: work.client_name,
+        client_email: work.client_email,
+        start_date: work.start_date,
+        end_date: work.end_date,
+        status: work.status,
+        cover_image_url: work.cover_image_url,
+        access_token: work.access_token,
+      },
+      timeline: timeline.map(e => ({
+        id: e.id,
+        work_id: e.work_id,
+        type: e.type,
+        media_url: e.media_url,
+        thumbnail_url: e.thumbnail_url,
+        title: e.title,
+        description: e.description,
+        date: e.date,
+        order: e.order,
+      })),
+    });
+  } catch (error) {
+    console.error('Technician work detail error:', error);
+    res.status(500).json({ error: 'Failed to get work' });
+  }
+});
+
+// POST /technician/works/:id/timeline/upload - Upload media (only if assigned)
+technicianRouter.post('/works/:id/timeline/upload', timelineUploadMw, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const technicianId = req.technician.id;
+    const { title, description, date, type } = req.body;
+    const file = req.file;
+
+    const assignment = await db.queryOne(
+      'SELECT 1 FROM work_assignments WHERE work_id = $1 AND technician_id = $2',
+      [id, technicianId]
+    );
+    if (!assignment) {
+      return res.status(403).json({ error: 'Not assigned to this work' });
+    }
+
+    if (!file) {
+      return res.status(400).json({ error: 'No file sent' });
+    }
+
+    const detectedType = file.mimetype.startsWith('image') ? 'image' : 'video';
+    const size = file.size ?? file.buffer?.length ?? 0;
+    if (detectedType === 'image' && size > MAX_IMAGE_BYTES) {
+      return res.status(413).json({ error: 'Image max 20 MB' });
+    }
+    if (detectedType === 'video' && size > MAX_VIDEO_BYTES) {
+      return res.status(413).json({ error: 'Video max 300 MB' });
+    }
+
+    let mediaUrl;
+    let thumbnailUrl = null;
+
+    if (cloudinary.isConfigured()) {
+      const resourceType = detectedType === 'image' ? 'image' : 'video';
+      if (!file.buffer) {
+        return res.status(400).json({ error: 'File not available for upload' });
+      }
+      const result = await cloudinary.uploadBuffer(file.buffer, {
+        folder: `ox-uploads/obras/${id}`,
+        resourceType,
+      });
+      mediaUrl = result.secure_url;
+      thumbnailUrl = result.thumbnail_url || null;
+    } else {
+      mediaUrl = `/uploads/works/${id}/${file.filename}`;
+      if (detectedType === 'video') {
+        thumbnailUrl = `/uploads/works/${id}/thumb_${file.filename}.jpg`;
+      }
+    }
+
+    const insertResult = await db.query(
+      `INSERT INTO timeline_entries (work_id, type, media_url, thumbnail_url, title, description, date, "order")
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 0)
+       RETURNING *`,
+      [id, detectedType, mediaUrl, thumbnailUrl, title || '', description || '', date || new Date().toISOString().split('T')[0]]
+    );
+    const data = insertResult.rows[0];
+    res.status(201).json({ entry: data });
+  } catch (error) {
+    console.error('Technician upload error:', error);
+    res.status(500).json({ error: 'Upload failed' });
+  }
+});
+
+// GET /technician/tools - List active tools (shop catalog)
+technicianRouter.get('/tools', async (req, res) => {
+  try {
+    const result = await db.query(
+      "SELECT * FROM tools WHERE active = true ORDER BY name"
+    );
+    const tools = result.rows || [];
+    res.json({ tools, total: tools.length });
+  } catch (error) {
+    if (error.code === '42P01') {
+      return res.json({ tools: [], total: 0 });
+    }
+    console.error('Technician tools list error:', error);
+    res.status(500).json({ error: 'Failed to list tools' });
+  }
+});
+
+// POST /technician/tool-orders - Create order (items: [{ tool_id, quantity }], notes?)
+technicianRouter.post('/tool-orders', async (req, res) => {
+  try {
+    const technicianId = req.technician.id;
+    const { items, notes } = req.body || {};
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'items array required with at least one { tool_id, quantity }' });
+    }
+    const orderResult = await db.query(
+      `INSERT INTO tool_orders (technician_id, status, notes)
+       VALUES ($1, 'pending', $2)
+       RETURNING *`,
+      [technicianId, notes || null]
+    );
+    const order = orderResult.rows[0];
+    for (const item of items) {
+      const { tool_id, quantity } = item;
+      if (!tool_id || !quantity || quantity < 1) continue;
+      await db.query(
+        `INSERT INTO tool_order_items (tool_order_id, tool_id, quantity)
+         VALUES ($1, $2, $3)`,
+        [order.id, tool_id, quantity]
+      );
+    }
+    await sendPushNotificationToAll(
+      'New tool request',
+      'A technician has requested tools',
+      { url: '/tool-orders', toolOrderId: order.id }
+    );
+    res.status(201).json({ order: { id: order.id, status: order.status, created_at: order.created_at } });
+  } catch (error) {
+    console.error('Technician tool order create error:', error);
+    res.status(500).json({ error: 'Failed to create order' });
+  }
+});
+
+// GET /technician/tool-orders - List my orders
+technicianRouter.get('/tool-orders', async (req, res) => {
+  try {
+    const technicianId = req.technician.id;
+    const result = await db.query(
+      'SELECT * FROM tool_orders WHERE technician_id = $1 ORDER BY created_at DESC',
+      [technicianId]
+    );
+    const orders = result.rows || [];
+    res.json({ orders, total: orders.length });
+  } catch (error) {
+    if (error.code === '42P01') {
+      return res.json({ orders: [], total: 0 });
+    }
+    console.error('Technician tool orders list error:', error);
+    res.status(500).json({ error: 'Failed to list orders' });
+  }
+});
+
+// GET /technician/tool-orders/:id - Order detail (own only)
+technicianRouter.get('/tool-orders/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const technicianId = req.technician.id;
+    const order = await db.queryOne(
+      'SELECT * FROM tool_orders WHERE id = $1 AND technician_id = $2',
+      [id, technicianId]
+    );
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    const itemsResult = await db.query(
+      `SELECT toi.*, t.name as tool_name, t.description as tool_description
+       FROM tool_order_items toi
+       JOIN tools t ON t.id = toi.tool_id
+       WHERE toi.tool_order_id = $1`,
+      [id]
+    );
+    const items = itemsResult.rows || [];
+    res.json({
+      order: {
+        id: order.id,
+        status: order.status,
+        notes: order.notes,
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+      },
+      items: items.map(i => ({
+        id: i.id,
+        tool_id: i.tool_id,
+        tool_name: i.tool_name,
+        tool_description: i.tool_description,
+        quantity: i.quantity,
+      })),
+    });
+  } catch (error) {
+    console.error('Technician tool order detail error:', error);
+    res.status(500).json({ error: 'Failed to get order' });
+  }
+});
+
+app.use('/technician', technicianRouter);
+
 // Iniciar servidor
 app.listen(PORT, () => {
     console.log(`🚀 Servidor rodando na porta ${PORT}`);
@@ -1204,4 +2064,14 @@ app.listen(PORT, () => {
     console.log(`   POST /admin/push/subscribe`);
     console.log(`   DELETE /admin/push/unsubscribe`);
     console.log(`   POST /admin/push/test`);
+    console.log(`   POST /admin/push/fcm-register`);
+    console.log(`📁 Endpoints technician:`);
+    console.log(`   POST /technician/auth/login`);
+    console.log(`   GET  /technician/works`);
+    console.log(`   GET  /technician/works/:id`);
+    console.log(`   POST /technician/works/:id/timeline/upload`);
+    console.log(`   GET  /technician/tools`);
+    console.log(`   POST /technician/tool-orders`);
+    console.log(`   GET  /technician/tool-orders`);
+    console.log(`   GET  /technician/tool-orders/:id`);
 });

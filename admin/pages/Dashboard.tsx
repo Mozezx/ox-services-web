@@ -68,8 +68,8 @@ const Dashboard = () => {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-text">Dashboard</h1>
-        <p className="text-text-light">Visão geral do seu painel administrativo</p>
+        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <p className="text-white/80">Visão geral do seu painel administrativo</p>
       </div>
       
       {/* Stats Grid */}
