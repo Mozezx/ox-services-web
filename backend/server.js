@@ -2033,14 +2033,20 @@ technicianRouter.post('/tool-orders', async (req, res) => {
         [order.id, tool_id, quantity]
       );
     }
-    await sendPushNotificationToAll(
+    sendPushNotificationToAll(
       'New tool request',
       'A technician has requested tools',
       { url: '/tool-orders', toolOrderId: order.id }
-    );
+    ).catch((err) => console.error('Push notification error (order still created):', err));
     res.status(201).json({ order: { id: order.id, status: order.status, created_at: order.created_at } });
   } catch (error) {
     console.error('Technician tool order create error:', error);
+    if (error.code === '42P01') {
+      return res.status(503).json({ error: 'Tool orders not configured. Run schema-technicians-tools.sql on the database.' });
+    }
+    if (error.code === '23503') {
+      return res.status(400).json({ error: 'Invalid technician or tool id' });
+    }
     res.status(500).json({ error: 'Failed to create order' });
   }
 });
