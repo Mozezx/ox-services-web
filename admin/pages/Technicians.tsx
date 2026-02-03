@@ -12,6 +12,8 @@ const Technicians = () => {
   const [editing, setEditing] = useState<Technician | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Technician | null>(null)
   const [toolsModalTechnician, setToolsModalTechnician] = useState<Technician | null>(null)
+  const [worksModalTechnician, setWorksModalTechnician] = useState<Technician | null>(null)
+  const [assignWorkId, setAssignWorkId] = useState('')
   const [returnForm, setReturnForm] = useState<{
     technician_id: string
     tool_id: string
