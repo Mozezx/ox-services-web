@@ -439,6 +439,19 @@ class AdminAPI {
     }
   }
 
+  async recordToolReturnBulk(body: { technician_id: string; notes?: string }): Promise<{ message: string }> {
+    const r = await adminFetch(`${API_BASE}/admin/tool-returns/bulk`, {
+      method: 'POST',
+      headers: this.authHeaders(),
+      body: JSON.stringify(body),
+    })
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || 'Erro ao registar devoluções')
+    }
+    return r.json()
+  }
+
   async createTechnician(body: { email: string; password: string; full_name?: string }): Promise<Technician> {
     const r = await adminFetch(`${API_BASE}/admin/technicians`, {
       method: 'POST',
@@ -476,6 +489,12 @@ class AdminAPI {
   // Work assignments
   async getWorkAssignments(workId: string): Promise<WorkAssignment[]> {
     const r = await adminFetch(`${API_BASE}/admin/works/${workId}/assignments`, { headers: this.authHeaders() })
+    const data = await r.json()
+    return data.assignments || []
+  }
+
+  async getTechnicianAssignments(technicianId: string): Promise<{ work_id: string; work_name: string }[]> {
+    const r = await adminFetch(`${API_BASE}/admin/technicians/${technicianId}/assignments`, { headers: this.authHeaders() })
     const data = await r.json()
     return data.assignments || []
   }

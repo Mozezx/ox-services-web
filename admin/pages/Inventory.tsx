@@ -1,10 +1,29 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api, TechnicianInventoryItem } from '../lib/api'
+import { useToast } from '../components/Toast'
+import ConfirmDialog from '../components/ConfirmDialog'
+import { useState } from 'react'
 
 const Inventory = () => {
+  const queryClient = useQueryClient()
+  const { addToast } = useToast()
+  const [bulkReturnTarget, setBulkReturnTarget] = useState<TechnicianInventoryItem | null>(null)
+
   const { data: technicians = [], isLoading } = useQuery<TechnicianInventoryItem[]>({
     queryKey: ['technician-inventory'],
     queryFn: () => api.getTechnicianInventory(),
+  })
+
+  const bulkReturnMutation = useMutation({
+    mutationFn: (body: { technician_id: string; notes?: string }) => api.recordToolReturnBulk(body),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['technician-inventory'] })
+      addToast('success', data.message || 'Devolução registada.')
+      setBulkReturnTarget(null)
+    },
+    onError: (err: Error) => {
+      addToast('error', err.message || 'Erro ao registar devolução.')
+    },
   })
 
   return (
@@ -34,6 +53,7 @@ const Inventory = () => {
                   <th className="pb-3 font-medium">Técnico</th>
                   <th className="pb-3 font-medium">Ferramentas</th>
                   <th className="pb-3 font-medium text-right w-24">Total</th>
+                  <th className="pb-3 font-medium text-right w-32">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -54,6 +74,20 @@ const Inventory = () => {
                       )}
                     </td>
                     <td className="py-4 text-right font-medium">{item.total_items}</td>
+                    <td className="py-4 text-right">
+                      {item.tools.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => setBulkReturnTarget(item)}
+                          className="text-sm btn btn-outline py-1.5 px-2"
+                        >
+                          <span className="material-symbols-outlined text-sm align-middle mr-1">reply_all</span>
+                          Devolver tudo
+                        </button>
+                      ) : (
+                        <span className="text-text-light text-sm">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -61,6 +95,22 @@ const Inventory = () => {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={bulkReturnTarget !== null}
+        onClose={() => setBulkReturnTarget(null)}
+        onConfirm={() => {
+          if (bulkReturnTarget) bulkReturnMutation.mutate({ technician_id: bulkReturnTarget.technician_id })
+        }}
+        title="Devolver tudo"
+        message={
+          bulkReturnTarget
+            ? `Registar devolução de todas as ferramentas de ${bulkReturnTarget.technician_name}? (${bulkReturnTarget.total_items} item(ns))`
+            : ''
+        }
+        confirmText="Devolver tudo"
+        isLoading={bulkReturnMutation.isPending}
+      />
     </div>
   )
 }

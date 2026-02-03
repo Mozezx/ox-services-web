@@ -47,13 +47,18 @@ function uploadBuffer(buffer, options = {}) {
           secure_url: result.secure_url,
           public_id: result.public_id,
         };
-        // Thumbnail: para vídeo = frame inicial; para imagem = mesma URL (sempre funciona; opcional: versão pequena)
+        // Thumbnail: para vídeo = URL de frame (f_jpg, so_0) ou secure_url; para imagem = mesma URL
         if (resourceType === 'video' && result.public_id) {
-          out.thumbnail_url = cloudinary.url(result.public_id, {
-            resource_type: 'video',
-            format: 'jpg',
-            start_offset: 0,
-          });
+          try {
+            const thumbUrl = cloudinary.url(result.public_id, {
+              resource_type: 'video',
+              format: 'jpg',
+              start_offset: 0,
+            });
+            out.thumbnail_url = thumbUrl || result.secure_url;
+          } catch (_) {
+            out.thumbnail_url = result.secure_url;
+          }
         } else if (resourceType === 'image') {
           out.thumbnail_url = result.secure_url;
         }

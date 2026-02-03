@@ -1,6 +1,6 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { api } from '../lib/api'
+import { api, resolveMediaUrl } from '../lib/api'
 import { useLanguage } from '../context/LanguageContext'
 
 const WorkDetail = () => {
@@ -65,13 +65,26 @@ const WorkDetail = () => {
               <div key={entry.id} className="rounded-lg overflow-hidden border border-border">
                 {entry.type === 'image' ? (
                   <img
-                    src={entry.media_url}
+                    src={resolveMediaUrl(entry.media_url)}
                     alt={entry.title}
                     className="w-full aspect-square object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/placeholder.png'
+                    }}
                   />
                 ) : (
-                  <div className="w-full aspect-square bg-border flex items-center justify-center">
-                    <span className="material-symbols-outlined text-4xl text-text-light">videocam</span>
+                  <div className="relative w-full aspect-square bg-border flex items-center justify-center overflow-hidden">
+                    {entry.thumbnail_url ? (
+                      <img
+                        src={resolveMediaUrl(entry.thumbnail_url)}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                    ) : null}
+                    <span className="material-symbols-outlined text-4xl text-text-light relative z-10">videocam</span>
                   </div>
                 )}
                 <div className="p-2">

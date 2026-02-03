@@ -245,9 +245,13 @@ const Lightbox: React.FC<LightboxProps> = ({ images, currentIndex, onClose, onNe
                         }`}
                     >
                         <img 
-                            src={img.thumbnailUrl || img.mediaUrl} 
+                            src={img.thumbnailUrl || img.mediaUrl || ''} 
                             alt=""
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                                e.currentTarget.src = ''
+                                e.currentTarget.style.display = 'none'
+                            }}
                         />
                     </button>
                 ))}

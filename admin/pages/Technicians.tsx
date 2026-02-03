@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, Technician, TechnicianInventoryItem } from '../lib/api'
+import { api, Technician, TechnicianInventoryItem, Work } from '../lib/api'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { useToast } from '../components/Toast'
@@ -18,7 +18,7 @@ const Technicians = () => {
     tool_name: string
     maxQuantity: number
   } | null>(null)
-  const [returnQuantity, setReturnQuantity] = useState(1)
+  const [returnQtyStr, setReturnQtyStr] = useState('1')
   const [returnNotes, setReturnNotes] = useState('')
   const [formEmail, setFormEmail] = useState('')
   const [formPassword, setFormPassword] = useState('')
@@ -32,6 +32,18 @@ const Technicians = () => {
   const { data: inventory = [] } = useQuery<TechnicianInventoryItem[]>({
     queryKey: ['technician-inventory'],
     queryFn: () => api.getTechnicianInventory(),
+  })
+
+  const { data: technicianAssignments = [] } = useQuery<{ work_id: string; work_name: string }[]>({
+    queryKey: ['technician-assignments', worksModalTechnician?.id],
+    queryFn: () => api.getTechnicianAssignments(worksModalTechnician!.id),
+    enabled: !!worksModalTechnician?.id,
+  })
+
+  const { data: works = [] } = useQuery<Work[]>({
+    queryKey: ['works'],
+    queryFn: () => api.getWorks(),
+    enabled: !!worksModalTechnician?.id,
   })
 
   const createMutation = useMutation({
@@ -85,11 +97,37 @@ const Technicians = () => {
       queryClient.invalidateQueries({ queryKey: ['technician-inventory'] })
       addToast('success', 'Devolução registada. A ferramenta foi descontada do técnico.')
       setReturnForm(null)
-      setReturnQuantity(1)
+      setReturnQtyStr('1')
       setReturnNotes('')
     },
     onError: (err: Error) => {
       addToast('error', err.message || 'Erro ao registar devolução.')
+    },
+  })
+
+  const bulkReturnMutation = useMutation({
+    mutationFn: (body: { technician_id: string; notes?: string }) => api.recordToolReturnBulk(body),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['technician-inventory'] })
+      addToast('success', data.message || 'Devolução registada.')
+      setToolsModalTechnician(null)
+    },
+    onError: (err: Error) => {
+      addToast('error', err.message || 'Erro ao registar devolução.')
+    },
+  })
+
+  const addAssignmentMutation = useMutation({
+    mutationFn: ({ workId, technicianId }: { workId: string; technicianId: string }) =>
+      api.addWorkAssignment(workId, technicianId),
+    onSuccess: (_, { workId }) => {
+      queryClient.invalidateQueries({ queryKey: ['technician-assignments', worksModalTechnician?.id] })
+      queryClient.invalidateQueries({ queryKey: ['work-assignments', workId] })
+      addToast('success', 'Obra atribuída com sucesso!')
+      setAssignWorkId('')
+    },
+    onError: (err: Error) => {
+      addToast('error', err.message || 'Erro ao atribuir obra.')
     },
   })
 
@@ -179,6 +217,14 @@ const Technicians = () => {
                     <td className="py-4 text-right">
                       <button
                         type="button"
+                        onClick={() => setWorksModalTechnician(t)}
+                        className="p-2 hover:bg-background rounded-lg transition-colors"
+                        title="Obras atribuídas"
+                      >
+                        <span className="material-symbols-outlined text-text-light">construction</span>
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setToolsModalTechnician(t)}
                         className="p-2 hover:bg-background rounded-lg transition-colors"
                         title="Ver ferramentas"
@@ -231,7 +277,7 @@ const Technicians = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault()
-                const q = Math.min(Math.max(1, returnQuantity), returnForm.maxQuantity)
+                const q = Math.min(Math.max(1, parseInt(returnQtyStr, 10) || 1), returnForm.maxQuantity)
                 returnMutation.mutate({
                   technician_id: returnForm.technician_id,
                   tool_id: returnForm.tool_id,
@@ -250,8 +296,9 @@ const Technicians = () => {
                   type="number"
                   min={1}
                   max={returnForm.maxQuantity}
-                  value={returnQuantity}
-                  onChange={(e) => setReturnQuantity(parseInt(e.target.value, 10) || 1)}
+                  step={1}
+                  value={returnQtyStr}
+                  onChange={(e) => setReturnQtyStr(e.target.value)}
                   className="input w-full"
                   required
                 />
@@ -285,7 +332,18 @@ const Technicians = () => {
                   <p className="text-text-light">Este técnico ainda não possui ferramentas (nenhum pedido aprovado).</p>
                 ) : (
                   <>
-                    <p className="text-sm text-text-light">Total: {total} item(ns). Marque como devolvido quando o técnico devolver.</p>
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm text-text-light">Total: {total} item(ns). Marque como devolvido quando o técnico devolver.</p>
+                      <button
+                        type="button"
+                        onClick={() => bulkReturnMutation.mutate({ technician_id: toolsModalTechnician.id })}
+                        disabled={bulkReturnMutation.isPending}
+                        className="text-sm btn btn-primary py-1.5 px-2"
+                      >
+                        <span className="material-symbols-outlined text-sm align-middle mr-1">reply_all</span>
+                        {bulkReturnMutation.isPending ? 'A registar...' : 'Devolver tudo'}
+                      </button>
+                    </div>
                     <ul className="list-none space-y-2">
                       {tools.map((item) => (
                         <li key={item.tool_id} className="flex justify-between items-center py-2 border-b border-border last:border-0">
@@ -301,7 +359,7 @@ const Technicians = () => {
                                   tool_name: item.tool_name,
                                   maxQuantity: item.quantity,
                                 })
-                                setReturnQuantity(1)
+                                setReturnQtyStr(String(item.quantity))
                                 setReturnNotes('')
                               }}
                               className="text-sm btn btn-outline py-1 px-2"
@@ -326,6 +384,89 @@ const Technicians = () => {
               </div>
             )
           })())}
+      </Modal>
+
+      {/* Modal: obras do técnico */}
+      <Modal
+        isOpen={!!worksModalTechnician}
+        onClose={() => {
+          setWorksModalTechnician(null)
+          setAssignWorkId('')
+        }}
+        title={worksModalTechnician ? `Obras de ${worksModalTechnician.full_name || 'Técnico'}` : ''}
+        size="md"
+      >
+        {worksModalTechnician && (
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium text-text mb-2">Obras atribuídas</h3>
+              {technicianAssignments.length === 0 ? (
+                <p className="text-sm text-text-light">Nenhuma obra atribuída.</p>
+              ) : (
+                <ul className="list-none space-y-1">
+                  {technicianAssignments.map((a) => (
+                    <li key={a.work_id} className="text-sm text-text flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-lg">construction</span>
+                      {a.work_name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="pt-4 border-t border-border">
+              <h3 className="text-sm font-medium text-text mb-2">Atribuir obra</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (assignWorkId) {
+                    addAssignmentMutation.mutate({
+                      workId: assignWorkId,
+                      technicianId: worksModalTechnician.id,
+                    })
+                  }
+                }}
+                className="flex flex-wrap gap-2 items-end"
+              >
+                <div className="flex-1 min-w-[200px]">
+                  <label className="block text-xs text-text-light mb-1">Obra</label>
+                  <select
+                    value={assignWorkId}
+                    onChange={(e) => setAssignWorkId(e.target.value)}
+                    className="input w-full"
+                  >
+                    <option value="">Selecione uma obra</option>
+                    {works
+                      .filter((w) => !technicianAssignments.some((a) => a.work_id === w.id))
+                      .map((w) => (
+                        <option key={w.id} value={w.id}>
+                          {w.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  disabled={!assignWorkId || addAssignmentMutation.isPending}
+                  className="btn btn-primary"
+                >
+                  {addAssignmentMutation.isPending ? 'A atribuir...' : 'Atribuir'}
+                </button>
+              </form>
+              {works.length > 0 && works.filter((w) => !technicianAssignments.some((a) => a.work_id === w.id)).length === 0 && (
+                <p className="text-xs text-text-light mt-2">Todas as obras já estão atribuídas a este técnico.</p>
+              )}
+            </div>
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setWorksModalTechnician(null)}
+                className="btn btn-outline"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       {/* Create modal */}

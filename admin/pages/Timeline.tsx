@@ -116,8 +116,8 @@ const Timeline = () => {
               onClick={() => setViewMode('timeline')}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 viewMode === 'timeline'
-                  ? 'bg-primary text-white'
-                  : 'bg-surface text-text-light hover:bg-background'
+                  ? 'bg-white text-primary border border-primary'
+                  : 'bg-background text-text-light hover:bg-surface'
               }`}
             >
               <span className="material-symbols-outlined text-lg align-middle mr-1">timeline</span>
@@ -127,8 +127,8 @@ const Timeline = () => {
               onClick={() => setViewMode('gallery')}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
                 viewMode === 'gallery'
-                  ? 'bg-primary text-white'
-                  : 'bg-surface text-text-light hover:bg-background'
+                  ? 'bg-white text-primary border border-primary'
+                  : 'bg-background text-text-light hover:bg-surface'
               }`}
             >
               <span className="material-symbols-outlined text-lg align-middle mr-1">grid_view</span>
@@ -265,12 +265,23 @@ const Timeline = () => {
                           }}
                         />
                       ) : (
-                        <video
-                          src={resolveMediaUrl(entry.media_url)}
-                          controls
-                          className="w-full h-48 md:h-64 object-cover"
-                          poster={(entry.thumbnail_url || entry.media_url) ? resolveMediaUrl(entry.thumbnail_url || entry.media_url) : undefined}
-                        />
+                        <div className="relative w-full h-48 md:h-64">
+                          <video
+                            src={resolveMediaUrl(entry.media_url)}
+                            controls
+                            className="w-full h-full object-cover"
+                            poster={(entry.thumbnail_url || entry.media_url) ? resolveMediaUrl(entry.thumbnail_url || entry.media_url) : undefined}
+                            onError={(e) => {
+                              const target = e.currentTarget
+                              target.style.display = 'none'
+                              const fallback = target.nextElementSibling as HTMLElement
+                              if (fallback) fallback.style.display = 'flex'
+                            }}
+                          />
+                          <div className="absolute inset-0 hidden items-center justify-center bg-primary/10" style={{ display: 'none' }}>
+                            <span className="material-symbols-outlined text-4xl text-primary">play_circle</span>
+                          </div>
+                        </div>
                       )}
                     </div>
                     

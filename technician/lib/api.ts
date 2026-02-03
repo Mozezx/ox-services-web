@@ -1,5 +1,15 @@
 const API_BASE = '/api'
+const BACKEND_ORIGIN =
+  (import.meta as { env?: { VITE_API_ORIGIN?: string; DEV?: boolean } }).env?.VITE_API_ORIGIN ??
+  ((import.meta as { env?: { DEV?: boolean } }).env?.DEV === true ? 'http://localhost:4000' : '')
 const TOKEN_KEY = 'technician_token'
+
+export function resolveMediaUrl(url: string | null | undefined): string {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (BACKEND_ORIGIN && url.startsWith('/')) return BACKEND_ORIGIN + url
+  return url
+}
 
 export function getToken(): string | null {
   if (typeof window === 'undefined') return null

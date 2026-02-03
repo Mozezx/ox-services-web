@@ -221,103 +221,8 @@ const WorkDetail = () => {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Info */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Work Info Card */}
-          <div className="card">
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-semibold">Informações da Obra</h2>
-                <p className="text-text-light text-sm">Dados principais e descrição</p>
-              </div>
-              <button
-                onClick={() => setIsEditModalOpen(true)}
-                className="btn btn-outline text-sm"
-              >
-                <span className="material-symbols-outlined">edit</span>
-                Editar
-              </button>
-            </div>
-            
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-medium text-sm text-text-light mb-2">Descrição</h3>
-                <p className="text-text">{work.description || 'Nenhuma descrição informada'}</p>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border">
-                <div>
-                  <p className="text-sm text-text-light mb-1">Data de Início</p>
-                  <p className="font-medium">
-                    {work.start_date 
-                      ? new Date(work.start_date).toLocaleDateString('pt-BR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })
-                      : 'Não informada'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-text-light mb-1">Data de Término</p>
-                  <p className="font-medium">
-                    {work.end_date 
-                      ? new Date(work.end_date).toLocaleDateString('pt-BR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
-                        })
-                      : 'Não informada'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Timeline Gallery */}
-          <div className="card">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-semibold">Galeria da Timeline</h2>
-                <p className="text-text-light text-sm">
-                  {timelineEntries.length} {timelineEntries.length === 1 ? 'registro' : 'registros'} na timeline
-                </p>
-              </div>
-              <Link 
-                to={`/works/${id}/timeline`} 
-                className="text-sm text-primary hover:underline font-medium"
-              >
-                Ver Timeline Completa
-              </Link>
-            </div>
-            
-            {isLoadingTimeline ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-square bg-border rounded-lg animate-skeleton" />
-                ))}
-              </div>
-            ) : (
-              <ImageGallery 
-                entries={timelineEntries.slice(0, 8)} 
-              />
-            )}
-            
-            {timelineEntries.length > 8 && (
-              <div className="text-center mt-4 pt-4 border-t border-border">
-                <Link 
-                  to={`/works/${id}/timeline`}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Ver mais {timelineEntries.length - 8} registros
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Sidebar */}
-        <div className="space-y-6">
+        {/* Sidebar first on mobile so "Técnicos atribuídos" appears before gallery */}
+        <div className="order-1 lg:order-2 space-y-6">
           {/* Assigned technicians */}
           <div className="card">
             <div className="flex items-center justify-between mb-4">
@@ -429,13 +334,13 @@ const WorkDetail = () => {
                 <p className="text-2xl font-bold text-white">
                   {work.start_date && work.end_date
                     ? Math.ceil((new Date(work.end_date).getTime() - new Date(work.start_date).getTime()) / (1000 * 60 * 60 * 24))
-                    : '-'}
+                    : '—'}
                 </p>
-                <p className="text-xs text-white/80">Dias</p>
+                <p className="text-xs text-white/80">Duração (dias)</p>
               </div>
             </div>
           </div>
-          
+
           {/* Quick Actions */}
           <div className="card">
             <h2 className="text-lg font-semibold mb-4">Ações Rápidas</h2>
@@ -469,6 +374,101 @@ const WorkDetail = () => {
                 <span>Excluir Obra</span>
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* Main Info */}
+        <div className="order-2 lg:order-1 lg:col-span-2 space-y-6">
+          {/* Work Info Card */}
+          <div className="card">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold">Informações da Obra</h2>
+                <p className="text-text-light text-sm">Dados principais e descrição</p>
+              </div>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="btn btn-outline text-sm"
+              >
+                <span className="material-symbols-outlined">edit</span>
+                Editar
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-medium text-sm text-text-light mb-2">Descrição</h3>
+                <p className="text-text">{work.description || 'Nenhuma descrição informada'}</p>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-border">
+                <div>
+                  <p className="text-sm text-text-light mb-1">Data de Início</p>
+                  <p className="font-medium">
+                    {work.start_date 
+                      ? new Date(work.start_date).toLocaleDateString('pt-BR', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })
+                      : 'Não informada'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-text-light mb-1">Data de Término</p>
+                  <p className="font-medium">
+                    {work.end_date 
+                      ? new Date(work.end_date).toLocaleDateString('pt-BR', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })
+                      : 'Não informada'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Timeline Gallery */}
+          <div className="card">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold">Galeria da Timeline</h2>
+                <p className="text-text-light text-sm">
+                  {timelineEntries.length} {timelineEntries.length === 1 ? 'registro' : 'registros'} na timeline
+                </p>
+              </div>
+              <Link 
+                to={`/works/${id}/timeline`} 
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                Ver Timeline Completa
+              </Link>
+            </div>
+            
+            {isLoadingTimeline ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="aspect-square bg-border rounded-lg animate-skeleton" />
+                ))}
+              </div>
+            ) : (
+              <ImageGallery 
+                entries={timelineEntries.slice(0, 8)} 
+              />
+            )}
+            
+            {timelineEntries.length > 8 && (
+              <div className="text-center mt-4 pt-4 border-t border-border">
+                <Link 
+                  to={`/works/${id}/timeline`}
+                  className="text-sm text-primary hover:underline"
+                >
+                  Ver mais {timelineEntries.length - 8} registros
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>

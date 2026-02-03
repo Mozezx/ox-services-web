@@ -68,11 +68,14 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-primary/10 relative">
-                {entry.thumbnail_url ? (
+                {(entry.thumbnail_url || entry.media_url) ? (
                   <img
-                    src={resolveMediaUrl(entry.thumbnail_url)}
+                    src={resolveMediaUrl(entry.thumbnail_url || entry.media_url)}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
                   />
                 ) : null}
                 <span className="material-symbols-outlined text-4xl text-primary relative z-10 drop-shadow">play_circle</span>
@@ -180,6 +183,7 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
             ) : (
               <video
                 src={resolveMediaUrl(entries[lightboxIndex].media_url)}
+                poster={(entries[lightboxIndex].thumbnail_url || entries[lightboxIndex].media_url) ? resolveMediaUrl(entries[lightboxIndex].thumbnail_url || entries[lightboxIndex].media_url) : undefined}
                 controls
                 className="max-w-full max-h-[75vh] rounded-lg"
               />

@@ -890,6 +890,51 @@ app.post('/admin/tool-returns', async (req, res) => {
   }
 });
 
+// POST /admin/tool-returns/bulk - Devolver todas as ferramentas de um técnico de uma vez
+app.post('/admin/tool-returns/bulk', async (req, res) => {
+  try {
+    const { technician_id, notes } = req.body;
+    if (!technician_id) {
+      return res.status(400).json({ error: 'technician_id é obrigatório' });
+    }
+    const rows = await db.query(
+      `WITH order_qty AS (
+        SELECT o.technician_id, toi.tool_id, SUM(toi.quantity)::INTEGER AS qty
+        FROM tool_orders o
+        JOIN tool_order_items toi ON toi.tool_order_id = o.id
+        WHERE o.technician_id = $1 AND o.status = 'approved'
+        GROUP BY o.technician_id, toi.tool_id
+      ),
+      return_qty AS (
+        SELECT technician_id, tool_id, SUM(quantity)::INTEGER AS qty
+        FROM tool_returns
+        WHERE technician_id = $1
+        GROUP BY technician_id, tool_id
+      )
+      SELECT oq.tool_id, GREATEST(0, oq.qty - COALESCE(rq.qty, 0))::INTEGER AS quantity
+      FROM order_qty oq
+      LEFT JOIN return_qty rq ON rq.technician_id = oq.technician_id AND rq.tool_id = oq.tool_id
+      WHERE (oq.qty - COALESCE(rq.qty, 0)) > 0`,
+      [technician_id]
+    );
+    const items = rows.rows || [];
+    if (items.length === 0) {
+      return res.status(400).json({ error: 'O técnico não possui ferramentas para devolver.' });
+    }
+    for (const row of items) {
+      await db.query(
+        `INSERT INTO tool_returns (technician_id, tool_id, quantity, notes) VALUES ($1, $2, $3, $4)`,
+        [technician_id, row.tool_id, row.quantity, notes || null]
+      );
+    }
+    res.status(201).json({ ok: true, message: `${items.length} ferramenta(s) devolvida(s).` });
+  } catch (error) {
+    if (error.code === '42P01') return res.status(503).json({ error: 'Tabela tool_returns não existe. Execute schema-tool-returns.sql.' });
+    console.error('POST /admin/tool-returns/bulk:', error);
+    res.status(500).json({ error: error.message || 'Erro ao registar devoluções' });
+  }
+});
+
 // GET /admin/technicians - Listar técnicos
 app.get('/admin/technicians', async (req, res) => {
   try {
@@ -991,6 +1036,27 @@ app.delete('/admin/technicians/:id', async (req, res) => {
     if (error.code === '42P01') return res.status(503).json({ error: 'Tabela technician_users não existe. Execute schema-technicians-tools.sql.' });
     console.error(error);
     res.status(500).json({ error: 'Erro ao excluir técnico' });
+  }
+});
+
+// GET /admin/technicians/:id/assignments - Listar obras atribuídas a um técnico
+app.get('/admin/technicians/:id/assignments', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query(
+      `SELECT wa.work_id, w.name AS work_name
+       FROM work_assignments wa
+       JOIN works w ON w.id = wa.work_id
+       WHERE wa.technician_id = $1
+       ORDER BY wa.assigned_at DESC`,
+      [id]
+    );
+    const data = result.rows || [];
+    res.json({ assignments: data, total: data.length });
+  } catch (error) {
+    if (error.code === '42P01') return res.json({ assignments: [], total: 0 });
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar obras do técnico' });
   }
 });
 
