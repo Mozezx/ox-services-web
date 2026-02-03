@@ -5,7 +5,7 @@
 | Interface | URL | Build (pasta) |
 |-----------|-----|----------------|
 | **Admin** (obras, agendamentos, técnicos, ferramentas) | **https://obras.oxservices.org** | `admin/dist` |
-| **Técnico** (minhas obras, loja, pedidos, upload de fotos) | **https://tecnico.oxservices.org** | `technician/dist` |
+| **Técnico** (minhas obras, loja, pedidos, upload de fotos) | **https://technician.oxservices.org** | `technician/dist` |
 | **Site principal** (landing + página da obra para o cliente) | **https://oxservices.org** | `dist` |
 | **Backend API** | Usado internamente na porta 4000 (Nginx faz proxy `/api` → `http://127.0.0.1:4000`) | — |
 
@@ -15,7 +15,7 @@
 
 - Node.js 18+, npm, Nginx, PostgreSQL (ou Supabase)
 - Domínio `oxservices.org` com DNS apontando para o VPS
-- Subdomínios criados no DNS: `obras.oxservices.org`, `tecnico.oxservices.org` (registro A ou CNAME para o IP do VPS)
+- Subdomínios criados no DNS: `obras.oxservices.org`, `technician.oxservices.org` (registro A ou CNAME para o IP do VPS)
 
 ---
 
@@ -79,7 +79,7 @@ npm run build
 # Admin (obras.oxservices.org)
 npm run build:admin
 
-# Técnico (tecnico.oxservices.org)
+# Técnico (technician.oxservices.org)
 npm run build:technician
 ```
 
@@ -97,7 +97,7 @@ Arquivos de exemplo no repositório:
 
 - **Admin:** `admin/obras-nginx.conf` → copiar para `/etc/nginx/sites-available/obras.oxservices.org`
 - **Site principal:** `admin/oxservices-nginx.conf` → copiar para `/etc/nginx/sites-available/oxservices` (ou o nome que já usar)
-- **Técnico:** `admin/tecnico-nginx.conf` → copiar para `/etc/nginx/sites-available/tecnico.oxservices.org`
+- **Técnico:** `admin/technician-nginx.conf` → copiar para `/etc/nginx/sites-available/technician.oxservices.org`
 
 ### 5.1 Admin (obras.oxservices.org)
 
@@ -106,10 +106,10 @@ sudo cp /var/www/ox-services-web/admin/obras-nginx.conf /etc/nginx/sites-availab
 # Ajustar root se o projeto estiver noutro caminho (ex.: root /var/www/ox-services-web/admin/dist;)
 ```
 
-### 5.2 Técnico (tecnico.oxservices.org)
+### 5.2 Técnico (technician.oxservices.org)
 
 ```bash
-sudo cp /var/www/ox-services-web/admin/tecnico-nginx.conf /etc/nginx/sites-available/tecnico.oxservices.org
+sudo cp /var/www/ox-services-web/admin/technician-nginx.conf /etc/nginx/sites-available/technician.oxservices.org
 ```
 
 Ajustar no ficheiro:
@@ -121,24 +121,24 @@ Ajustar no ficheiro:
 
 Usar `admin/oxservices-nginx.conf` como referência e ajustar `root` para `/var/www/ox-services-web/dist` e paths de SSL.
 
-### 5.4 Certificado SSL para tecnico.oxservices.org
+### 5.4 Certificado SSL para technician.oxservices.org
 
 Se ainda não tiver certificado para o subdomínio do técnico:
 
 ```bash
-sudo certbot certonly --nginx -d tecnico.oxservices.org
+sudo certbot certonly --nginx -d technician.oxservices.org
 ```
 
-Se o Certbot criar um path diferente (ex.: `tecnico.oxservices.org-0001`), ajustar no `tecnico-nginx.conf`:
+Se o Certbot criar um path diferente (ex.: `technician.oxservices.org-0001`), ajustar no config:
 
-- `ssl_certificate /etc/letsencrypt/live/tecnico.oxservices.org/fullchain.pem;`
-- `ssl_certificate_key /etc/letsencrypt/live/tecnico.oxservices.org/privkey.pem;`
+- `ssl_certificate /etc/letsencrypt/live/technician.oxservices.org-0001/fullchain.pem;`
+- `ssl_certificate_key /etc/letsencrypt/live/technician.oxservices.org-0001/privkey.pem;`
 
 ### 5.5 Habilitar os três sites
 
 ```bash
 sudo ln -sf /etc/nginx/sites-available/obras.oxservices.org /etc/nginx/sites-enabled/
-sudo ln -sf /etc/nginx/sites-available/tecnico.oxservices.org /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/technician.oxservices.org /etc/nginx/sites-enabled/
 sudo ln -sf /etc/nginx/sites-available/oxservices /etc/nginx/sites-enabled/
 ```
 
@@ -154,7 +154,7 @@ sudo systemctl reload nginx
 ## 6. Resumo de acesso
 
 - **Admin:** https://obras.oxservices.org (login admin)
-- **Técnico:** https://tecnico.oxservices.org (login técnico – e-mail/senha das contas criadas no admin)
+- **Técnico:** https://technician.oxservices.org (login técnico – e-mail/senha das contas criadas no admin)
 - **Site:** https://oxservices.org (público + página da obra `/obra/:token`)
 
 ---
