@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, Tool } from '../lib/api'
+import { api, Tool, resolveMediaUrl } from '../lib/api'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { useToast } from '../components/Toast'
@@ -9,7 +9,7 @@ const backendOrigin =
   (import.meta as { env?: { VITE_API_ORIGIN?: string; DEV?: boolean } }).env?.VITE_API_ORIGIN ??
   ((import.meta as { env?: { DEV?: boolean } }).env?.DEV === true ? 'http://localhost:4000' : '')
 
-function getImageSrc(url: string | null | undefined): string {
+function resolveMediaUrl(url: string | null | undefined): string {
   if (!url) return ''
   if (url.startsWith('http://') || url.startsWith('https://')) return url
   if (backendOrigin && url.startsWith('/')) return backendOrigin + url
@@ -201,7 +201,7 @@ const Tools = () => {
                   <tr key={t.id} className="border-b border-border last:border-0">
                     <td className="py-4">
                       {t.image_url ? (
-                        <img src={getImageSrc(t.image_url)} alt="" className="w-12 h-12 object-cover rounded-lg" />
+                        <img src={resolveMediaUrl(t.image_url)} alt="" className="w-12 h-12 object-cover rounded-lg" />
                       ) : (
                         <div className="w-12 h-12 rounded-lg bg-border flex items-center justify-center">
                           <span className="material-symbols-outlined text-text-light">build</span>
@@ -283,7 +283,7 @@ const Tools = () => {
               </button>
               {formImageUrl && (
                 <div className="flex items-center gap-2">
-                  <img src={getImageSrc(formImageUrl)} alt="" className="w-16 h-16 object-cover rounded-lg border border-border" />
+                  <img src={resolveMediaUrl(formImageUrl)} alt="" className="w-16 h-16 object-cover rounded-lg border border-border" />
                   <button
                     type="button"
                     onClick={() => setFormImageUrl('')}
@@ -372,7 +372,7 @@ const Tools = () => {
               </button>
               {formImageUrl && (
                 <div className="flex items-center gap-2">
-                  <img src={getImageSrc(formImageUrl)} alt="" className="w-16 h-16 object-cover rounded-lg border border-border" />
+                  <img src={resolveMediaUrl(formImageUrl)} alt="" className="w-16 h-16 object-cover rounded-lg border border-border" />
                   <button
                     type="button"
                     onClick={() => setFormImageUrl('')}

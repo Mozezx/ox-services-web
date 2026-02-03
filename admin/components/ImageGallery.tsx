@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { TimelineEntry } from '../lib/api'
+import { TimelineEntry, resolveMediaUrl } from '../lib/api'
 
 interface ImageGalleryProps {
   entries: TimelineEntry[]
@@ -59,18 +59,18 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
           >
             {entry.type === 'image' ? (
               <img
-                src={getMediaUrl(entry.thumbnail_url || entry.media_url)}
+                src={resolveMediaUrl(entry.thumbnail_url || entry.media_url)}
                 alt={entry.title}
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 onError={(e) => {
-                  e.currentTarget.src = getMediaUrl(entry.media_url) || '/placeholder.png'
+                  e.currentTarget.src = resolveMediaUrl(entry.media_url) || '/placeholder.png'
                 }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-primary/10 relative">
                 {entry.thumbnail_url ? (
                   <img
-                    src={getMediaUrl(entry.thumbnail_url)}
+                    src={resolveMediaUrl(entry.thumbnail_url)}
                     alt=""
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -173,13 +173,13 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
           >
             {entries[lightboxIndex].type === 'image' ? (
               <img
-                src={getMediaUrl(entries[lightboxIndex].media_url)}
+                src={resolveMediaUrl(entries[lightboxIndex].media_url)}
                 alt={entries[lightboxIndex].title}
                 className="max-w-full max-h-[75vh] object-contain rounded-lg"
               />
             ) : (
               <video
-                src={getMediaUrl(entries[lightboxIndex].media_url)}
+                src={resolveMediaUrl(entries[lightboxIndex].media_url)}
                 controls
                 className="max-w-full max-h-[75vh] rounded-lg"
               />

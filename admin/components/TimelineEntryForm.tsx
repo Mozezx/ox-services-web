@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { TimelineEntry } from '../lib/api'
+import { TimelineEntry, resolveMediaUrl } from '../lib/api'
 
 interface TimelineEntryFormProps {
   entry?: TimelineEntry | null
@@ -71,7 +71,7 @@ const TimelineEntryForm = ({ entry, onSubmit, onCancel, isLoading = false }: Tim
             <div className="w-20 h-20 rounded-lg overflow-hidden bg-primary/10 flex-shrink-0">
               {entry.type === 'image' ? (
                 <img
-                  src={entry.media_url}
+                  src={resolveMediaUrl(entry.media_url)}
                   alt={entry.title}
                   className="w-full h-full object-cover"
                 />

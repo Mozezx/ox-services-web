@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, Work, TimelineEntry } from '../lib/api'
+import { api, Work, TimelineEntry, resolveMediaUrl } from '../lib/api'
 import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import TimelineEntryForm, { TimelineEntryFormData } from '../components/TimelineEntryForm'
@@ -19,12 +19,6 @@ const Timeline = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('timeline')
   const [editEntry, setEditEntry] = useState<TimelineEntry | null>(null)
   const [deleteEntry, setDeleteEntry] = useState<TimelineEntry | null>(null)
-
-  const getMediaUrl = (url: string) => {
-    if (!url) return ''
-    if (url.startsWith('http')) return url
-    return url
-  }
 
   // Fetch work details
   const { data: work } = useQuery<Work>({
@@ -263,7 +257,7 @@ const Timeline = () => {
                     <div className="rounded-lg overflow-hidden bg-background max-w-lg">
                       {entry.type === 'image' ? (
                         <img
-                          src={getMediaUrl(entry.media_url)}
+                          src={resolveMediaUrl(entry.media_url)}
                           alt={entry.title}
                           className="w-full h-48 md:h-64 object-cover"
                           onError={(e) => {
@@ -272,10 +266,10 @@ const Timeline = () => {
                         />
                       ) : (
                         <video
-                          src={getMediaUrl(entry.media_url)}
+                          src={resolveMediaUrl(entry.media_url)}
                           controls
                           className="w-full h-48 md:h-64 object-cover"
-                          poster={(entry.thumbnail_url || entry.media_url) ? getMediaUrl(entry.thumbnail_url || entry.media_url) : undefined}
+                          poster={(entry.thumbnail_url || entry.media_url) ? resolveMediaUrl(entry.thumbnail_url || entry.media_url) : undefined}
                         />
                       )}
                     </div>

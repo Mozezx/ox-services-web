@@ -1403,7 +1403,9 @@ app.post('/admin/works/:id/timeline/upload', timelineUploadMw, async (req, res) 
     } else {
       // Fallback: disco local (req.file tem path e filename quando multer disk)
       mediaUrl = `/uploads/works/${id}/${file.filename}`;
-      if (detectedType === 'video') {
+      if (detectedType === 'image') {
+        thumbnailUrl = mediaUrl;
+      } else if (detectedType === 'video') {
         thumbnailUrl = `/uploads/works/${id}/thumb_${file.filename}.jpg`;
       }
     }

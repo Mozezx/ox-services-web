@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTimeline } from '../hooks/useTimeline'
+import { resolveMediaUrl } from '../lib/api'
 
 const TimelineEnhanced = () => {
   const { id } = useParams<{ id: string }>()
@@ -261,7 +262,7 @@ const TimelineEnhanced = () => {
                         <span>Ordem: {entry.order}</span>
                       </div>
                       <a
-                        href={entry.media_url}
+                        href={resolveMediaUrl(entry.media_url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"

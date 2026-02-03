@@ -5,6 +5,14 @@ const BACKEND_ORIGIN =
   ((import.meta as { env?: { DEV?: boolean } }).env?.DEV === true ? 'http://localhost:4000' : '')
 const TOKEN_KEY = 'admin_token'
 
+/** Resolve URL de mídia/imagem: URLs relativas (/uploads/...) são prefixadas com a origem do backend para carregar no admin. */
+export function resolveMediaUrl(url: string | null | undefined): string {
+  if (!url) return ''
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  if (BACKEND_ORIGIN && url.startsWith('/')) return BACKEND_ORIGIN + url
+  return url
+}
+
 function getToken(): string | null {
   if (typeof window === 'undefined') return null
   return localStorage.getItem(TOKEN_KEY)

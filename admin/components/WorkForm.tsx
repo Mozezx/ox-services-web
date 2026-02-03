@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Work, api } from '../lib/api'
+import { Work, api, resolveMediaUrl } from '../lib/api'
 
 interface WorkFormProps {
   work?: Work | null
@@ -270,7 +270,7 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
         {formData.cover_image_url ? (
           <div className="relative">
             <img
-              src={formData.cover_image_url}
+              src={resolveMediaUrl(formData.cover_image_url)}
               alt="Preview da capa"
               className="w-full h-48 object-cover rounded-lg border border-border"
               onError={(e) => {

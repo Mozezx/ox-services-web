@@ -47,19 +47,15 @@ function uploadBuffer(buffer, options = {}) {
           secure_url: result.secure_url,
           public_id: result.public_id,
         };
-        // Thumbnail: para vídeo = frame inicial; para imagem = versão redimensionada (evita thumbs quebradas no admin)
-        if (result.public_id) {
-          if (resourceType === 'video') {
-            out.thumbnail_url = cloudinary.url(result.public_id, {
-              resource_type: 'video',
-              format: 'jpg',
-              start_offset: 0,
-            });
-          } else {
-            out.thumbnail_url = cloudinary.url(result.public_id, {
-              transformation: [{ width: 400, height: 400, crop: 'fill' }],
-            });
-          }
+        // Thumbnail: para vídeo = frame inicial; para imagem = mesma URL (sempre funciona; opcional: versão pequena)
+        if (resourceType === 'video' && result.public_id) {
+          out.thumbnail_url = cloudinary.url(result.public_id, {
+            resource_type: 'video',
+            format: 'jpg',
+            start_offset: 0,
+          });
+        } else if (resourceType === 'image') {
+          out.thumbnail_url = result.secure_url;
         }
         return resolve(out);
       }
