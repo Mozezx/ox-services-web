@@ -1903,7 +1903,9 @@ technicianRouter.post('/works/:id/timeline/upload', timelineUploadMw, async (req
       thumbnailUrl = result.thumbnail_url || null;
     } else {
       mediaUrl = `/uploads/works/${id}/${file.filename}`;
-      if (detectedType === 'video') {
+      if (detectedType === 'image') {
+        thumbnailUrl = mediaUrl;
+      } else if (detectedType === 'video') {
         thumbnailUrl = `/uploads/works/${id}/thumb_${file.filename}.jpg`;
       }
     }

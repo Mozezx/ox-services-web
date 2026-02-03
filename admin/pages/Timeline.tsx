@@ -275,7 +275,7 @@ const Timeline = () => {
                           src={getMediaUrl(entry.media_url)}
                           controls
                           className="w-full h-48 md:h-64 object-cover"
-                          poster={entry.thumbnail_url ? getMediaUrl(entry.thumbnail_url) : undefined}
+                          poster={(entry.thumbnail_url || entry.media_url) ? getMediaUrl(entry.thumbnail_url || entry.media_url) : undefined}
                         />
                       )}
                     </div>

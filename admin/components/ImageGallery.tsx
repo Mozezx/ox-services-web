@@ -59,16 +59,23 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
           >
             {entry.type === 'image' ? (
               <img
-                src={getMediaUrl(entry.media_url)}
+                src={getMediaUrl(entry.thumbnail_url || entry.media_url)}
                 alt={entry.title}
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 onError={(e) => {
-                  e.currentTarget.src = '/placeholder.png'
+                  e.currentTarget.src = getMediaUrl(entry.media_url) || '/placeholder.png'
                 }}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                <span className="material-symbols-outlined text-4xl text-primary">play_circle</span>
+              <div className="w-full h-full flex items-center justify-center bg-primary/10 relative">
+                {entry.thumbnail_url ? (
+                  <img
+                    src={getMediaUrl(entry.thumbnail_url)}
+                    alt=""
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                ) : null}
+                <span className="material-symbols-outlined text-4xl text-primary relative z-10 drop-shadow">play_circle</span>
               </div>
             )}
 
