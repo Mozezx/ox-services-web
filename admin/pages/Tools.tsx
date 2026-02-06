@@ -5,17 +5,6 @@ import Modal from '../components/Modal'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { useToast } from '../components/Toast'
 
-const backendOrigin =
-  (import.meta as { env?: { VITE_API_ORIGIN?: string; DEV?: boolean } }).env?.VITE_API_ORIGIN ??
-  ((import.meta as { env?: { DEV?: boolean } }).env?.DEV === true ? 'http://localhost:4000' : '')
-
-function resolveMediaUrl(url: string | null | undefined): string {
-  if (!url) return ''
-  if (url.startsWith('http://') || url.startsWith('https://')) return url
-  if (backendOrigin && url.startsWith('/')) return backendOrigin + url
-  return url
-}
-
 const Tools = () => {
   const queryClient = useQueryClient()
   const { addToast } = useToast()

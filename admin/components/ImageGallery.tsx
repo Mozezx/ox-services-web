@@ -110,7 +110,7 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
                       e.stopPropagation()
                       onEdit(entry)
                     }}
-                    className="p-1.5 bg-white rounded-lg shadow hover:bg-primary hover:text-white transition-colors"
+                    className="p-1.5 bg-white rounded-full shadow text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
                     title="Editar"
                   >
                     <span className="material-symbols-outlined text-sm">edit</span>
@@ -122,7 +122,7 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
                       e.stopPropagation()
                       onDelete(entry)
                     }}
-                    className="p-1.5 bg-white rounded-lg shadow hover:bg-red-600 hover:text-white transition-colors"
+                    className="p-1.5 bg-white rounded-full shadow text-blue-600 hover:bg-red-600 hover:text-white transition-colors"
                     title="Excluir"
                   >
                     <span className="material-symbols-outlined text-sm">delete</span>

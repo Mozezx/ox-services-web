@@ -2017,6 +2017,27 @@ technicianRouter.post('/tool-orders', async (req, res) => {
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'items array required with at least one { tool_id, quantity }' });
     }
+    const validItems = items.filter((it) => it && it.tool_id && (parseInt(it.quantity, 10) || 0) >= 1);
+    if (validItems.length === 0) {
+      return res.status(400).json({ error: 'Each item must have tool_id and quantity >= 1' });
+    }
+    const toolIds = [...new Set(validItems.map((it) => it.tool_id))];
+    const toolsCheck = await db.query(
+      'SELECT id FROM tools WHERE active = true AND id = ANY($1::uuid[])',
+      [toolIds]
+    );
+    const foundIds = new Set((toolsCheck.rows || []).map((r) => r.id));
+    const missing = toolIds.filter((id) => !foundIds.has(id));
+    if (missing.length > 0) {
+      return res.status(400).json({
+        error: 'One or more tools not found or inactive. Add tools in Admin > Ferramentas first.',
+        detail: missing.length === 1 ? `Tool id ${missing[0]} not found.` : `${missing.length} tools not found.`,
+      });
+    }
+    const techExists = await db.queryOne('SELECT 1 FROM technician_users WHERE id = $1', [technicianId]);
+    if (!techExists) {
+      return res.status(401).json({ error: 'Session invalid. Please log in again.' });
+    }
     const orderResult = await db.query(
       `INSERT INTO tool_orders (technician_id, status, notes)
        VALUES ($1, 'pending', $2)
@@ -2024,13 +2045,12 @@ technicianRouter.post('/tool-orders', async (req, res) => {
       [technicianId, notes || null]
     );
     const order = orderResult.rows[0];
-    for (const item of items) {
-      const { tool_id, quantity } = item;
-      if (!tool_id || !quantity || quantity < 1) continue;
+    for (const item of validItems) {
+      const qty = parseInt(item.quantity, 10) || 1;
       await db.query(
         `INSERT INTO tool_order_items (tool_order_id, tool_id, quantity)
          VALUES ($1, $2, $3)`,
-        [order.id, tool_id, quantity]
+        [order.id, item.tool_id, qty]
       );
     }
     sendPushNotificationToAll(
@@ -2045,7 +2065,11 @@ technicianRouter.post('/tool-orders', async (req, res) => {
       return res.status(503).json({ error: 'Tool orders not configured. Run schema-technicians-tools.sql on the database.' });
     }
     if (error.code === '23503') {
-      return res.status(400).json({ error: 'Invalid technician or tool id' });
+      const detail = error.detail ? ` (${error.detail})` : '';
+      return res.status(400).json({
+        error: 'Invalid technician or tool id' + detail,
+        detail: error.detail,
+      });
     }
     res.status(500).json({ error: 'Failed to create order' });
   }

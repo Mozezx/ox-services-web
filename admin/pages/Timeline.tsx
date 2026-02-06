@@ -114,10 +114,10 @@ const Timeline = () => {
           <div className="flex border border-border rounded-lg overflow-hidden">
             <button
               onClick={() => setViewMode('timeline')}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
+              className={`px-4 py-2 text-sm font-medium transition-colors flex items-center ${
                 viewMode === 'timeline'
                   ? 'bg-white text-primary border border-primary'
-                  : 'bg-background text-text-light hover:bg-surface'
+                  : 'bg-background text-blue-600 hover:bg-white/10 hover:text-blue-500'
               }`}
             >
               <span className="material-symbols-outlined text-lg align-middle mr-1">timeline</span>
@@ -125,10 +125,10 @@ const Timeline = () => {
             </button>
             <button
               onClick={() => setViewMode('gallery')}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
+              className={`px-4 py-2 text-sm font-medium transition-colors flex items-center ${
                 viewMode === 'gallery'
                   ? 'bg-white text-primary border border-primary'
-                  : 'bg-background text-text-light hover:bg-surface'
+                  : 'bg-background text-blue-600 hover:bg-white/10 hover:text-blue-500'
               }`}
             >
               <span className="material-symbols-outlined text-lg align-middle mr-1">grid_view</span>
@@ -234,17 +234,17 @@ const Timeline = () => {
                       <div className="flex gap-2 flex-shrink-0">
                         <button 
                           onClick={() => setEditEntry(entry)}
-                          className="p-2 hover:bg-background rounded transition-colors"
+                          className="p-2 bg-white rounded-full shadow text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
                           title="Editar"
                         >
-                          <span className="material-symbols-outlined text-text-light hover:text-primary">edit</span>
+                          <span className="material-symbols-outlined text-sm">edit</span>
                         </button>
                         <button 
                           onClick={() => setDeleteEntry(entry)}
-                          className="p-2 hover:bg-background rounded transition-colors"
+                          className="p-2 bg-white rounded-full shadow text-blue-600 hover:bg-red-600 hover:text-white transition-colors"
                           title="Excluir"
                         >
-                          <span className="material-symbols-outlined text-text-light hover:text-red-600">delete</span>
+                          <span className="material-symbols-outlined text-sm">delete</span>
                         </button>
                       </div>
                     </div>

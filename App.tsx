@@ -49,7 +49,7 @@ const LandingPage: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#0B242A' }}>
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/obra/:token" element={<WorkPage />} />

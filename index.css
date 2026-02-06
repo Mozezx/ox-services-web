@@ -1,3 +1,11 @@
+/* Site principal: fundo escuro (teal) – evita tela azul */
+html,
+body,
+#root,
+#root > div {
+  background-color: #0B242A !important;
+}
+
 /* Navbar scroll effects */
 .navbar {
     transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
