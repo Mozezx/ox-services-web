@@ -21,7 +21,7 @@ const Footer: React.FC<FooterProps> = ({ companyName, content }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     <div className="flex flex-col gap-4">
                         <div className="flex items-center gap-3 text-white mb-2">
-                            <img src="https://res.cloudinary.com/dswtssvkq/image/upload/v1766195939/logo1_x7rihp.png" alt={companyName} className="h-12 w-auto rounded-lg" />
+                            <img src="/logo.png" alt={companyName} className="h-12 w-auto rounded-lg" />
                         </div>
                         <p className="text-white/60 text-sm font-body leading-relaxed">
                             {content.about}
