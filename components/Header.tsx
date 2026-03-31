@@ -64,38 +64,38 @@ const Header: React.FC<HeaderProps> = ({ companyName, navLinks, ctaButtonText })
     }, [isMenuOpen]);
 
     return (
-        <header className={`navbar sticky top-0 z-50 w-full bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 transition-all duration-300 ${isScrolled ? 'scrolled' : ''} ${isHidden ? 'nav-hidden' : ''}`}>
+        <header className={`navbar fixed top-0 z-50 w-full transition-all duration-300 ${isScrolled ? 'bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm' : 'bg-transparent border-b border-transparent'} ${isHidden ? 'nav-hidden' : ''}`}>
             <div className="mx-auto max-w-[1280px] px-4 md:px-10">
                 <div className="flex items-center justify-between h-20">
-                    <a href={isWorkPage ? "/" : "#home"} className="flex items-center gap-3 text-primary dark:text-white" aria-label={`${companyName} homepage`}>
+                    <a href={isWorkPage ? "/" : "#home"} className={`flex items-center gap-3 transition-colors ${isScrolled ? 'text-primary dark:text-white' : 'text-white'}`} aria-label={`${companyName} homepage`}>
                         <img src="/logo.png" alt={companyName} className="h-12 md:h-16 w-auto rounded-lg" />
                     </a>
 
                     <nav className="hidden md:flex items-center gap-8">
                         {navLinks.map((link) => (
-                            <a key={link.name} href={getLinkHref(link.href)} className="text-primary/80 dark:text-white/80 hover:text-primary dark:hover:text-white text-sm font-medium transition-colors">
+                            <a key={link.name} href={getLinkHref(link.href)} className={`text-sm font-medium transition-colors ${isScrolled ? 'text-primary/80 dark:text-white/80 hover:text-primary dark:hover:text-white' : 'text-white/90 hover:text-white'}`}>
                                 {link.name}
                             </a>
                         ))}
                     </nav>
 
                     <div className="hidden md:flex items-center gap-4">
-                        <LanguageSelector />
-                        <a href={isWorkPage ? "/#contact" : "#contact"} className="flex items-center justify-center rounded-lg h-10 px-6 bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-colors">
+                        <LanguageSelector isScrolled={isScrolled} />
+                        <a href={isWorkPage ? "/#contact" : "#contact"} className={`flex items-center justify-center rounded-lg h-10 px-6 text-sm font-bold transition-colors ${isScrolled ? 'bg-primary hover:bg-primary-hover text-white' : 'bg-white text-primary hover:bg-gray-100'}`}>
                             {ctaButtonText}
                         </a>
                     </div>
 
                     <div className="flex items-center gap-2 md:hidden">
-                        <LanguageSelector />
-                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-primary dark:text-white" aria-label="Toggle mobile menu" aria-expanded={isMenuOpen}>
+                        <LanguageSelector isScrolled={isScrolled} />
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={isScrolled ? 'text-primary dark:text-white' : 'text-white'} aria-label="Toggle mobile menu" aria-expanded={isMenuOpen}>
                             <span className="material-symbols-outlined text-3xl notranslate" translate="no">{isMenuOpen ? 'close' : 'menu'}</span>
                         </button>
                     </div>
                 </div>
                 {isMenuOpen && (
                     <div className="md:hidden pb-4">
-                        <nav className="flex flex-col items-center gap-4">
+                        <nav className="flex flex-col items-center gap-4 bg-background-light/95 dark:bg-background-dark/95 p-6 rounded-xl shadow-xl mt-2">
                             {navLinks.map((link) => (
                                 <a key={link.name} href={getLinkHref(link.href)} onClick={() => setIsMenuOpen(false)} className="text-primary/80 dark:text-white/80 hover:text-primary dark:hover:text-white py-2 text-base font-medium transition-colors">
                                     {link.name}

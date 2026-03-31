@@ -185,7 +185,7 @@ const AIChatWidget: React.FC<AIChatWidgetProps> = ({
             {/* Chat Window */}
             {isOpen && (
                 <div
-                    className="ai-chat-window fixed bottom-24 left-6 z-50 w-[360px] max-w-[calc(100vw-48px)] h-[500px] max-h-[calc(100vh-150px)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+                    className="ai-chat-window fixed bottom-20 left-4 right-4 sm:left-6 sm:right-auto sm:bottom-24 z-50 sm:w-[360px] h-[450px] sm:h-[500px] max-h-[calc(100dvh-100px)] sm:max-h-[calc(100vh-150px)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
                     style={{
                         animation: 'slideUp 0.3s ease-out'
                     }}

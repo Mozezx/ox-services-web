@@ -1506,5 +1506,5 @@ export const languageFlags: Record<Language, string> = {
     nl: '/flags/nl.svg',
     es: '/flags/es.svg',
     fr: '/flags/fr.svg',
-    pt: '/flags/gb.svg',
+    pt: '/flags/pt.svg',
 };
