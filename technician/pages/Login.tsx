@@ -32,7 +32,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--background)' }}>
       <div className="w-full max-w-md card animate-fade-in">
         <div className="flex items-center gap-3 mb-8">
-          <img src="/logo.png" alt="OX Technician" className="w-12 h-12 object-contain rounded-lg bg-primary/5" />
+          <img src="/logo.webp" alt="OX Technician" className="w-12 h-12 object-contain rounded-lg bg-primary/5" />
           <h1 className="text-2xl font-bold text-text">{t.login.title}</h1>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">

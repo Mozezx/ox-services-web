@@ -61,7 +61,7 @@ async function sendPushNotificationToAll(title, body, data = {}) {
 
         console.log(`📤 Enviando push para ${subscriptions.length} dispositivo(s)...`);
 
-        const iconUrl = `${ADMIN_APP_URL}/notification-icon.png`;
+        const iconUrl = `${ADMIN_APP_URL}/notification-icon.webp`;
         const payload = JSON.stringify({
             title,
             body,
@@ -183,7 +183,7 @@ const works = [
         startDate: '2024-03-15',
         endDate: '2024-06-30',
         status: 'in_progress',
-        coverImageUrl: '/hero-background-new.png',
+        coverImageUrl: '/hero-background-new.webp',
         accessToken: 'abc123-token-teste',
     }
 ];
@@ -193,8 +193,8 @@ const timelineEntries = [
         id: '1',
         workId: '1',
         type: 'image',
-        mediaUrl: '/hero-slide-1.png',
-        thumbnailUrl: '/hero-slide-1.png',
+        mediaUrl: '/hero-slide-1.webp',
+        thumbnailUrl: '/hero-slide-1.webp',
         title: 'Demolição da parede antiga',
         description: 'Remoção da parede entre cozinha e sala para criar ambiente integrado.',
         date: '2024-03-20',
@@ -205,7 +205,7 @@ const timelineEntries = [
         workId: '1',
         type: 'video',
         mediaUrl: 'https://example.com/video.mp4',
-        thumbnailUrl: '/hero-slide-2.png',
+        thumbnailUrl: '/hero-slide-2.webp',
         title: 'Instalação elétrica',
         description: 'Instalação de nova fiação e pontos de energia.',
         date: '2024-04-05',
@@ -215,8 +215,8 @@ const timelineEntries = [
         id: '3',
         workId: '1',
         type: 'image',
-        mediaUrl: '/hero-slide-3.png',
-        thumbnailUrl: '/hero-slide-3.png',
+        mediaUrl: '/hero-slide-3.webp',
+        thumbnailUrl: '/hero-slide-3.webp',
         title: 'Assentamento de piso',
         description: 'Colocação de porcelanato na área da cozinha.',
         date: '2024-04-20',
@@ -491,7 +491,7 @@ app.get('/api/works/:token', async (req, res) => {
             startDate: work.start_date,
             endDate: work.end_date,
             status: work.status,
-            coverImageUrl: work.cover_image_url || '/hero-background-new.png',
+            coverImageUrl: work.cover_image_url || '/hero-background-new.webp',
             accessToken: work.access_token,
         };
         
@@ -646,7 +646,7 @@ app.post('/api/works/:token/upload', async (req, res) => {
         
         const insertResult = await db.query(
             `INSERT INTO timeline_entries (work_id, type, media_url, thumbnail_url, title, description, date, "order")
-             VALUES ($1, $2, '/placeholder.png', '/placeholder.png', $3, $4, $5, 0)
+             VALUES ($1, $2, '/placeholder.webp', '/placeholder.webp', $3, $4, $5, 0)
              RETURNING *`,
             [work.id, type, title, description || '', new Date().toISOString().split('T')[0]]
         );
@@ -1362,7 +1362,7 @@ app.post('/admin/upload/cover', coverUploadMw, async (req, res) => {
         fs.mkdirSync(coversDir, { recursive: true });
       }
       const base = path.basename(file.originalname || 'cover').replace(/\s/g, '_');
-      const ext = path.extname(base) || '.jpg';
+      const ext = path.extname(base) || '.webp';
       const name = path.basename(base, ext) || 'cover';
       const filename = `${Date.now()}_${name}${ext}`;
       const filepath = path.join(coversDir, filename);
@@ -1410,7 +1410,7 @@ async function handleToolImageUpload(req, res) {
         fs.mkdirSync(toolsDir, { recursive: true });
       }
       const base = path.basename(file.originalname || 'tool').replace(/\s/g, '_');
-      const ext = path.extname(base) || '.jpg';
+      const ext = path.extname(base) || '.webp';
       const name = path.basename(base, ext) || 'tool';
       const filename = `${Date.now()}_${name}${ext}`;
       const filepath = path.join(toolsDir, filename);
@@ -1472,7 +1472,7 @@ app.post('/admin/works/:id/timeline/upload', timelineUploadMw, async (req, res) 
       if (detectedType === 'image') {
         thumbnailUrl = mediaUrl;
       } else if (detectedType === 'video') {
-        thumbnailUrl = `/uploads/works/${id}/thumb_${file.filename}.jpg`;
+        thumbnailUrl = `/uploads/works/${id}/thumb_${file.filename}.webp`;
       }
     }
 
@@ -1974,7 +1974,7 @@ technicianRouter.post('/works/:id/timeline/upload', timelineUploadMw, async (req
       if (detectedType === 'image') {
         thumbnailUrl = mediaUrl;
       } else if (detectedType === 'video') {
-        thumbnailUrl = `/uploads/works/${id}/thumb_${file.filename}.jpg`;
+        thumbnailUrl = `/uploads/works/${id}/thumb_${file.filename}.webp`;
       }
     }
 

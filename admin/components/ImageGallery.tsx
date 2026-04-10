@@ -63,7 +63,7 @@ const ImageGallery = ({ entries, onEdit, onDelete }: ImageGalleryProps) => {
                 alt={entry.title}
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 onError={(e) => {
-                  e.currentTarget.src = resolveMediaUrl(entry.media_url) || '/placeholder.png'
+                  e.currentTarget.src = resolveMediaUrl(entry.media_url) || '/placeholder.webp'
                 }}
               />
             ) : (

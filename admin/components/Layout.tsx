@@ -102,7 +102,7 @@ function LayoutInner({ children }: LayoutProps) {
         <div className="p-6 border-b border-primary-light">
           <div className="flex items-center gap-3">
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="OX Services"
               className="w-10 h-10 object-contain flex-shrink-0 rounded-lg bg-white/5"
             />

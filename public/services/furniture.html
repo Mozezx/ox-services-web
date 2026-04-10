@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+
+<html class="light overflow-x-hidden" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>OX Services - Custom Furniture &amp; Doors</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Material Symbols (Local) -->
+    <link href="fonts/material-symbols.css" rel="stylesheet" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Config -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0a2329",
+                        "primary-hover": "#0f353d",
+                        "accent": "#57838e",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#131d1f",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .font-body {
+            font-family: 'Noto Sans', sans-serif;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar.nav-hidden {
+            transform: translateY(-100%);
+        }
+
+        /* Sidebar animations */
+        .sidebar-enter {
+            transform: translateX(100%);
+        }
+
+        .sidebar-enter-active {
+            transform: translateX(0);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Scroll Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .animate-fade-in-left {
+            animation: fadeInLeft 0.6s ease-out forwards;
+        }
+
+        .animate-fade-in-right {
+            animation: fadeInRight 0.6s ease-out forwards;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.5s ease-out forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-400 {
+            animation-delay: 0.4s;
+        }
+
+        .delay-500 {
+            animation-delay: 0.5s;
+        }
+
+        .delay-600 {
+            animation-delay: 0.6s;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-primary dark:text-white font-display antialiased overflow-x-hidden">
+    <div class="flex flex-col min-h-screen overflow-x-hidden">
+        <header id="navbar" class="navbar fixed top-0 z-50 w-full bg-[#0B242A] border-b border-white/10">
+            <div class="mx-auto max-w-[1280px] px-4 md:px-10">
+                <div class="flex h-20 items-center justify-between">
+                    <div class="flex-1 flex justify-start">
+                        <a href="/" class="flex items-center gap-3">
+                            <img src="/logo.webp" alt="OX Services" class="h-12 md:h-16 w-auto rounded-lg" />
+                        </a>
+                    </div>
+                    <nav class="hidden md:grid grid-cols-4 items-center w-[400px]">
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors text-center" href="/#home"
+                            data-translate="nav-home">Home</a>
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors text-center"
+                            href="/#services" data-translate="nav-services">Services</a>
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors text-center"
+                            href="/#portfolio" data-translate="nav-portfolio">Portfolio</a>
+                        <a class="text-white/80 hover:text-white text-sm font-medium transition-colors text-center" href="/#contact"
+                            data-translate="nav-contact">Contact</a>
+                    </nav>
+                    <div class="hidden md:flex flex-1 items-center justify-end gap-4">
+                        <div id="language-selector-container"></div>
+                        <a href="/#contact"
+                            class="flex items-center justify-center rounded-lg bg-white px-6 h-10 text-sm font-bold text-[#0B242A] transition hover:bg-gray-100"
+                            data-translate="nav-getQuote">Get
+                            a Quote</a>
+                    </div>
+                    <div class="flex items-center gap-2 md:hidden">
+                        <div id="language-selector-container-mobile"></div>
+                        <button id="mobile-menu-btn" class="text-white" aria-label="Toggle mobile menu">
+                            <span class="material-symbols-outlined notranslate text-3xl">menu</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overlay -->
+            <div id="overlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300"
+                onclick="closeSidebar()"></div>
+
+            <!-- Sidebar -->
+            <div id="sidebar"
+                class="fixed top-0 right-0 h-full w-[280px] bg-white dark:bg-[#1a2629] shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out">
+                <div class="flex flex-col h-full">
+                    <!-- Sidebar Header -->
+                    <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                        <span class="text-lg font-bold text-primary dark:text-white">OX Services</span>
+                        <button onclick="closeSidebar()" class="text-primary dark:text-white" aria-label="Close menu">
+                            <span class="material-symbols-outlined notranslate text-3xl">close</span>
+                        </button>
+                    </div>
+
+                    <!-- Sidebar Navigation -->
+                    <nav class="flex flex-col p-6 gap-2 flex-1">
+                        <a href="/#home" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-home">Home</a>
+                        <a href="/#services" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-services">Services</a>
+                        <a href="/#portfolio" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-portfolio">Portfolio</a>
+                        <a href="/#contact" onclick="closeSidebar()"
+                            class="text-primary dark:text-white hover:bg-primary/5 dark:hover:bg-white/5 px-4 py-3 rounded-lg text-base font-medium transition-colors"
+                            data-translate="nav-contact">Contact</a>
+                    </nav>
+
+                    <!-- Sidebar Footer -->
+                    <div class="p-6 border-t border-gray-200 dark:border-gray-700">
+                        <a href="/#contact" onclick="closeSidebar()"
+                            class="w-full flex items-center justify-center rounded-lg h-12 px-6 bg-primary text-white hover:bg-primary-hover text-base font-bold transition-colors"
+                            data-translate="nav-getQuote">Get
+                            a Quote</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Hero Section - Mobile (background image) -->
+        <section class="w-full flex justify-center pb-5 px-4 md:hidden pt-[104px]">
+            <div class="w-full max-w-[1280px]">
+                <div class="relative overflow-hidden rounded-xl bg-primary min-h-[500px] flex flex-col justify-end p-8 bg-cover bg-center"
+                    style="background-image: linear-gradient(rgba(11, 36, 42, 0.3) 0%, rgba(11, 36, 42, 0.8) 100%), url('https://lh3.googleusercontent.com/aida-public/AB6AXuByrvM-7aSirHF5aEZjuemkMdTX4I2KVB8wSM04-divHFySyeF4tn3nBow3YoLfP-Oj4ZDVSslbab0r-xTWjQnAD5CWv6oQtsnYmwNBtb5xBoZmqlQ6ZukcajoH-XlpZ1yrjvmI8EcG6OoGPW_wpCmm1MGYBbadO7tRbum7ca1nWl5VkUd2jL1YxkRbThYveNhSyd7oupW9q86U0NPkBMVPDwHUb30YI9T60ttbidPcF78F9MpKK8BJbRpLYA_TEog_sOblZHSfyrCh')"
+                    role="banner">
+                    <div class="max-w-[720px] flex flex-col gap-6">
+                        <div class="flex items-center gap-2 text-white/90">
+                            <span class="material-symbols-outlined notranslate text-sm">verified</span>
+                            <span class="text-xs font-bold tracking-wider uppercase"
+                                data-translate="furniture-heroTag">Premium Infrastructure</span>
+                        </div>
+                        <h1 class="text-white text-4xl font-bold font-display leading-tight tracking-tighter"
+                            data-translate="furniture-heroTitle">
+                            Bespoke Interior Craftsmanship
+                        </h1>
+                        <p class="text-white/90 text-base font-normal font-body leading-relaxed"
+                            data-translate="furniture-heroSubtitle">
+                            Elevating corporate environments with precision-engineered doors and custom joinery.
+                            Experience the intersection of industrial strength and modern finesse.
+                        </p>
+                        <div class="flex flex-wrap gap-4 mt-4">
+                            <a href="/#portfolio"
+                                class="flex h-12 px-8 items-center justify-center rounded-lg bg-white text-primary hover:bg-gray-100 text-base font-bold transition-colors"
+                                data-translate="common-viewProjects">
+                                View Projects
+                            </a>
+                            <a href="/#contact"
+                                class="flex h-12 px-8 items-center justify-center rounded-lg border border-white/30 bg-white/10 backdrop-blur-md text-white hover:bg-white/20 text-base font-bold transition-colors"
+                                data-translate="nav-getQuote">
+                                Get a Quote
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hero Section - Desktop (2 columns) -->
+        <section class="relative w-full overflow-hidden bg-background-light dark:bg-background-dark hidden md:block">
+            <div class="mx-auto max-w-[1280px] px-6 pt-[104px] pb-16 lg:px-8 lg:pt-[112px] lg:pb-24">
+                <div class="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+                    <div class="flex flex-col justify-center space-y-8">
+                        <div class="space-y-4">
+                            <span
+                                class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary dark:bg-white/10 dark:text-white ring-1 ring-inset ring-primary/20"
+                                data-translate="furniture-heroTag">
+                                Premium Infrastructure
+                            </span>
+                            <h1 class="text-5xl font-bold tracking-tight text-primary dark:text-white sm:text-6xl xl:text-7xl"
+                                data-translate="furniture-heroTitle">
+                                Bespoke Interior Craftsmanship
+                            </h1>
+                            <p class="max-w-[600px] text-lg text-primary/70 dark:text-white/70 font-body leading-relaxed"
+                                data-translate="furniture-heroSubtitle">
+                                Elevating corporate environments with precision-engineered doors and custom joinery.
+                                Experience the intersection of industrial strength and modern finesse.
+                            </p>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="/#portfolio"
+                                class="inline-flex items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-white transition hover:bg-primary-hover"
+                                data-translate="common-viewProjects">
+                                View Projects
+                            </a>
+                            <a href="/#contact"
+                                class="inline-flex items-center justify-center rounded-lg border border-primary/20 px-8 py-4 text-base font-bold text-primary transition hover:bg-primary/5"
+                                data-translate="nav-getQuote">
+                                Get a Quote
+                            </a>
+                        </div>
+                    </div>
+                    <div class="relative lg:h-full min-h-[400px]">
+                        <div class="relative h-full w-full overflow-hidden rounded-xl shadow-2xl">
+                            <div class="absolute inset-0 bg-primary/10 mix-blend-multiply"></div>
+                            <img alt="Modern luxury corporate office interior with wood paneling and glass walls"
+                                class="h-full w-full object-cover"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuByrvM-7aSirHF5aEZjuemkMdTX4I2KVB8wSM04-divHFySyeF4tn3nBow3YoLfP-Oj4ZDVSslbab0r-xTWjQnAD5CWv6oQtsnYmwNBtb5xBoZmqlQ6ZukcajoH-XlpZ1yrjvmI8EcG6OoGPW_wpCmm1MGYBbadO7tRbum7ca1nWl5VkUd2jL1YxkRbThYveNhSyd7oupW9q86U0NPkBMVPDwHUb30YI9T60ttbidPcF78F9MpKK8BJbRpLYA_TEog_sOblZHSfyrCh" />
+                        </div>
+                        <div
+                            class="absolute -bottom-6 -left-6 rounded-lg bg-primary p-6 shadow-xl border border-white/10 max-w-xs">
+                            <div class="flex items-start gap-4">
+                                <span class="material-symbols-outlined notranslate text-3xl
+                                    text-white">verified</span>
+                                <div>
+                                    <p class="font-bold text-white" data-translate="furniture-cardTitle">ISO Certified
+                                    </p>
+                                    <p class="text-sm text-white/70 font-body" data-translate="furniture-cardDesc">
+                                        Sustainable sourcing
+                                        & precision manufacturing guarantee.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- The Art of Customization -->
+        <section class="py-20 bg-[#0B242A]">
+            <div class="mx-auto max-w-[1280px] px-6 lg:px-8">
+                <div class="mb-12">
+                    <h2 class="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl"
+                        data-translate="furniture-featuresTitle">
+                        The Art of Customization</h2>
+                    <div class="mt-4 h-1 w-20 bg-white"></div>
+                </div>
+                <div class="flex flex-col lg:flex-row gap-8 items-stretch">
+                    <div
+                        class="flex-1 rounded-xl bg-background-light dark:bg-background-dark p-8 lg:p-12 border border-gray-200 dark:border-gray-800">
+                        <div class="flex h-full flex-col justify-between gap-8">
+                            <div>
+                                <h3 class="text-2xl font-bold text-primary dark:text-white mb-4"
+                                    data-translate="furniture-featuresFormTitle">Form Meets Function
+                                </h3>
+                                <p class="text-primary/70 dark:text-white/70 font-body leading-relaxed text-lg"
+                                    data-translate="furniture-featuresDesc">
+                                    We believe in the philosophy that infrastructure should be beautiful. Our
+                                    customization process highlights the raw integrity of materials like premium
+                                    hardwoods, brushed metal accents, and tempered glass. Every piece is built to
+                                    withstand the rigors of corporate use while maintaining a museum-quality finish.
+                                </p>
+                            </div>
+                            <div
+                                class="flex items-center gap-4 text-primary dark:text-white font-bold cursor-pointer hover:gap-6 transition-all group">
+                                <span data-translate="furniture-featuresLink">Read about our philosophy</span>
+                                <span class="material-symbols-outlined notranslate transition-transform
+                                    group-hover:translate-x-1">arrow_forward</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-h-[300px] lg:min-h-0 relative rounded-xl overflow-hidden group">
+                        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors z-10"></div>
+                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                            data-alt="Close up of bespoke wooden joinery detail on a modern desk"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB6qYE0WtrSxORuQXYyQEeByn_REabXAnLfTkGHu6whH-p_YcuEbf9WB2zst3JEq2y_pxuQZD9iAM-_y4kahn6mnajBIrVH2tkV15HVcQwum8glxevI4HzVKk46QoIiZ2b49guT9RGHd0d9nPwrpjLnnL7iBRhUEOZsphbKvE1sG4y4ks0F-U9itQA_LKIvqhjonTBHTms4u-xxD-09SKKKeNInhGkkKnayafHK3pJYv_ZgOxJEDX35RjmImc01lYYHau1xo6tsRe5f');">
+                        </div>
+                        <div class="absolute bottom-0 left-0 p-8 z-20">
+                            <span
+                                class="inline-block bg-white/90 dark:bg-black/80 backdrop-blur px-4 py-2 rounded text-xs font-bold uppercase tracking-wider text-primary dark:text-white">
+                                Detail Shot
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Our Solutions Grid -->
+        <section class="py-20 bg-background-light dark:bg-background-dark">
+            <div class="mx-auto max-w-[1280px] px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                    <div>
+                        <h2 class="text-3xl font-bold leading-tight tracking-tight text-primary dark:text-white sm:text-4xl"
+                            data-translate="furniture-solutionsTitle">
+                            Our Solutions</h2>
+                        <p class="mt-4 text-lg text-primary/70 dark:text-white/70 max-w-2xl font-body"
+                            data-translate="furniture-solutionsDesc">
+                            From executive suites to collaborative spaces, we engineer environments that inspire.
+                        </p>
+                    </div>
+                    <a class="hidden md:flex items-center gap-2 text-primary dark:text-white font-bold hover:underline"
+                        href="#">
+                        View All Products <span class="material-symbols-outlined notranslate
+                            text-sm">arrow_outward</span>
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div
+                        class="group relative flex flex-col overflow-hidden rounded-xl bg-white dark:bg-[#1a2629] shadow-sm transition hover:shadow-md border border-gray-100 dark:border-gray-800">
+                        <div class="aspect-[4/3] w-full overflow-hidden">
+                            <img alt="Modern executive desk with dark wood and clean lines"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                data-alt="Modern executive desk with dark wood and clean lines"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe0991qvIBUoD3AYC0iQETKWiq8KClT7MVjhY-3Mk4xcGcgJr2Q00xAmDI4qiKzCgatPxh3bKalCobeAIWfXA1tQoKWrGW7yPEqLmDxvC8jowVTH2AOdV_NiyPY2R5nucY-7_5evyA_K45nphVD0R9_oHFyeEvM_9ifP2eRGCqOOInUpNQKSpW25WNru4QlX6550T4xQ4oHxl-636hG5_UP-Lu_y-KdGX5LgSz6ZPXFak" />
+                        </div>
+                        <div class="flex flex-1 flex-col p-6">
+                            <h3 class="text-xl font-bold text-primary dark:text-white"
+                                data-translate="furniture-solution1Title">Executive Desks</h3>
+                            <p class="mt-2 text-sm text-primary/60 dark:text-white/60 font-body line-clamp-2"
+                                data-translate="furniture-solution1Desc">
+                                Commanding centerpieces crafted from solid walnut and integrated with smart power
+                                solutions for the modern leader.
+                            </p>
+                            <div class="mt-auto pt-4">
+                                <span
+                                    class="text-sm font-bold text-primary dark:text-white group-hover:text-accent transition-colors flex items-center gap-1">
+                                    Explore <span class="material-symbols-outlined notranslate
+                                        text-[16px]">chevron_right</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2 -->
+                    <div
+                        class="group relative flex flex-col overflow-hidden rounded-xl bg-white dark:bg-[#1a2629] shadow-sm transition hover:shadow-md border border-gray-100 dark:border-gray-800">
+                        <div class="aspect-[4/3] w-full overflow-hidden">
+                            <img alt="Glass partition doors in an office hallway"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                data-alt="Glass partition doors in an office hallway"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUPuiKYmT60HgsM1xF2ZpG2FHfTWPHtIA40Yl723fNdXyXkUtTbG20ljr1HC8sJKgxRhltPFUqJWGrvlQYKEbPimVYOMhTEiwLsybBGvHo8ilM8Pps3MVNx-o927ImxjVtXjMXTmM4GlvLUVTRxQbeL8ORq8sPtYjIVfkaeloSsqdOioLuHdtjTK-ybhXHwIDbfMD6f44VODpxQU9Ak-op47PaGccRyLBm3IdC124zIKhRKMHkmkuqeaO_fHP4YG8j5yDkvjFJEegw" />
+                        </div>
+                        <div class="flex flex-1 flex-col p-6">
+                            <h3 class="text-xl font-bold text-primary dark:text-white"
+                                data-translate="furniture-solution2Title">Partition Doors</h3>
+                            <p class="mt-2 text-sm text-primary/60 dark:text-white/60 font-body line-clamp-2"
+                                data-translate="furniture-solution2Desc">
+                                Acoustic glass partitions with blackened steel framing, designed to maintain
+                                transparency while ensuring privacy.
+                            </p>
+                            <div class="mt-auto pt-4">
+                                <span
+                                    class="text-sm font-bold text-primary dark:text-white group-hover:text-accent transition-colors flex items-center gap-1">
+                                    Explore <span class="material-symbols-outlined notranslate
+                                        text-[16px]">chevron_right</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3 -->
+                    <div
+                        class="group relative flex flex-col overflow-hidden rounded-xl bg-white dark:bg-[#1a2629] shadow-sm transition hover:shadow-md border border-gray-100 dark:border-gray-800">
+                        <div class="aspect-[4/3] w-full overflow-hidden">
+                            <img alt="Custom wall cabinetry and shelving unit"
+                                class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                data-alt="Custom wall cabinetry and shelving unit"
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-zfrKZagXWfsFjJ75XUtD8LzHXLfAH3I__wrGWJGEPatE0d7UDQo1CU8aC7TnMx52VBtSe6eN-X0IYdFnlj8XmXm1YwnNhXPJEup9CHrayrwxDEXxHghzkWlLmdTzw3TTuLOewbkow1-tnwVU3pbA-IkWe80Bre99Bvh8z3Fpoh6h-aXh-sbYPb_4hTkHQKLBfeFwWEuhAghpcJphwbfgwGy0uCKvW6KRaxwsmXIVenJsCjCtssMV1FG1-ztDsuUUunYjnSc3aoyL" />
+                        </div>
+                        <div class="flex flex-1 flex-col p-6">
+                            <h3 class="text-xl font-bold text-primary dark:text-white"
+                                data-translate="furniture-solution3Title">Integrated Cabinetry</h3>
+                            <p class="mt-2 text-sm text-primary/60 dark:text-white/60 font-body line-clamp-2"
+                                data-translate="furniture-solution3Desc">
+                                Seamless wall-to-wall storage solutions that blend architecturally with your space,
+                                maximizing utility and aesthetics.
+                            </p>
+                            <div class="mt-auto pt-4">
+                                <span
+                                    class="text-sm font-bold text-primary dark:text-white group-hover:text-accent transition-colors flex items-center gap-1">
+                                    Explore <span class="material-symbols-outlined notranslate
+                                        text-[16px]">chevron_right</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 md:hidden text-center">
+                    <a class="inline-flex items-center gap-2 text-primary dark:text-white font-bold hover:underline"
+                        href="#">
+                        View All Products <span class="material-symbols-outlined notranslate
+                            text-sm">arrow_outward</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- Process Section -->
+        <section class="py-20 bg-primary dark:bg-black text-white relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-5"
+                style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 30px 30px;"></div>
+            <div class="mx-auto max-w-[1280px] px-6 lg:px-8 relative z-10">
+                <div class="mb-16 text-center">
+                    <span class="text-accent font-bold tracking-wider uppercase text-sm"
+                        data-translate="furniture-processTag">Workflow</span>
+                    <h2 class="mt-2 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl"
+                        data-translate="furniture-processTitle">The
+                        Craftsmanship Process</h2>
+                    <p class="mt-4 text-white/60 font-body max-w-2xl mx-auto" data-translate="furniture-processDesc">
+                        From conceptual sketches to the final
+                        screw, we manage every detail.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Step 1 -->
+                    <div class="relative group">
+                        <div
+                            class="flex flex-col items-center text-center p-6 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition duration-300">
+                            <div
+                                class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined notranslate
+                                    text-3xl">design_services</span>
+                            </div>
+                            <h3 class="text-lg font-bold" data-translate="furniture-processStep1Title">01. 3D Design
+                            </h3>
+                            <p class="mt-2 text-sm text-white/60 font-body" data-translate="furniture-processStep1Desc">
+                                Detailed CAD models and photorealistic
+                                renderings for approval.</p>
+                        </div>
+                        <!-- Connector Line (Desktop) -->
+                        <div class="hidden lg:block absolute top-1/2 -right-4 w-8 h-[2px] bg-white/10"></div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="relative group">
+                        <div
+                            class="flex flex-col items-center text-center p-6 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition duration-300">
+                            <div
+                                class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined notranslate
+                                    text-3xl">handyman</span>
+                            </div>
+                            <h3 class="text-lg font-bold" data-translate="furniture-processStep2Title">02. Material
+                                Sourcing</h3>
+                            <p class="mt-2 text-sm text-white/60 font-body" data-translate="furniture-processStep2Desc">
+                                Selecting the finest sustainable woods and
+                                industrial metals.</p>
+                        </div>
+                        <!-- Connector Line (Desktop) -->
+                        <div class="hidden lg:block absolute top-1/2 -right-4 w-8 h-[2px] bg-white/10"></div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="relative group">
+                        <div
+                            class="flex flex-col items-center text-center p-6 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition duration-300">
+                            <div
+                                class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined notranslate
+                                    text-3xl">precision_manufacturing</span>
+                            </div>
+                            <h3 class="text-lg font-bold" data-translate="furniture-processStep3Title">03. Manufacturing
+                            </h3>
+                            <p class="mt-2 text-sm text-white/60 font-body" data-translate="furniture-processStep3Desc">
+                                Artisan construction in our specialized
+                                workshop.</p>
+                        </div>
+                        <!-- Connector Line (Desktop) -->
+                        <div class="hidden lg:block absolute top-1/2 -right-4 w-8 h-[2px] bg-white/10"></div>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="relative group">
+                        <div
+                            class="flex flex-col items-center text-center p-6 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition duration-300">
+                            <div
+                                class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined notranslate
+                                    text-3xl">verified_user</span>
+                            </div>
+                            <h3 class="text-lg font-bold" data-translate="furniture-processStep4Title">04. Installation
+                            </h3>
+                            <p class="mt-2 text-sm text-white/60 font-body" data-translate="furniture-processStep4Desc">
+                                White-glove delivery and precision fitting
+                                on site.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Material Library -->
+        <section class="py-20 bg-white dark:bg-[#1a2629]">
+            <div class="mx-auto max-w-[1280px] px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row gap-12">
+                    <div class="lg:w-1/3">
+                        <h2 class="text-3xl font-bold leading-tight tracking-tight text-primary dark:text-white sm:text-4xl"
+                            data-translate="furniture-materialsTitle">
+                            Materials Library</h2>
+                        <p class="mt-4 text-primary/70 dark:text-white/70 font-body text-lg"
+                            data-translate="furniture-materialsDesc">
+                            We source only the finest materials to ensure durability and aesthetic excellence. Explore
+                            our curated selection of finishes.
+                        </p>
+                        <div class="mt-8">
+                            <button
+                                class="inline-flex items-center gap-2 rounded-lg border border-primary px-6 py-3 text-sm font-bold text-primary transition hover:bg-primary hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-primary">
+                                <span data-translate="furniture-materialsBtn">Download Full Catalog</span> <span
+                                    class="material-symbols-outlined notranslate">download</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class=" lg:w-2/3">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <!-- Material 1 -->
+                            <div
+                                class="group relative overflow-hidden rounded-lg bg-gray-100 aspect-square cursor-pointer">
+                                <img alt="Rich dark walnut wood texture"
+                                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    data-alt="Rich dark walnut wood texture"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDik2yfyXdsajOUSa6vgQz2PxG9Xkwodp5frXjYLnpNDxp06YEQdsij7fHDN3lZQf0y9E0OQsyn0_GEi3mlYTp--0lk_bfmU4AMt1vfpjuqGo5SdiODzfECUcR_Nf6qOtBM2V5cPhfFAiXfmyBE2PCwemGnzv0kj92Dm6mvQWlZr7mNQLLCoNRzO_2UPPaU_y0riwzSAPYvam0lnrbdUNo9PajdwhNHDrKukW-O22ynjh78PO2_xRQcSSNX25CkSYiHCIjbAQfQDvdC" />
+                                <div
+                                    class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <div class="text-center p-2">
+                                        <p class="text-white font-bold text-lg">American Walnut</p>
+                                        <p class="text-white/80 text-xs mt-1">Sustainably Sourced</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Material 2 -->
+                            <div
+                                class="group relative overflow-hidden rounded-lg bg-gray-100 aspect-square cursor-pointer">
+                                <img alt="Light oak wood grain texture"
+                                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    data-alt="Light oak wood grain texture"
+                                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDix4fv6EPiLidne0bMxNTgVgwwYLlZVu_R6k4JBv0SxVhuiDngXWgsR1T1XpPHGvOT1Y_qq-jLedw8vPmMJZYvJvUtdCgqJDXVWO6DNAbybOzD2gs_Y5hHaoCCEcJjq2fsCnF2l0ZbooBngZRram3ES-QNFOTrHE0reSVXjavv9qfzGd6hefL3Sn_HVzEzSCQqopyp1oJVFL6mpO_h38dObFJvYJskXA0jwgL81GNvHqTOleogAi60lqQMOkSKh4cCgMIhDjBrj_4s" />
+                                <div
+                                    class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <div class="text-center p-2">
+                                        <p class="text-white font-bold text-lg">White Oak</p>
+                                        <p class="text-white/80 text-xs mt-1">Matte Finish</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Material 3 -->
+                            <div
+                                class="group relative overflow-hidden rounded-lg bg-gray-100 aspect-square cursor-pointer">
+                                <div
+                                    class="h-full w-full bg-gradient-to-br from-gray-700 to-black transition-transform duration-500 group-hover:scale-110">
+                                </div>
+                                <div
+                                    class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <div class="text-center p-2">
+                                        <p class="text-white font-bold text-lg">Blackened Steel</p>
+                                        <p class="text-white/80 text-xs mt-1">Industrial Grade</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Material 4 -->
+                            <div
+                                class="group relative overflow-hidden rounded-lg bg-gray-100 aspect-square cursor-pointer">
+                                <div
+                                    class="h-full w-full bg-gradient-to-br from-yellow-100 to-yellow-600 transition-transform duration-500 group-hover:scale-110">
+                                </div>
+                                <div
+                                    class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <div class="text-center p-2">
+                                        <p class="text-white font-bold text-lg">Brushed Brass</p>
+                                        <p class="text-white/80 text-xs mt-1">PVD Coated</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Material 5 -->
+                            <div
+                                class="group relative overflow-hidden rounded-lg bg-gray-100 aspect-square cursor-pointer">
+                                <div
+                                    class="h-full w-full bg-blue-100/50 backdrop-blur-md border border-gray-200 transition-transform duration-500 group-hover:scale-110">
+                                </div>
+                                <div
+                                    class="absolute inset-0 bg-primary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <div class="text-center p-2">
+                                        <p class="text-white font-bold text-lg">Acoustic Glass</p>
+                                        <p class="text-white/80 text-xs mt-1">High Clarity</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Material 6 -->
+                            <div
+                                class="group relative overflow-hidden rounded-lg bg-gray-100 aspect-square cursor-pointer flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700">
+                                <div class="text-center">
+                                    <span class="material-symbols-outlined notranslate
+                                                    text-4xl text-gray-400">add</span>
+                                    <p class="text-sm font-bold text-gray-500 mt-2">View More</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- CTA Section -->
+        <section
+            class="bg-background-light dark:bg-background-dark py-20 border-t border-gray-200 dark:border-gray-800">
+            <div class="mx-auto max-w-[960px] px-6 text-center">
+                <h2 class="text-3xl font-bold tracking-tight text-primary dark:text-white sm:text-4xl">Ready to
+                    transform your space?</h2>
+                <p class="mt-4 text-lg text-primary/70 dark:text-white/70 font-body">
+                    Schedule a consultation with our design team to discuss your project requirements.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+                    <button
+                        class="flex items-center justify-center rounded-lg bg-primary px-8 py-4 text-base font-bold text-white transition hover:bg-primary-hover dark:bg-white dark:text-primary dark:hover:bg-gray-100 min-w-[200px]">
+                        Request Consultation
+                    </button>
+                    <button
+                        class="flex items-center justify-center rounded-lg border border-primary/20 bg-transparent px-8 py-4 text-base font-bold text-primary transition hover:bg-primary/5 dark:border-white/20 dark:text-white dark:hover:bg-white/5 min-w-[200px]">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </section>
+        <!-- Footer -->
+        <footer class="bg-white text-primary border-t border-primary/10 pt-16 pb-8">
+            <div class="mx-auto max-w-[1280px] px-4 md:px-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                    <!-- Logo & About -->
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center gap-3 text-primary mb-2">
+                            <img src="/logo.webp"
+                                alt="OX Services" class="h-12 w-auto rounded-lg" />
+                        </div>
+                        <p class="text-primary/60 text-sm font-body leading-relaxed" data-translate="footer-about">
+                            Building excellence through quality craftsmanship and innovative solutions for over 15
+                            years.
+                        </p>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-primary font-bold text-base font-display" data-translate="footer-quickLinksTitle">
+                            Quick Links</h3>
+                        <div class="flex flex-col gap-2">
+                            <a href="/#home" class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="nav-home">Home</a>
+                            <a href="/#services"
+                               class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="nav-services">Services</a>
+                            <a href="/#portfolio"
+                               class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="nav-portfolio">Portfolio</a>
+                            <a href="/#contact"
+                               class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="nav-contact">Contact</a>
+                        </div>
+                    </div>
+
+                    <!-- Services -->
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-primary font-bold text-base font-display" data-translate="footer-servicesTitle">
+                            Services</h3>
+                        <div class="flex flex-col gap-2">
+                            <a href="/services/solar.html"
+                               class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="footer-solarLink">Solar PV Systems</a>
+                            <a href="/services/roofing.html"
+                               class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="footer-roofingLink">EPDM Roofing</a>
+                            <a href="/services/joinery.html"
+                               class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="footer-joineryLink">Aluminum Joinery</a>
+                            <a href="/services/furniture.html"
+                               class="text-primary/60 hover:text-primary text-sm font-body transition-colors"
+                               data-translate="footer-furnitureLink">Bespoke Furniture</a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-primary font-bold text-base font-display" data-translate="footer-contactTitle">
+                            Contact</h3>
+                        <div class="flex flex-col gap-3 text-sm text-primary/60 font-body">
+                            <p class="flex items-start gap-3">
+                                <span class="material-symbols-outlined notranslate text-lg
+                                    mt-0.5">location_on</span>
+                                <span data-translate="footer-address">Belgium</span>
+                            </p>
+                            <a href="tel:+32492801353" class="flex items-center gap-3 hover:text-primary">
+                                <span class="material-symbols-outlined notranslate text-lg">call</span>
+                                +32 492 80 13 53
+                            </a>
+                            <a href="mailto:info@oxservices.com" class="flex items-center gap-3 hover:text-primary">
+                                <span class="material-symbols-outlined notranslate text-lg">mail</span>
+                                info@oxservices.com
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-primary/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-primary/40 text-xs font-body" data-translate="footer-copyright">© 2024 OX Services. All
+                        rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script>
+        const navbar = document.getElementById('navbar');
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener('scroll', () => {
+            if (!navbar) return;
+            const currentY = window.scrollY;
+
+            // Adiciona/remove classe 'scrolled' baseado na posição
+            if (currentY > 40) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            // Esconde ao rolar para baixo (com threshold), mostra ao rolar para cima (sem threshold)
+            if (currentY > lastScrollY + 6 && currentY > 40) {
+                // Rolando para baixo
+                navbar.classList.add('nav-hidden');
+            } else if (currentY < lastScrollY) {
+                // Rolando para cima - QUALQUER movimento para cima mostra
+                navbar.classList.remove('nav-hidden');
+            }
+
+            // Sempre mostra quando está no topo
+            if (currentY < 10) {
+                navbar.classList.remove('nav-hidden');
+            }
+
+            lastScrollY = currentY;
+        }, { passive: true });
+
+        // Sidebar toggle functions
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const menuIcon = mobileMenuBtn.querySelector('.material-symbols-outlined');
+
+        function openSidebar() {
+            sidebar.classList.remove('translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            overlay.classList.remove('hidden');
+            menuIcon.textContent = 'close';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.add('translate-x-full');
+            sidebar.classList.remove('translate-x-0');
+            overlay.classList.add('hidden');
+            menuIcon.textContent = 'menu';
+        }
+
+        mobileMenuBtn.addEventListener('click', () => {
+            if (sidebar.classList.contains('translate-x-full')) {
+                openSidebar();
+            } else {
+                closeSidebar();
+            }
+        });
+    </script>
+    <script src="translations.js"></script>
+    <script src="animations.js"></script>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/32492801353?text=Hello!%20I%20would%20like%20more%20information." target="_blank"
+        rel="noopener noreferrer"
+        class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] hover:bg-[#20bd5a] rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+        aria-label="Contact us on WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" class="w-7 h-7">
+            <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+    </a>
+
+    <!-- OX Services AI Chat Widget -->
+    <script src="ai-chat-widget.js"></script>
+</body>
+
+</html>

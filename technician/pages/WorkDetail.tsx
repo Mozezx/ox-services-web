@@ -69,7 +69,7 @@ const WorkDetail = () => {
                     alt={entry.title}
                     className="w-full aspect-square object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = '/placeholder.png'
+                      e.currentTarget.src = '/placeholder.webp'
                     }}
                   />
                 ) : (

@@ -274,7 +274,7 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
               alt="Preview da capa"
               className="w-full h-48 object-cover rounded-lg border border-border"
               onError={(e) => {
-                e.currentTarget.src = '/placeholder.png'
+                e.currentTarget.src = '/placeholder.webp'
               }}
             />
             <div className="absolute top-2 right-2 flex gap-2">
@@ -356,7 +356,7 @@ const WorkForm = ({ work, onSubmit, onCancel, isLoading = false }: WorkFormProps
             type="text"
             name="cover_image_url"
             className="input mt-2 text-sm"
-            placeholder="https://exemplo.com/imagem.jpg ou /uploads/covers/..."
+            placeholder="https://exemplo.com/imagem.webp ou /uploads/covers/..."
             value={formData.cover_image_url}
             onChange={(e) => handleChange('cover_image_url', e.target.value)}
           />

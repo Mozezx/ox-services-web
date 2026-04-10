@@ -36,12 +36,12 @@ async function run() {
     await db.query(
       `INSERT INTO timeline_entries (work_id, type, media_url, thumbnail_url, title, description, date, "order")
        VALUES ($1, 'image', $2, $2, $3, $4, $5, 0)`,
-      [work.id, `${baseUrl}/sample.jpg`, 'Demolição e preparo do substrato', 'Remoção de telhas antigas e nivelamento da laje.', OBRA.start_date]
+      [work.id, `${baseUrl}/sample.webp`, 'Demolição e preparo do substrato', 'Remoção de telhas antigas e nivelamento da laje.', OBRA.start_date]
     );
     await db.query(
       `INSERT INTO timeline_entries (work_id, type, media_url, thumbnail_url, title, description, date, "order")
        VALUES ($1, 'image', $2, $2, $3, $4, $5, 1)`,
-      [work.id, `${baseUrl}/sample.jpg`, 'Aplicação da manta EPDM', 'Primeira etapa da impermeabilização concluída.', '2025-02-01']
+      [work.id, `${baseUrl}/sample.webp`, 'Aplicação da manta EPDM', 'Primeira etapa da impermeabilização concluída.', '2025-02-01']
     );
 
     console.log('✅ Obra criada:', work.name);

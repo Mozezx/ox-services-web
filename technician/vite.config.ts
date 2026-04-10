@@ -32,7 +32,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['logo.png'],
+      includeAssets: ['logo.webp'],
       manifest: {
         name: 'OX Technician',
         short_name: 'OX Technician',
@@ -44,8 +44,8 @@ export default defineConfig({
         scope: '/',
         start_url: '/',
         icons: [
-          { src: 'logo.png', sizes: 'any', type: 'image/png', purpose: 'any' },
-          { src: 'logo.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+          { src: 'logo.webp', sizes: 'any', type: 'image/png', purpose: 'any' },
+          { src: 'logo.webp', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
         ]
       },
       workbox: {

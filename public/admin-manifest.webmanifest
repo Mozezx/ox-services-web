@@ -10,13 +10,13 @@
   "start_url": "/admin/index.html",
   "icons": [
     {
-      "src": "/logo.png",
+      "src": "/logo.webp",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/logo.png",
+      "src": "/logo.webp",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -29,21 +29,21 @@
       "short_name": "Agendamentos",
       "description": "Ver novos agendamentos",
       "url": "/admin/index.html#/appointments",
-      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo.webp", "sizes": "192x192" }]
     },
     {
       "name": "Nova Obra",
       "short_name": "Nova Obra",
       "description": "Criar uma nova obra",
       "url": "/admin/index.html?action=create-work",
-      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo.webp", "sizes": "192x192" }]
     },
     {
       "name": "Upload",
       "short_name": "Upload",
       "description": "Fazer upload de imagens",
       "url": "/admin/index.html?action=upload",
-      "icons": [{ "src": "/logo.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/logo.webp", "sizes": "192x192" }]
     }
   ]
 }

@@ -50,7 +50,7 @@ function LayoutInner({ children }: LayoutProps) {
       >
         <div className="p-6 border-b border-primary-light">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="OX Technician" className="w-10 h-10 object-contain flex-shrink-0 rounded-lg bg-white/5" />
+            <img src="/logo.webp" alt="OX Technician" className="w-10 h-10 object-contain flex-shrink-0 rounded-lg bg-white/5" />
             <div className="min-w-0">
               <h1 className="font-bold text-lg truncate">OX Technician</h1>
               <p className="text-sm text-white/70">{t.common.myWorksAndTools}</p>

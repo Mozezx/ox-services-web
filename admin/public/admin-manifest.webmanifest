@@ -9,7 +9,7 @@
   "scope": "/",
   "start_url": "/",
   "icons": [
-    { "src": "/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" },
-    { "src": "/logo.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/logo.webp", "sizes": "any", "type": "image/png", "purpose": "any" },
+    { "src": "/logo.webp", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

@@ -261,7 +261,7 @@ const Timeline = () => {
                           alt={entry.title}
                           className="w-full h-48 md:h-64 object-cover"
                           onError={(e) => {
-                            e.currentTarget.src = '/placeholder.png'
+                            e.currentTarget.src = '/placeholder.webp'
                           }}
                         />
                       ) : (
